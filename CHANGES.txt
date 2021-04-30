@@ -1,0 +1,5 @@
+log of changes with each release:
+------------------------------------------------------------------------------------
+|  Date  |    Prénom Nom     |             mail               |  Commentaire       |
+------------------------------------------------------------------------------------
+30/04/21 - Guillaume Guardia - guardia.1903@apside-groupe.com - Création du package
