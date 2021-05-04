@@ -1,14 +1,24 @@
+# -*- coding: utf-8 -*-
+
 import os
 import re
+from collections import defaultdict
 import yaml
 import pandas as pd
 from PyQt6 import QtWidgets, QtCore
 from pyndf.google_maps_process import DistanceMatrixAPI
+from pyndf.ndf_template import NdfTemplate
 from pyndf.logbook import Logger
 
 
-# Main program of the app
-class Window(QtWidgets.QWidget, Logger):
+class Window(Logger, QtWidgets.QWidget):
+    """Main window of the app
+
+    Args:
+        QtWidgets (Qobject): Qt object
+        Logger (object): For logging
+    """
+
     def __init__(self):
         super().__init__()
 
@@ -22,6 +32,7 @@ class Window(QtWidgets.QWidget, Logger):
 
         # En entrée, feuille excel
         self.sourcefile_x = QtWidgets.QLineEdit()
+        self.sourcefile_x.setText(r"C:\Users\guill\Documents\Projets\NDF_python\venv\src\ndf-python\data\test.xlsx")
         self.sourcefile_x.setDisabled(True)  # must use the file finder to select a valid file.
 
         self.file_select_x = QtWidgets.QPushButton("Select Excel...")
@@ -29,6 +40,7 @@ class Window(QtWidgets.QWidget, Logger):
 
         # En sortie, répertoire de sortie
         self.output = QtWidgets.QLineEdit()
+        self.output.setText(r"C:\Users\guill\Documents\Projets\NDF_python\venv\src\output")
         self.output.setDisabled(True)  # must use the file finder to select a valid file.
 
         self.file_select_output = QtWidgets.QPushButton("Select output...")
@@ -45,18 +57,25 @@ class Window(QtWidgets.QWidget, Logger):
         self.setLayout(layout)
 
     def choose_exl_file(self):
+        """Method which call the native file dialog to choose excel file."""
         filename, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select a file", filter="Excel files (*.xl*)")
         if filename:
             self.sourcefile_x.setText(filename)
 
     def choose_output_file(self):
+        """Method which call the native file dialog to choose the output directory."""
         output = QtWidgets.QFileDialog.getExistingDirectory(self, "Select a folder")
         if output:
             self.output.setText(output)
 
     def generate(self):
+        """Method triggered with the button to start the generation of pdf.
+
+        Returns:
+            [type]: [description]
+        """
         if not self.sourcefile_x.text():
-            return  # If the field is empty, ignore.
+            return None  # If the field is empty, ignore.
 
         self.generate_btn.setDisabled(True)
 
@@ -69,56 +88,81 @@ class Window(QtWidgets.QWidget, Logger):
         # g.signals.finished.connect(self.generated)
         # g.signals.error.connect(print)  # Print errors to console.
         # self.threadpool.start(g)
+        return True
 
     def process(self, data):
+        """Process method
+
+        Args:
+            data (dict): two info: excel file + output directory
+        """
         api = DistanceMatrixAPI(self.configuration)
+        template = NdfTemplate(directory=data.get("output", "."))
         # Open the window, set the file to upload, button to generate NDF
         xl_file = data["sourcefile_x"]
         dataframe = pd.read_excel(xl_file, sheet_name="A")
 
+        records = defaultdict(dict)
+
         # Recuperer les colonnes et les placer dans un dico
         try:
             reg = re.compile("INDEMNITE.*")
-            for index, record in enumerate(dataframe.to_dict("records")):
-                my_record = {}
+            for record in dataframe.to_dict("records"):
+                matricule = record[self.configuration["colonne"]["matricule"]]
 
                 if reg.match(record[self.configuration["colonne"]["libelle"]]) is None:
                     continue
 
+                if matricule not in records:
+                    # Personal info
+                    for key in ("nom", "matricule", "societe", "agence", "agence_o", "adresse_intervenant"):
+                        records[matricule][key] = record[self.configuration["colonne"][key]]
+                        self.log.debug(f"{matricule} | {key} = {records[matricule][key]}")
+                    records[matricule]["missions"] = []
+
+                # Mission Info
+                mission_record = {}
                 for key in (
-                    "nom",
-                    "matricule",
-                    "societe",
-                    "agence",
-                    "agence_o",
-                    "periode_paie",
+                    "periode_production",
                     "client",
                     "adresse_client",
-                    "adresse_intervenant",
                     "quantite_payee",
                     "prix_unitaire",
                     "total",
                 ):
-                    my_record[key] = record[self.configuration["colonne"][key]]
-                    self.log.info(my_record[key])
+                    mission_record[key] = record[self.configuration["colonne"][key]]
+                    self.log.debug(f"{matricule} | missions | {key} = {mission_record[key]}")
+                records[matricule]["missions"].append(mission_record)
 
-                distance, duration = api.run(my_record["adresse_client"], my_record["adresse_intervenant"])
+                distance, duration = api.run(
+                    records[matricule]["missions"][-1]["adresse_client"], records[matricule]["adresse_intervenant"]
+                )
+                self.log.debug(f'Origin: {records[matricule]["missions"][-1]["adresse_client"]}')
+                self.log.debug(f'Destination: {records[matricule]["adresse_intervenant"]}')
+                self.log.debug(f"Distance: {distance}, duration: {duration}")
 
                 # Col Nombre de km par mois
-                my_record["nbrkm_mois"] = my_record["quantite_payee"] * 2 * distance
+                records[matricule]["missions"][-1]["nbrkm_mois"] = (
+                    records[matricule]["missions"][-1]["quantite_payee"] * 2 * distance
+                )
 
                 # Forfait
-                my_record["forfait"] = my_record["total"] / my_record["nbrkm_mois"]
+                records[matricule]["missions"][-1]["forfait"] = (
+                    records[matricule]["missions"][-1]["total"] / records[matricule]["missions"][-1]["nbrkm_mois"]
+                )
 
+            for matricule, data in records.items():
+                self.log.info(f"Start Create pdf for matricule {matricule} with {len(data['missions'])} missions.")
                 # Create pdf facture
-                
-                self.log.info(f"{index}: {my_record}")
+                template.create(data)
+
         except Exception as error:
             self.log.exception(error)
         else:
             self.generated()
 
     def generated(self):
+        """Success methdod"""
         self.generate_btn.setDisabled(False)
         QtWidgets.QMessageBox.information(self, "Finished", "PDFs have been generated")
 

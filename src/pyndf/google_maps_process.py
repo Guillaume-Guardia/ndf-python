@@ -1,15 +1,30 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import re
+import yaml
 import googlemaps
-import pandas as pd
 from pyndf.logbook import Logger
 
 
 class DistanceMatrixAPI(Logger):
-    def __init__(self, configuration):
+    """Class which cover the API of google, adapted for ndf.
+
+    Args:
+        Logger (object): for logging in console.
+    """
+
+    _cache = {}
+
+    def __init__(self, configuration=None):
         super().__init__()
+        if configuration is None:
+            # configuration file
+            conf_file = os.path.join(os.path.dirname(__file__), "conf", "conf.yaml")
+
+            with open(conf_file, "rt", encoding="utf-8") as opened_file:
+                configuration = yaml.safe_load(opened_file)
+
         self.configuration = configuration
         self.key = "AIzaSyBxHUFfYitI-doxwvyAv04rJwop13ktzcM"
         self.language = "fr"
@@ -18,6 +33,15 @@ class DistanceMatrixAPI(Logger):
         self.client = googlemaps.Client(self.key)
 
     def format_address(self, addr):
+        """Formatter of addresses. Each address is returned like:
+        - ROAD, ZIPCODE, CITY
+
+        Args:
+            addr (string): addresse to format
+
+        Returns:
+            string: formatted addresse or "" if no match with the regex.
+        """
         reg = re.compile(r"(?P<road>^.*)(?P<zipcode> \d{5})(?P<city>.*$)")
         match = reg.match(addr)
         if match is not None:
@@ -28,8 +52,21 @@ class DistanceMatrixAPI(Logger):
         return ""
 
     def run(self, origin, destination):
+        """Start the process google matrix api.
+
+        Args:
+            origin (string): origin to evaluate.
+            destination (string): destination to evaluate.
+
+        Returns:
+            (tuple): Returned the result of API: distance between the origin and destination with duration.
+        """
         origin = self.format_address(origin)
         destination = self.format_address(destination)
+
+        if (origin, destination) in self._cache:
+            self.log.info("Find in cache, not use the Google API!")
+            return self._cache[(origin, destination)]
 
         dict_params = dict(
             origins=origin,
@@ -60,5 +97,7 @@ class DistanceMatrixAPI(Logger):
         # conversion de m en km
         distance = element["distance"]["value"] / 1000
         duration = element["duration"]["value"]
+
+        self._cache[(origin, destination)] = distance, duration
 
         return distance, duration
