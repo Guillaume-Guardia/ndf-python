@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import os
 import re
-import yaml
 import googlemaps
-from pyndf.logbook import Logger
+from pyndf.logbook import Logger, log_time
+from pyndf.constants import CONFIG
 
 
 class DistanceMatrixAPI(Logger):
@@ -16,20 +15,13 @@ class DistanceMatrixAPI(Logger):
 
     _cache = {}
 
-    def __init__(self, configuration=None):
+    def __init__(self):
         super().__init__()
-        if configuration is None:
-            # configuration file
-            conf_file = os.path.join(os.path.dirname(__file__), "conf", "conf.yaml")
 
-            with open(conf_file, "rt", encoding="utf-8") as opened_file:
-                configuration = yaml.safe_load(opened_file)
-
-        self.configuration = configuration
-        self.key = "AIzaSyBxHUFfYitI-doxwvyAv04rJwop13ktzcM"
-        self.language = "fr"
-        self.mode = configuration["mode"]["DRIVING"]
-        self.unit = configuration["units"]["METERS"]
+        self.key = CONFIG["distance_params"]["key"]
+        self.language = CONFIG["distance_params"]["language"]
+        self.mode = CONFIG["distance_params"]["mode"]
+        self.unit = CONFIG["distance_params"]["unit"]
         self.client = googlemaps.Client(self.key)
 
     def format_address(self, addr):
@@ -51,6 +43,7 @@ class DistanceMatrixAPI(Logger):
             return ",".join([road, code, city])
         return ""
 
+    @log_time
     def run(self, origin, destination):
         """Start the process google matrix api.
 
@@ -61,12 +54,13 @@ class DistanceMatrixAPI(Logger):
         Returns:
             (tuple): Returned the result of API: distance between the origin and destination with duration.
         """
+        self.log.debug(f"Start calcul the distance between {origin} and {destination}.")
         origin = self.format_address(origin)
         destination = self.format_address(destination)
 
         if (origin, destination) in self._cache:
-            self.log.info("Find in cache, not use the Google API!")
-            return self._cache[(origin, destination)]
+            self.log.info(f"Status: {CONFIG['good_status'][1]} || Result: {self._cache[(origin, destination)]}")
+            return CONFIG["good_status"][1], self._cache[(origin, destination)]
 
         dict_params = dict(
             origins=origin,
@@ -75,24 +69,23 @@ class DistanceMatrixAPI(Logger):
             mode=self.mode,
             units=self.unit,
         )
-
         result = self.client.distance_matrix(**dict_params)
-        self.log.info(result)
 
         # Check status result
         top_status = result["status"]
 
-        if top_status != self.configuration["status"]["OK"]:
-            self.log.warning(f"Resultat pas ok: {top_status}")
+        if top_status in CONFIG["bad_status"]["Top"]:
+            self.log.warning(f"Status: {top_status} || Result: None")
+            return top_status, None
 
         # Informations sur le trajet : duree et distance "elements"
         # Check status element
         element = result["rows"][0]["elements"][0]
         element_status = element["status"]
 
-        if element_status != self.configuration["status"]["OK"]:
-            self.log.warning(f"Element not OK: {element_status}")
-            self.log.warning("Lieu(x) introuvable(s)")
+        if element_status in CONFIG["bad_status"]["Element"]:
+            self.log.warning(f"Status: {element_status} || Result: None")
+            return element_status, None
 
         # conversion de m en km
         distance = element["distance"]["value"] / 1000
@@ -100,4 +93,5 @@ class DistanceMatrixAPI(Logger):
 
         self._cache[(origin, destination)] = distance, duration
 
-        return distance, duration
+        self.log.info(f"Status: {element_status} || Result: {(distance, duration)}")
+        return element_status, (distance, duration)

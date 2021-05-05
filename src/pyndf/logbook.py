@@ -2,12 +2,7 @@
 
 from time import time
 import logging
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="[%(asctime)s.%(msecs)03d] [%(levelname)s] %(name)s: %(message)s",
-    datefmt="%d-%b-%y %H:%M:%S",
-)
+from colorlog import ColoredFormatter
 
 
 class Logger:
@@ -16,7 +11,30 @@ class Logger:
     def __init__(self, *args, **kwargs):
         """Initialisation method"""
         super().__init__(*args, **kwargs)
-        self.log = logging.getLogger(self.__class__.__name__)
+        self.log = self.setup_logger()
+
+    def setup_logger(self):
+        """Return a logger with a default ColoredFormatter."""
+        formatter = ColoredFormatter(
+            "%(log_color)s[%(asctime)s.%(msecs)03d][%(levelname)-8s] %(name)-20s: %(reset)s%(white)s%(message)s",
+            datefmt="%d-%b-%y %H:%M:%S",
+            reset=True,
+            log_colors={
+                "DEBUG": "cyan",
+                "INFO": "green",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "red",
+            },
+        )
+
+        logger = logging.getLogger(self.__class__.__name__)
+        handler = logging.StreamHandler()
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+
+        return logger
 
 
 def log_time(func):
@@ -28,13 +46,12 @@ def log_time(func):
     Returns:
         ?: result of the wrapped function.
     """
-    log = logging.getLogger("Time")
 
     def wrapper(*args, **kwargs):
         start = time()
-        log.info(f"START {func.__name__}")
+        args[0].log.info(f"START {func.__name__}")
         result = func(*args, **kwargs)
-        log.info(f"END {time() - start}")
+        args[0].log.info(f"END {func.__name__} {time() - start}\n")
         return result
 
     return wrapper

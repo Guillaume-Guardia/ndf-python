@@ -1,3 +1,9 @@
+distance_params:
+  key: AIzaSyBxHUFfYitI-doxwvyAv04rJwop13ktzcM
+  language: fr
+  mode: driving # driving, walking, bicycling, transit
+  unit: metric # metric, imperial
+
 colonne:
   nom: Nom
   code: Code\nIntervenant
@@ -34,49 +40,43 @@ colonne:
   analytique_4: Analytique 4
   analytique_5: Analytique 5
 
-mode:
-  DRIVING: "driving"
-  WALKING: "walking"
-  BIKE: "bicycling"
-  TRANSIT: "transit"
+colonne_perso:
+  - nom
+  - matricule
+  - societe
+  - agence
+  - agence_o
+  - adresse_intervenant
 
-units:
-  METERS: "metric"
-  IMPERIAL: "imperial"
+colonne_mission:
+  - periode_production
+  - client
+  - adresse_client
+  - quantite_payee
+  - prix_unitaire
+  - total
 
-status:
-  OK: "OK"  # indicates the response contains a valid result.
-  TopLevelStatus:
-    INVALID_REQUEST: "INVALID_REQUEST"  # indicates that the provided request was invalid.
+good_status:
+  - OK  # indicates the response contains a valid result.
+  - CACHE # indicates no use of API, use cache class.
 
-    # indicates that the product of origins and destinations exceeds the per-query limit.
-    # -> 100 elements by request
-    MAX_ELEMENTS_EXCEEDED: "MAX_ELEMENTS_EXCEEDED"
-
-    # indicates that the number of origins or destinations exceeds the per-query limit.
-    # -> 25 origins or 25 detinations
-    MAX_DIMENSIONS_EXCEEDED: "MAX_DIMENSIONS_EXCEEDED"
+bad_status:
+  Top:
+    - INVALID_REQUEST  # indicates that the provided request was invalid.
+    - MAX_ELEMENTS_EXCEEDED # > 100 elements by request
+    - MAX_DIMENSIONS_EXCEEDED # rqt > 25 origins or 25 detinations
+    - OVER_QUERY_LIMIT # > 1000 elements / second
+    - REQUEST_DENIED
+    - UNKNOWN_ERROR # Server Error -> Try again.
 
     # indicates any of the following:
     # The API key is missing or invalid.
     # Billing has not been enabled on your account.
     # A self-imposed usage cap has been exceeded.
     # The provided method of payment is no longer valid (for example, a credit card has expired).
-    OVER_DAILY_LIMIT: "OVER_DAILY_LIMIT"
+    - OVER_DAILY_LIMIT
 
-    # indicates the service has received too many requests from your application within the allowed time period.
-    # 1000 elements / second
-    OVER_QUERY_LIMIT: "OVER_QUERY_LIMIT"
-
-    # indicates that the service denied use of the Distance Matrix service by your application.
-    REQUEST_DENIED: "REQUEST_DENIED"
-
-    # indicates a Distance Matrix request could not be processed due to a server error. The request may succeed if you try again.
-    UNKNOWN_ERROR: "UNKNOWN_ERROR"
-
-  ElementLevelStatus:
-    NOT_FOUND: "NOT_FOUND"  # indicates that the origin and/or destination of this pairing could not be geocoded.
-    ZERO_RESULTS: "ZERO_RESULTS"  # indicates no route could be found between the origin and destination.
-
-    # indicates the requested route is too long and cannot be processed.
-    MAX_ROUTE_LENGTH_EXCEEDED: "MAX_ROUTE_LENGTH_EXCEEDED"
+  Element:
+    - NOT_FOUND  # indicates that the origin and/or destination of this pairing could not be geocoded.
+    - ZERO_RESULTS  # indicates no route could be found between the origin and destination.
+    - MAX_ROUTE_LENGTH_EXCEEDED # indicates the requested route is too long and cannot be processed.

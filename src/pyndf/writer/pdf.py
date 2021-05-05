@@ -15,6 +15,7 @@ from reportlab.platypus.tables import Table, TableStyle
 from reportlab.platypus.paragraph import Paragraph
 
 from pyndf.logbook import Logger, log_time
+from pyndf.constants import LOGO, CONFIG
 
 UNKNOWN = "Inconnu"
 stylesheet = getSampleStyleSheet()
@@ -22,7 +23,7 @@ stylesheet.add(ParagraphStyle(name="Justify", parent=stylesheet["Normal"], align
 stylesheet.add(ParagraphStyle(name="Center", parent=stylesheet["Normal"], alignment=TA_CENTER))
 
 
-class NdfTemplate(Logger, BaseDocTemplate):
+class PdfWriter(Logger, BaseDocTemplate):
     """NDF template adapted for the NDF apside based on BaseDocTemplate.
 
     Args:
@@ -59,10 +60,7 @@ class NdfTemplate(Logger, BaseDocTemplate):
             # header
             canvas.drawRightString(10.5 * inch, 8 * inch, f"{self.date} {self.version}")
             # Set Image
-            apside_logo = os.path.join(os.path.dirname(__file__), "data", "apside-logo.png")
-            canvas.drawImage(
-                apside_logo, 0.5 * inch, 8 * inch, width=2.5 * cm, height=-2.5 * cm, preserveAspectRatio=True
-            )
+            canvas.drawImage(LOGO, 0.5 * inch, 8 * inch, width=2.5 * cm, height=-2.5 * cm, preserveAspectRatio=True)
 
         if add_footer:
             # footer
@@ -82,7 +80,6 @@ class NdfTemplate(Logger, BaseDocTemplate):
 
     def build(self, *args, **kwargs):
         self._calc()  # in case we changed margins sizes etc
-        self.log.info([self.leftMargin, self.bottomMargin, self.width, self.height])
         frame = Frame(self.leftMargin, self.bottomMargin, self.width, self.height, id="normal")
         self.addPageTemplates(PageTemplate(frames=frame, onPage=self.all_page_setup, pagesize=self.pagesize))
         super().build(*args, **kwargs)
@@ -115,40 +112,55 @@ class NdfTemplate(Logger, BaseDocTemplate):
         Returns:
             Table: returned table with style.
         """
-        data = []
-        data.append(
-            [
-                Paragraph("Nom du client", stylesheet["Center"]),
-                Paragraph("Période", stylesheet["Center"]),
-                Paragraph("Adresse de réalisation", stylesheet["Center"]),
-                Paragraph("Nombre de Kilomètres/mois", stylesheet["Center"]),
-                Paragraph("Taux", stylesheet["Center"]),
-                Paragraph("Plafond Apside", stylesheet["Center"]),
-                Paragraph("Montant Total", stylesheet["Center"]),
-            ]
-        )
+        data = [[]]
+        for name in (
+            "Nom du client",
+            "Période",
+            "Adresse de réalisation",
+            "Nombre de Kilomètres/mois",
+            "Taux",
+            "Plafond Apside",
+            "Montant Total",
+        ):
+            data[0].append(Paragraph(name, stylesheet["Center"]))
         nbrkm_mois = 0
         quantite_payee = 0
         total = 0
         prix_unitaire = 0
+
+        error = False
+
         for mission in record.get("missions", {}):
+            if mission["status"] not in CONFIG["good_status"]:
+                error = True
+                break
+
             nbrkm_mois += mission.get("nbrkm_mois", 0)
             quantite_payee += mission.get("quantite_payee", 0)
             total += mission.get("total", 0)
             prix_unitaire = max(mission.get("prix_unitaire", 0), prix_unitaire)
 
         for mission in record.get("missions", {}):
-            data.append(
-                [
-                    Paragraph(mission.get("client", UNKNOWN), stylesheet["Justify"]),
-                    mission.get("periode_production", UNKNOWN),
-                    Paragraph(mission.get("adresse_client", UNKNOWN), stylesheet["Justify"]),
-                    round(nbrkm_mois, 2),
-                    round(quantite_payee, 2),
-                    round(prix_unitaire, 2),
-                    round(total, 2),
-                ]
-            )
+            if not error:
+                data.append(
+                    [
+                        Paragraph(mission.get("client", UNKNOWN), stylesheet["Justify"]),
+                        mission.get("periode_production", UNKNOWN),
+                        Paragraph(mission.get("adresse_client", UNKNOWN), stylesheet["Justify"]),
+                        round(nbrkm_mois, 2),
+                        round(quantite_payee, 2),
+                        round(prix_unitaire, 2),
+                        round(total, 2),
+                    ]
+                )
+            else:
+                data.append(
+                    [
+                        Paragraph(mission.get("client", UNKNOWN), stylesheet["Justify"]),
+                        Paragraph(mission.get("adresse_client", UNKNOWN), stylesheet["Justify"]),
+                        mission.get("status"),
+                    ]
+                )
 
         table = Table(
             data,
@@ -168,21 +180,24 @@ class NdfTemplate(Logger, BaseDocTemplate):
             ]
         )
 
-        # Merge
-        for i in (1, 3, 4, 5, 6):
-            style.add("SPAN", (i, 1), (i, -1))
+        if not error:
+            # Merge
+            for i in (1, 3, 4, 5, 6):
+                style.add("SPAN", (i, 1), (i, -1))
 
         table.setStyle(style)
         return table
 
     @log_time
-    def create(self, data):
+    def write(self, data):
         """Create method, add each element of pdf.
 
         Args:
             data (dict): record data with personnal info of collaborator and his missions info.
         """
-        filename = f"{data.get('agence', UNKNOWN)}_{data.get('matricule', UNKNOWN)}_{self.date}"
+        matricule = data.get("matricule", UNKNOWN)
+        self.log.info(f"Start Create pdf for matricule {matricule} with {len(data['missions'])} missions.")
+        filename = f"{data.get('agence', UNKNOWN)}_{matricule}_{self.date}"
 
         paragraphs = []
         # add some flowables
