@@ -30,7 +30,7 @@ class ExcelReader(Logger):
         for record in dataframe.to_dict("records"):
             matricule = record[CONFIG[COL]["matricule"]]
 
-            if self.reg.match(record[CONFIG[COL]["libelle"]]) is None:
+            if self.reg.match(str(record[CONFIG[COL]["libelle"]])) is None:
                 continue
 
             if matricule not in records:

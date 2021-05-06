@@ -1,68 +1,72 @@
 # -*- coding: utf-8 -*-
 
+import sys
 from PyQt6 import QtWidgets, QtCore
 from pyndf.logbook import Logger
 from pyndf.process.thread import Thread
 
 
-class Window(Logger, QtWidgets.QWidget):
-    """Main window of the app
+class MainWindow(Logger, QtWidgets.QMainWindow):
+    """Main window of the app"""
 
-    Args:
-        QtWidgets (Qobject): Qt object
-        Logger (object): For logging
-    """
-
-    def __init__(self):
+    def __init__(self, data_file="", output_directory=""):
         super().__init__()
         self.threadpool = QtCore.QThreadPool()
 
-        # En entrée, feuille excel
-        self.sourcefile_x = QtWidgets.QLineEdit()
-        self.sourcefile_x.setText(r"C:\Users\guill\Documents\Projets\NDF_python\venv\src\ndf-python\data\test.xlsx")
-        self.sourcefile_x.setDisabled(True)  # must use the file finder to select a valid file.
+        self.setWindowTitle("pyNDF")
+        self.setWindowIcon(self.style().standardIcon(self.style().StandardPixmap.SP_TitleBarMenuButton))
+        self.setMinimumSize(1000, 200)
 
-        self.file_select_x = QtWidgets.QPushButton("Select Excel...")
-        self.file_select_x.pressed.connect(self.choose_exl_file)
+        self.buttons = {}
+        self.texts = {}
+
+        # En entrée, feuille excel
+        self.add_button("excel", "(*.xl*)", default=data_file)
 
         # En sortie, répertoire de sortie
-        self.output = QtWidgets.QLineEdit()
-        self.output.setText(r"C:\Users\guill\Documents\Projets\NDF_python\venv\src\output")
-        self.output.setDisabled(True)  # must use the file finder to select a valid file.
-
-        self.file_select_output = QtWidgets.QPushButton("Select output directory...")
-        self.file_select_output.pressed.connect(self.choose_output_file)
+        self.add_button("output", default=output_directory)
 
         self.generate_btn = QtWidgets.QPushButton("Generate PDF")
         self.generate_btn.pressed.connect(self.generate)
 
         layout = QtWidgets.QFormLayout()
-        layout.addRow(self.sourcefile_x, self.file_select_x)
-        layout.addRow(self.output, self.file_select_output)
+
+        for text, button in zip(self.texts.values(), self.buttons.values()):
+            layout.addRow(text, button)
         layout.addRow(self.generate_btn)
 
-        self.setLayout(layout)
+        widget = QtWidgets.QWidget()
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
 
-    def choose_exl_file(self):
-        """Method which call the native file dialog to choose excel file."""
-        filename, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select a file", filter="Excel files (*.xl*)")
-        if filename:
-            self.sourcefile_x.setText(filename)
+    def add_button(self, name, _format=None, default=""):
+        self.texts[name] = QtWidgets.QLineEdit()
+        self.texts[name].setText(default)
+        self.texts[name].setMinimumWidth(800)
+        self.texts[name].setDisabled(True)  # must use the file finder to select a valid file.
 
-    def choose_output_file(self):
-        """Method which call the native file dialog to choose the output directory."""
-        output = QtWidgets.QFileDialog.getExistingDirectory(self, "Select a folder")
-        if output:
-            self.output.setText(output)
+        self.buttons[name] = QtWidgets.QPushButton(f"Select {name.capitalize()}...")
+        self.buttons[name].setMaximumWidth(200)
+        self.buttons[name].pressed.connect(lambda: self.choose(name, _format))
+
+    def choose(self, name, _format):
+        """Method which call the native file dialog to choose file."""
+        if _format is None:
+            path = QtWidgets.QFileDialog.getExistingDirectory(self, "Select a folder")
+        else:
+            path, _ = QtWidgets.QFileDialog.getOpenFileName(
+                self, "Select a file", filter=f"{name.capitalize()} files {_format}"
+            )
+        if path:
+            self.texts[name].setText(path)
 
     def generate(self):
         """Method triggered with the button to start the generation of pdf."""
-        if not self.sourcefile_x.text() or not self.output.text():
-            return None  # If the field is empty, ignore.
+        if not all([t.text() for t in self.texts.values()]):
+            return None  # If one field is empty, ignore.
 
         self.generate_btn.setDisabled(True)
-
-        process = Thread(self.sourcefile_x.text(), self.output.text())
+        process = Thread(*[t.text() for t in self.texts.values()])
         process.signals.finished.connect(self.generated)
         self.threadpool.start(process)
         return True
@@ -75,6 +79,8 @@ class Window(Logger, QtWidgets.QWidget):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
-    w = Window()
+    file_ = "C:/Users/guill/Documents/Projets/NDF_python/venv/src/ndf-python/data/test.xlsx"
+    direct = "C:/Users/guill/Documents/Projets/NDF_python/venv/src/output"
+    w = MainWindow(file_, direct)
     w.show()
-    app.exec()
+    sys.exit(app.exec())

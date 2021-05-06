@@ -11,6 +11,7 @@ class Logger:
     def __init__(self, *args, **kwargs):
         """Initialisation method"""
         super().__init__(*args, **kwargs)
+        self.log_level = logging.INFO
         self.log = self.setup_logger()
 
     def setup_logger(self):
@@ -29,10 +30,12 @@ class Logger:
         )
 
         logger = logging.getLogger(self.__class__.__name__)
-        handler = logging.StreamHandler()
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        logger.setLevel(logging.INFO)
+        logger.setLevel(self.log_level)
+
+        if len(logger.handlers) == 0:
+            handler = logging.StreamHandler()
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
 
         return logger
 
@@ -51,7 +54,7 @@ def log_time(func):
         start = time()
         args[0].log.info(f"START {func.__name__}")
         result = func(*args, **kwargs)
-        args[0].log.info(f"END {func.__name__} {time() - start}\n")
+        args[0].log.info(f"END {func.__name__} {round(time() - start, 5)} .")
         return result
 
     return wrapper

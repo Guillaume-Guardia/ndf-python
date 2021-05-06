@@ -13,3 +13,6 @@ LOGO = os.path.join(os.path.dirname(__file__), "data", "apside-logo.png")
 CONF_FILE = os.path.join(os.path.dirname(__file__), "conf", "conf.yaml")
 with open(CONF_FILE, "rt", encoding="utf-8") as opened_file:
     CONFIG = yaml.safe_load(opened_file)
+
+# DB file
+DB_FILE = os.path.join(os.path.dirname(__file__), "db", "pydb.db")

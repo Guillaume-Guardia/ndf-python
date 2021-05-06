@@ -59,6 +59,7 @@ colonne_mission:
 good_status:
   - OK  # indicates the response contains a valid result.
   - CACHE # indicates no use of API, use cache class.
+  - DB # indicates no use of API, use cache class.
 
 bad_status:
   Top:

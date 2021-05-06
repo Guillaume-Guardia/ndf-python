@@ -40,7 +40,7 @@ class Thread(Logger, QtCore.QRunnable):
             reader = ExcelReader(self.data_file, "A")
             records = reader.read()
 
-            # Calcul distance between origin and destination with google API
+            # Calcul distance between adresse_client and adresse_intervenant with google API
             api = DistanceMatrixAPI()
             for record in records.values():
                 for mission in record["missions"]:
