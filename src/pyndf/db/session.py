@@ -16,7 +16,7 @@ from pyndf.db.measure import Measure
 class Database(Logger):
     DB_ENGINE = {"sqlite": "sqlite:///{DB}"}
 
-    def __init__(self, dbtype, dbname="", base=None):
+    def __init__(self, dbtype, dbname="", base=None, verbose=False):
         super().__init__()
         self.base = base
         if dbtype in self.DB_ENGINE:
@@ -25,7 +25,7 @@ class Database(Logger):
             self.engine_url = "sqlite:///:memory:"
             self.log.warning("DBType is not found in DB_ENGINE")
 
-        self.db_engine = create_engine(self.engine_url, echo=True)
+        self.db_engine = create_engine(self.engine_url, echo=verbose)
         self.session = sessionmaker(bind=self.db_engine)
         with self.session_scope() as session:
             self.base.metadata.create_all(self.db_engine)
@@ -45,15 +45,6 @@ class Database(Logger):
             raise
         finally:
             db_session.close()
-
-    def get_or_insert(self, session, db_object):
-        try:
-            session.add(db_object)
-            session.flush()
-            return db_object.id
-        except IntegrityError:
-            # Exists
-            return None
 
 
 db = Database(dbtype="sqlite", dbname=DB_FILE, base=Base)

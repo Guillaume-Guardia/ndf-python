@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
 
 from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
 from pyndf.db.base import Base
 
 
 class Client(Base):
     """Db class"""
 
+    # Employee relation many to many -> backref
+
+    # Measure relation many to one
+    measures = relationship("Measure")
+
+    # Real attribute
     address = Column(String, nullable=False, unique=True)

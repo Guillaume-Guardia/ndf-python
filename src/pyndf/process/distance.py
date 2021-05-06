@@ -121,27 +121,32 @@ class DistanceMatrixAPI(Logger):
         with db.session_scope() as session:
             # Check if client or employee exists
             new_client = Client(address=client_address)
-            new_employee = Client(address=employee_address)
-            add_measure = False
-
             if session.query(Client).filter(Client.address == client_address).first() is None:
+                self.log.info(f"Add new client {new_client}")
                 session.add(new_client)
-                add_measure = True
 
+            new_employee = Employee(address=employee_address)
             if session.query(Employee).filter(Employee.address == employee_address).first() is None:
+                self.log.info(f"Add new employee {new_employee}")
                 session.add(new_employee)
-                add_measure = True
 
             session.flush()
 
-            if add_measure:
-                new_measure = Measure(
-                    client_address=client_address,
-                    employee_address=employee_address,
-                    distance=distance,
-                    duration=duration,
-                )
-                session.add(new_measure)
+            # Add relation between client and employee
+            employee = session.query(Employee).filter(Employee.address == employee_address).first()
+            client = session.query(Client).filter(Client.address == client_address).first()
+
+            if client not in employee.clients:
+                employee.clients.append(client)
+
+            new_measure = Measure(
+                client=client,
+                employee=employee,
+                distance=distance,
+                duration=duration,
+            )
+            self.log.info(f"Add new measure {new_measure}")
+            session.add(new_measure)
 
         self.log.info(f"Status: {element_status} || Result: {(distance, duration)}")
         return element_status, (distance, duration)
