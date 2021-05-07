@@ -59,9 +59,7 @@ class Thread(Logger, QtCore.QRunnable):
             writer = PdfWriter(directory=self.output_directory)
             n = len(records)
             for index, record in enumerate(records.values()):
-                status = writer.write(record)
-                if status is False:
-                    self.log.warning(f"{index} error !")
+                writer.write(record)
                 self.signals.progressed.emit(70 + (index / n) * 30)
 
         except Exception as error:

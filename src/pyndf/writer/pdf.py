@@ -58,7 +58,7 @@ class PdfWriter(Logger, BaseDocTemplate):
 
         if add_header:
             # header
-            canvas.drawRightString(10.5 * inch, 8 * inch, f"{self.date} {self.version}")
+            canvas.drawRightString(10.5 * inch, 8 * inch, f"{self.date}")
             # Set Image
             canvas.drawImage(LOGO, 0.5 * inch, 8 * inch, width=2.5 * cm, height=-2.5 * cm, preserveAspectRatio=True)
 
@@ -66,6 +66,7 @@ class PdfWriter(Logger, BaseDocTemplate):
             # footer
             canvas.drawString(0.5 * inch, 0.5 * inch, "Apside Groupe")
             canvas.drawCentredString(self.pagesize[0] / 2, 0.5 * inch, f"- {doc.page} -")
+            canvas.drawRightString(10.5 * inch, 0.5 * inch, f"{self.version}")
 
         if add_watermark:
             # Move the origin to middle, and after rotate the image
@@ -112,6 +113,7 @@ class PdfWriter(Logger, BaseDocTemplate):
         Returns:
             Table: returned table with style.
         """
+        memory_mission = []
         data = [[]]
         for name in (
             "Nom du client",
@@ -141,23 +143,27 @@ class PdfWriter(Logger, BaseDocTemplate):
             prix_unitaire = max(mission.get("prix_unitaire", 0), prix_unitaire)
 
         for mission in record.get("missions", {}):
+            client = mission.get("client", UNKNOWN)
+            address = mission.get("adresse_client", UNKNOWN)
             if not error:
-                data.append(
-                    [
-                        Paragraph(mission.get("client", UNKNOWN), stylesheet["Justify"]),
-                        mission.get("periode_production", UNKNOWN),
-                        Paragraph(mission.get("adresse_client", UNKNOWN), stylesheet["Justify"]),
-                        round(nbrkm_mois, 2),
-                        round(quantite_payee, 2),
-                        round(prix_unitaire, 2),
-                        round(total, 2),
-                    ]
-                )
+                if (client, address) not in memory_mission:
+                    data.append(
+                        [
+                            Paragraph(client, stylesheet["Justify"]),
+                            mission.get("periode_production", UNKNOWN),
+                            Paragraph(address, stylesheet["Justify"]),
+                            round(nbrkm_mois, 2),
+                            round(quantite_payee, 2),
+                            round(prix_unitaire, 2),
+                            round(total, 2),
+                        ]
+                    )
+                    memory_mission.append((client, address))
             else:
                 data.append(
                     [
-                        Paragraph(mission.get("client", UNKNOWN), stylesheet["Justify"]),
-                        Paragraph(mission.get("adresse_client", UNKNOWN), stylesheet["Justify"]),
+                        Paragraph(client, stylesheet["Justify"]),
+                        Paragraph(address, stylesheet["Justify"]),
                         mission.get("status"),
                     ]
                 )
@@ -213,9 +219,8 @@ class PdfWriter(Logger, BaseDocTemplate):
 
         try:
             self.build(paragraphs, path)
-        except:
-            return False
-        return True
+        except Exception as e:
+            self.log.exception(e)
 
     def check_path(self, filename, ext="pdf", force=True):
         """Check path method.
