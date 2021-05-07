@@ -105,7 +105,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
     def progressed(self, value):
         if value <= 100:
-            self.progress.setValue(value)
+            self.progress.setValue(int(value))
 
     def generated(self):
         """Success methdod"""

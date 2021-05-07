@@ -76,7 +76,6 @@ class DistanceMatrixAPI(Logger):
                 .filter(Measure.employee_address == employee_address)
                 .first()
             )
-            self.log.info(f"Result measure in DB: {measure}")
 
             if measure:
                 # Add in cache

@@ -38,7 +38,7 @@ class Thread(Logger, QtCore.QRunnable):
         """Run method"""
         try:
             # Read Excel file
-            reader = ExcelReader(self.data_file, "A")
+            reader = ExcelReader(self.data_file)
             records = reader.read(progress_callback=self.signals.progressed.emit, p=20)
 
             # Calcul distance between adresse_client and adresse_intervenant with google API

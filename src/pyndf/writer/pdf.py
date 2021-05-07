@@ -142,6 +142,14 @@ class PdfWriter(Logger, BaseDocTemplate):
             total += mission.get("total", 0)
             prix_unitaire = max(mission.get("prix_unitaire", 0), prix_unitaire)
 
+        nbrkm_mois = round(nbrkm_mois, 2)
+        quantite_payee = round(quantite_payee, 2)
+        prix_unitaire = round(prix_unitaire, 2)
+        total = round(total, 2)
+
+        if nbrkm_mois / quantite_payee > 100:
+            nbrkm_mois = f"> {100 * quantite_payee}"
+
         for mission in record.get("missions", {}):
             client = mission.get("client", UNKNOWN)
             address = mission.get("adresse_client", UNKNOWN)
@@ -152,10 +160,10 @@ class PdfWriter(Logger, BaseDocTemplate):
                             Paragraph(client, stylesheet["Justify"]),
                             mission.get("periode_production", UNKNOWN),
                             Paragraph(address, stylesheet["Justify"]),
-                            round(nbrkm_mois, 2),
-                            round(quantite_payee, 2),
-                            round(prix_unitaire, 2),
-                            round(total, 2),
+                            nbrkm_mois,
+                            quantite_payee,
+                            prix_unitaire,
+                            total,
                         ]
                     )
                     memory_mission.append((client, address))
