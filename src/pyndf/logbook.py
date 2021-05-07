@@ -52,7 +52,7 @@ def log_time(func):
 
     def wrapper(*args, **kwargs):
         start = time()
-        args[0].log.info(f"START {func.__name__}")
+        # args[0].log.info(f"START {func.__name__}")
         result = func(*args, **kwargs)
         args[0].log.info(f"END {func.__name__:*<70} {round(time() - start, 5)}s")
         return result

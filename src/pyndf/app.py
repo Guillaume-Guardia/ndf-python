@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from PyQt6 import QtWidgets, QtCore
+from PyQt6 import QtWidgets, QtCore, QtGui
 from pyndf.logbook import Logger
 from pyndf.process.thread import Thread
+from pyndf.constants import CONFIG
 
 
 class MainWindow(Logger, QtWidgets.QMainWindow):
     """Main window of the app"""
 
-    def __init__(self, data_file="", output_directory=""):
+    def __init__(self, data_file="", output_directory="", resolution=None):
         super().__init__()
         self.threadpool = QtCore.QThreadPool()
 
         self.setWindowTitle("pyNDF")
         self.setWindowIcon(self.style().standardIcon(self.style().StandardPixmap.SP_TitleBarMenuButton))
-        self.setMinimumSize(1000, 200)
+        if resolution:
+            self.setFixedWidth(int(resolution.width() / 2))
+            self.setFixedHeight(int(resolution.height() / 8))
 
         self.buttons = {}
         self.texts = {}
@@ -27,17 +30,39 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.add_button("output", default=output_directory)
 
         self.generate_btn = QtWidgets.QPushButton("Generate PDF")
+        self.generate_btn.setStyleSheet(CONFIG["buttonstyle"])
         self.generate_btn.pressed.connect(self.generate)
+        self.generate_btn.setFixedWidth(int(self.width() * 0.2))
 
-        layout = QtWidgets.QFormLayout()
+        layout = QtWidgets.QGridLayout()
 
-        for text, button in zip(self.texts.values(), self.buttons.values()):
-            layout.addRow(text, button)
-        layout.addRow(self.generate_btn)
+        for index, (text, button) in enumerate(zip(self.texts.values(), self.buttons.values())):
+            hlay2 = QtWidgets.QHBoxLayout()
+            hlay2.setContentsMargins(0, 0, 0, 0)
+
+            hlay2.addWidget(text)
+            hlay2.addStretch()
+            hlay2.addWidget(button)
+
+            new_widget = QtWidgets.QWidget()
+            new_widget.setLayout(hlay2)
+
+            layout.addWidget(new_widget, index, 0)
+
+        hlay2 = QtWidgets.QHBoxLayout()
+        hlay2.setContentsMargins(0, 0, 0, 0)
+        hlay2.addStretch()
+        hlay2.addWidget(self.generate_btn)
+        hlay2.addStretch()
+
+        new_widget = QtWidgets.QWidget()
+        new_widget.setLayout(hlay2)
+
+        layout.addWidget(new_widget, 2, 0)
 
         self.progress = QtWidgets.QProgressBar()
         self.progress.hide()
-        layout.addRow(self.progress)
+        layout.addWidget(self.progress)
 
         widget = QtWidgets.QWidget()
         widget.setLayout(layout)
@@ -46,12 +71,13 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
     def add_button(self, name, _format=None, default=""):
         self.texts[name] = QtWidgets.QLineEdit()
         self.texts[name].setText(default)
-        self.texts[name].setMinimumWidth(800)
+        self.texts[name].setFixedWidth(int(self.width() * 0.7))
         self.texts[name].setDisabled(True)  # must use the file finder to select a valid file.
 
         self.buttons[name] = QtWidgets.QPushButton(f"Select {name.capitalize()}...")
-        self.buttons[name].setMaximumWidth(200)
+        self.buttons[name].setFixedWidth(int(self.width() * 0.2))
         self.buttons[name].pressed.connect(lambda: self.choose(name, _format))
+        self.buttons[name].setStyleSheet(CONFIG["buttonstyle"])
 
     def choose(self, name, _format):
         """Method which call the native file dialog to choose file."""
@@ -93,6 +119,8 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication([])
     file_ = "C:/Users/guill/Documents/Projets/NDF_python/venv/src/ndf-python/data/test.xlsx"
     direct = "C:/Users/guill/Documents/Projets/NDF_python/venv/src/output"
-    w = MainWindow(file_, direct)
+
+    resolution = app.primaryScreen().availableSize()
+    w = MainWindow(file_, direct, resolution=resolution)
     w.show()
     sys.exit(app.exec())
