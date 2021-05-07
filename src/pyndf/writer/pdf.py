@@ -198,6 +198,7 @@ class PdfWriter(Logger, BaseDocTemplate):
         matricule = data.get("matricule", UNKNOWN)
         self.log.info(f"Start Create pdf for matricule {matricule} with {len(data['missions'])} missions.")
         filename = f"{data.get('agence', UNKNOWN)}_{matricule}_{self.date}"
+        path = self.check_path(filename)
 
         paragraphs = []
         # add some flowables
@@ -209,8 +210,12 @@ class PdfWriter(Logger, BaseDocTemplate):
         paragraphs.append(self.create_table_missions(data))
 
         paragraphs.append(Paragraph("<b>NB: Carte grise à disposition de la direction.</b>", stylesheet["Normal"]))
-        path = self.check_path(filename)
-        self.build(paragraphs, path)
+
+        try:
+            self.build(paragraphs, path)
+        except:
+            return False
+        return True
 
     def check_path(self, filename, ext="pdf", force=True):
         """Check path method.

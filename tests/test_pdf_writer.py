@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 
+import os
 import unittest
-from pyndf.ndf_template import NdfTemplate
+import tempfile
+import shutil
+from pyndf.writer.pdf import PdfWriter
 
 
-class TestAddress(unittest.TestCase):
-    """Test Class
-
-    Args:
-        unittest (module): python module
-    """
+class TestPdfWriter(unittest.TestCase):
+    """Test Class"""
 
     @classmethod
     def setUpClass(cls):
-        directory = r"C:\Users\guill\Documents\Projets\NDF_python\venv\src\output"
-        cls.template = NdfTemplate(directory=directory)
+        cls.directory = tempfile.mkdtemp()
+        cls.writer = PdfWriter(directory=cls.directory)
 
         cls.data = {
             "nom": "Moise",
@@ -33,6 +32,7 @@ class TestAddress(unittest.TestCase):
                     "total": 64.8,
                     "nbrkm_mois": 92.85600000000001,
                     "forfait": 0.697854742827604,
+                    "status": "OK",
                 },
                 {
                     "client": "BREST 2",
@@ -43,6 +43,7 @@ class TestAddress(unittest.TestCase):
                     "total": 80,
                     "nbrkm_mois": 85,
                     "forfait": 0.35,
+                    "status": "OK",
                 },
             ],
         }
@@ -52,30 +53,42 @@ class TestAddress(unittest.TestCase):
 
     def test_create_table_collaborator(self):
         """test function."""
-        self.template.create_table_collaborator(self.data)
+        table = self.writer.create_table_collaborator(self.data)
+
+        # Check table
+        data = [
+            ["Nom Prénom:", self.data["nom"]],
+            ["Matricule:", self.data["matricule"]],
+            ["Adresse:", self.data["adresse_intervenant"]],
+        ]
+
+        self.assertListEqual(table._cellvalues, data)
 
     def test_create_table_missions(self):
         """test function."""
-        self.template.create_table_missions(self.data)
+        table = self.writer.create_table_missions(self.data)
 
-    def test_create(self):
-        """test function."""
-        self.template.create(self.data)
+        # Check number of row -> mission
+        self.assertEqual(table._nrows, len(self.data["missions"]) + 1)
 
     def test_check_path(self):
         """test function."""
         # Check if transform path
-        path = ""
-        test_path = self.template.check_path(path)
-        self.assertEqual(path, test_path)
+        path = "un_path"
+        test_path = self.writer.check_path(path)
+        self.assertEqual(os.path.join(self.directory, path + ".pdf"), test_path)
 
     def tearDown(self):
         pass
 
     @classmethod
     def tearDownClass(cls):
-        cls.template = None
+        cls.writer = None
         cls.data = None
+
+        # destroy tempdir
+        shutil.rmtree(cls.directory, ignore_errors=True)
+        cls.directory = None
 
 
 if __name__ == "__main__":

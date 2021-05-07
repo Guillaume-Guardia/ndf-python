@@ -13,6 +13,7 @@ class WorkerSignals(QtCore.QObject):
     """
 
     finished = QtCore.pyqtSignal()
+    progressed = QtCore.pyqtSignal(float)
 
 
 class Thread(Logger, QtCore.QRunnable):
@@ -38,11 +39,12 @@ class Thread(Logger, QtCore.QRunnable):
         try:
             # Read Excel file
             reader = ExcelReader(self.data_file, "A")
-            records = reader.read()
+            records = reader.read(progress_callback=self.signals.progressed.emit, p=20)
 
             # Calcul distance between adresse_client and adresse_intervenant with google API
             api = DistanceMatrixAPI()
-            for record in records.values():
+            n = len(records)
+            for index, record in enumerate(records.values()):
                 for mission in record["missions"]:
                     status, result = api.run(mission["adresse_client"], record["adresse_intervenant"])
                     mission["status"] = status
@@ -51,13 +53,19 @@ class Thread(Logger, QtCore.QRunnable):
 
                         mission["nbrkm_mois"] = mission["quantite_payee"] * 2 * distance
                         mission["forfait"] = mission["total"] / mission["nbrkm_mois"]
+                self.signals.progressed.emit(20 + (index / n) * 50)
 
             # Create PDF with data records and distance from the API
             writer = PdfWriter(directory=self.output_directory)
-            for record in records.values():
-                writer.write(record)
+            n = len(records)
+            for index, record in enumerate(records.values()):
+                status = writer.write(record)
+                if status is False:
+                    self.log.warning(f"{index} error !")
+                self.signals.progressed.emit(70 + (index / n) * 30)
 
         except Exception as error:
             self.log.exception(error)
         else:
+            self.signals.progressed.emit(100)
             self.signals.finished.emit()

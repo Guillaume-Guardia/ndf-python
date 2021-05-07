@@ -35,6 +35,10 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             layout.addRow(text, button)
         layout.addRow(self.generate_btn)
 
+        self.progress = QtWidgets.QProgressBar()
+        self.progress.hide()
+        layout.addRow(self.progress)
+
         widget = QtWidgets.QWidget()
         widget.setLayout(layout)
         self.setCentralWidget(widget)
@@ -65,14 +69,22 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         if not all([t.text() for t in self.texts.values()]):
             return None  # If one field is empty, ignore.
 
+        self.progress.show()
         self.generate_btn.setDisabled(True)
         process = Thread(*[t.text() for t in self.texts.values()])
         process.signals.finished.connect(self.generated)
+        process.signals.progressed.connect(self.progressed)
         self.threadpool.start(process)
         return True
 
+    def progressed(self, value):
+        if value <= 100:
+            self.progress.setValue(value)
+
     def generated(self):
         """Success methdod"""
+        self.progress.hide()
+        self.progress.reset()
         self.generate_btn.setDisabled(False)
         QtWidgets.QMessageBox.information(self, "Finished", "PDFs have been generated")
 
