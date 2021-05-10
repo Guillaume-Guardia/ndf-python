@@ -13,7 +13,7 @@ class WorkerSignals(QtCore.QObject):
     """
 
     finished = QtCore.pyqtSignal()
-    progressed = QtCore.pyqtSignal(float)
+    progressed = QtCore.pyqtSignal(float, str)
 
 
 class Thread(Logger, QtCore.QRunnable):
@@ -53,17 +53,20 @@ class Thread(Logger, QtCore.QRunnable):
 
                         mission["nbrkm_mois"] = mission["quantite_payee"] * 2 * distance
                         mission["forfait"] = mission["total"] / mission["nbrkm_mois"]
-                self.signals.progressed.emit(20 + (index / n) * 50)
+                self.signals.progressed.emit(
+                    20 + (index / n) * 50,
+                    self.signals.tr(f"Get distance from Google API or DB or cache: {index} / {n}"),
+                )
 
             # Create PDF with data records and distance from the API
             writer = PdfWriter(directory=self.output_directory)
             n = len(records)
             for index, record in enumerate(records.values()):
                 writer.write(record)
-                self.signals.progressed.emit(70 + (index / n) * 30)
+                self.signals.progressed.emit(70 + (index / n) * 30, self.signals.tr(f"Create PDFs: {index} / {n}"))
 
         except Exception as error:
             self.log.exception(error)
         else:
-            self.signals.progressed.emit(100)
+            self.signals.progressed.emit(100, self.signals.tr("Done!"))
             self.signals.finished.emit()

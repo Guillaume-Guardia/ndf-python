@@ -3,11 +3,12 @@
 import re
 from collections import defaultdict
 import pandas as pd
+from PyQt6 import QtCore
 from pyndf.logbook import Logger, log_time
 from pyndf.constants import CONFIG, COL, COL_PERSO, COL_MISSION
 
 
-class ExcelReader(Logger):
+class ExcelReader(Logger, QtCore.QObject):
     """Class for reading excel file."""
 
     def __init__(self, filename=None, sheet_name=0, regex_libelle="INDEMNITE.*"):
@@ -35,7 +36,7 @@ class ExcelReader(Logger):
         dataframe = pd.read_excel(path, sheet_name=sheet, na_filter=False, dtype={"matricule": str})
 
         if progress_callback:
-            progress_callback(0.1 * p)
+            progress_callback(0.1 * p, self.tr("Load excel file with pandas..."))
 
         n = len(dataframe.to_dict("records"))
         for index, record in enumerate(dataframe.to_dict("records")):
@@ -59,6 +60,6 @@ class ExcelReader(Logger):
             records[matricule]["missions"].append(mission_record)
 
             if progress_callback:
-                progress_callback((0.1 + (index / n) * 0.9) * p)
+                progress_callback((0.1 + (index / n) * 0.9) * p, self.tr(f"Select info {index} / {n}"))
 
         return records

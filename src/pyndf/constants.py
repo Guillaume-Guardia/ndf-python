@@ -33,3 +33,6 @@ CONFIG[
 
 # DB file
 DB_FILE = os.path.join(os.path.dirname(__file__), "db", "pydb.db")
+
+# Translation directory
+TRANSLATION_DIR = os.path.join(os.path.dirname(__file__), "data", "translations")
