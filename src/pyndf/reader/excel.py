@@ -36,7 +36,7 @@ class ExcelReader(Logger, QtCore.QObject):
         dataframe = pd.read_excel(path, sheet_name=sheet, na_filter=False, dtype={"matricule": str})
 
         if progress_callback:
-            progress_callback(0.1 * p, self.tr("Load excel file with pandas..."))
+            progress_callback(0.1 * p, self.tr("Load Excel file with pandas..."))
 
         n = len(dataframe.to_dict("records"))
         for index, record in enumerate(dataframe.to_dict("records")):

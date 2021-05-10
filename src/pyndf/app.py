@@ -18,13 +18,14 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.setWindowTitle("PYNDF")
         self.setWindowIcon(self.style().standardIcon(self.style().StandardPixmap.SP_TitleBarMenuButton))
         if resolution:
-            self.setFixedWidth(int(resolution.width() / 1.5))
-            self.setFixedHeight(int(resolution.height() / 3))
+            self.setMinimumWidth(int(resolution.width() / 1.5))
+            self.setMinimumHeight(int(resolution.height() / 3))
 
         self.tabs = QtWidgets.QTabWidget()
         self.param_tab = QtWidgets.QWidget()
         self.analyse_tab = QtWidgets.QWidget()
 
+        self.labels = {}
         self.buttons = {}
         self.texts = {}
 
@@ -49,50 +50,56 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.add_button(self.tr("excel file"), "(*.xl*)", default=data)
         self.add_button(self.tr("output directory"), default=output)
 
-        for index, widgets in enumerate(zip(self.texts.values(), self.buttons.values())):
-            self.add_widget(layout, widgets, index)
+        grid_layout = QtWidgets.QGridLayout()
+        for row, widgets in enumerate(zip(self.labels.values(), self.texts.values(), self.buttons.values())):
+            for col, widget in enumerate(widgets):
+                grid_layout.addWidget(widget, row, col)
+        new_widget = QtWidgets.QWidget()
+        new_widget.setLayout(grid_layout)
+        layout.addWidget(new_widget)
 
         # Generate button
         self.buttons["generate"] = QtWidgets.QPushButton(self.tr("Generate PDFs"))
-        self.buttons["generate"].setStyleSheet(CONFIG["buttonstyle"])
         self.buttons["generate"].pressed.connect(self.generate)
-        self.buttons["generate"].setFixedWidth(int(self.width() * 0.2))
+        self.buttons["generate"].setMinimumWidth(120)
+        self.buttons["generate"].setMinimumHeight(40)
+        self.buttons["generate"].setStyleSheet(CONFIG["buttonstyle"])
 
-        self.add_widget(layout, [self.buttons["generate"]], 2)
-
+        widget = self.add_widget([self.buttons["generate"]])
+        layout.addStretch()
+        layout.addWidget(widget)
         layout.addStretch()
 
         tab.setLayout(layout)
 
-    def add_widget(self, lay, widgets, index, style="center"):
+    def add_widget(self, widgets):
         # Create Horizontal Layout
         layout = QtWidgets.QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
 
-        if style == "center":
-            layout.addStretch()
+        layout.addStretch()
+
         for ind, widget in enumerate(widgets):
             layout.addWidget(widget)
             if ind < len(widgets) - 1:
                 layout.addStretch()
-        if style == "center":
-            layout.addStretch()
+
+        layout.addStretch()
 
         new_widget = QtWidgets.QWidget()
         new_widget.setLayout(layout)
-
-        lay.addWidget(new_widget, index)
+        return new_widget
 
     def add_button(self, name, _format=None, default=""):
+        self.labels[name] = QtWidgets.QLabel(name.capitalize())
         self.texts[name] = QtWidgets.QLineEdit()
         self.texts[name].setText(default)
-        self.texts[name].setFixedWidth(int(self.width() * 0.65))
+        self.texts[name].setFixedHeight(30)
         self.texts[name].setDisabled(True)  # must use the file finder to select a valid file.
 
-        self.buttons[name] = QtWidgets.QPushButton(f"{self.tr('Select')} {name}...")
-        self.buttons[name].setFixedWidth(int(self.width() * 0.3))
+        self.buttons[name] = QtWidgets.QPushButton("...")
+        self.buttons[name].setFixedHeight(30)
         self.buttons[name].pressed.connect(lambda: self.choose(name, _format))
-        self.buttons[name].setStyleSheet(CONFIG["buttonstyle"])
 
     def choose(self, name, _format):
         """Method which call the native file dialog to choose file."""

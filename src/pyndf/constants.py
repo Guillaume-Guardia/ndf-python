@@ -21,6 +21,8 @@ CONFIG[
       border-radius: 10px;
       border-style: solid;
       border-width: 2px;
+      font-size: 12px;
+      font-weight: bold;
   }
 
   QPushButton:hover {
