@@ -64,12 +64,21 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         for title in (self.tr("Analyse Google API"), self.tr("Analyse PDF writer")):
             self.tabs[title].init_table()
         process = Thread(*[t.text() for t in self.tabs["process"].texts.values()])
+        process.signals.error.connect(self.error)
         process.signals.finished.connect(self.generated)
         process.signals.progressed.connect(self.progressed)
         process.signals.analysed_api.connect(self.tabs[self.tr("Analyse Google API")].analysed)
         process.signals.analysed_pdf.connect(self.tabs[self.tr("Analyse PDF writer")].analysed)
         self.threadpool.start(process)
         return True
+
+    def error(self, obj):
+        self.progress.hide()
+        self.progress.reset()
+        for title in (self.tr("Analyse Google API"), self.tr("Analyse PDF writer")):
+            self.tabs[title].finished()
+        self.tabs["process"].buttons["generate"].setDisabled(False)
+        QtWidgets.QMessageBox.critical(self, self.tr("Error"), self.tr("Error: {}".format(obj)))
 
     def progressed(self, value, text):
         if value <= 100:
@@ -117,9 +126,9 @@ def cmdline():
 
     args = parser.parse_args()
 
-    args.excel = "C:/Users/guill/Documents/Projets/NDF_python/venv/src/ndf-python/data/test.xlsx"
+    args.excel = r"C:\Users\guill\Documents\Projets\NDF_python\venv\src\ndf-python\data\FRAIS_202011.XLS"
     args.csv = r"C:\Users\guill\Documents\Projets\NDF_python\venv\src\ndf-python\data\RE NDF\GA327122020 test.CSV"
-    args.output = "C:/Users/guill/Documents/Projets/NDF_python/venv/src/output"
+    args.output = "C:/Users/guill/Documents/Projets/NDF_python/venv/src/test2"
 
     main(excel=args.excel, csv=args.csv, output=args.output, language=args.language)
 

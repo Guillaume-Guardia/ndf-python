@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 from time import time
 from PyQt6 import QtCore
 from pyndf.process.reader.excel import ExcelReader
@@ -16,6 +17,7 @@ class WorkerSignals(QtCore.QObject):
     Defines the signals available from a running worker thread.
     """
 
+    error = QtCore.pyqtSignal(object)
     finished = QtCore.pyqtSignal(float)
     progressed = QtCore.pyqtSignal(float, str)
     analysed_api = QtCore.pyqtSignal(object)
@@ -78,7 +80,8 @@ class Thread(Logger, QtCore.QRunnable):
                 )
 
             # Create PDF with data records and distance from the API
-            writer = PdfWriter(directory=self.output_directory)
+            date = os.path.basename(self.excel_file).split(".")[0].split("_")[1]
+            writer = PdfWriter(date, directory=self.output_directory)
             n = len(records)
             for index, record in enumerate(records.values()):
                 (filename, total, status), time_spend = writer.write(record)
@@ -91,6 +94,7 @@ class Thread(Logger, QtCore.QRunnable):
 
         except Exception as error:
             self.log.exception(error)
+            self.signals.error.emit(error)
         else:
             self.signals.progressed.emit(100, self.signals.tr("Done!"))
             self.signals.finished.emit(round(time() - start, 2))

@@ -2,6 +2,8 @@
 
 import os
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from dateutil.parser import isoparse
 
 from reportlab.lib.units import cm, inch
 from reportlab.lib import colors
@@ -31,7 +33,7 @@ class PdfWriter(Logger, BaseDocTemplate):
         BaseDocTemplate (object): object from reportlab.
     """
 
-    def __init__(self, filename="", directory=".", **kwargs):
+    def __init__(self, date, filename="", directory=".", **kwargs):
         kwargs["pagesize"] = landscape(A4)
 
         # Define for pylint
@@ -40,11 +42,11 @@ class PdfWriter(Logger, BaseDocTemplate):
         self.leftMargin = None
         super().__init__(filename, **kwargs)
         self.directory = directory
-        self.date = datetime.today().strftime("%d-%m-%Y")
-        self.version = "0.0.1"
+        self.date = datetime(year=int(date[:4]), month=int(date[4:6]), day=1) + relativedelta(months=+1)
+        self.version = "1.0"
         self.fund = "fund"
 
-    def all_page_setup(self, canvas, doc, add_header=True, add_footer=True, add_watermark=True):
+    def all_page_setup(self, canvas, doc, add_header=True, add_footer=True, add_watermark=False):
         """Set up page.
 
         Args:
@@ -56,21 +58,33 @@ class PdfWriter(Logger, BaseDocTemplate):
         """
         canvas.saveState()
 
+        marge = 2.5 * cm
+
+        # X [0 -> 29.7]
+        right = self.pagesize[0] - marge
+        x_center = self.pagesize[0] / 2
+        left = marge
+
+        # Y [0 -> 21]
+        top = self.pagesize[1] - marge
+        y_center = self.pagesize[1] / 2
+        bottom = marge
+
         if add_header:
             # header
-            canvas.drawRightString(10.5 * inch, 8 * inch, f"{self.date}")
+            canvas.drawRightString(right, top, f"{self.date.strftime('%B %Y')}")
             # Set Image
-            canvas.drawImage(LOGO, 0.5 * inch, 8 * inch, width=2.5 * cm, height=-2.5 * cm, preserveAspectRatio=True)
+            canvas.drawImage(LOGO, left, top + cm, width=2.5 * cm, height=-2.5 * cm, preserveAspectRatio=True)
 
         if add_footer:
             # footer
-            canvas.drawString(0.5 * inch, 0.5 * inch, "Apside Groupe")
-            canvas.drawCentredString(self.pagesize[0] / 2, 0.5 * inch, f"- {doc.page} -")
-            canvas.drawRightString(10.5 * inch, 0.5 * inch, f"{self.version}")
+            canvas.drawString(left, bottom, "Apside Groupe")
+            canvas.drawCentredString(x_center, bottom - cm, f"- {doc.page} -")
+            canvas.drawRightString(right, bottom, f"{self.version}")
 
         if add_watermark:
             # Move the origin to middle, and after rotate the image
-            canvas.translate(self.pagesize[0] / 2, self.pagesize[1] / 2)
+            canvas.translate(x_center, y_center)
             canvas.rotate(-30)
             canvas.setFont("Helvetica", 150)
             canvas.setStrokeGray(0.90)
@@ -119,10 +133,10 @@ class PdfWriter(Logger, BaseDocTemplate):
             "Nom du client",
             "Période",
             "Adresse de réalisation",
-            "Nombre de Kilomètres/mois",
+            "Nb de Km par mois",
             "Taux",
-            "Plafond Apside",
-            "Montant Total",
+            "Plafond APSIDE",
+            "Montant total",
         ):
             data[0].append(Paragraph(name, stylesheet["Center"]))
         nbrkm_mois = 0
@@ -187,7 +201,7 @@ class PdfWriter(Logger, BaseDocTemplate):
         style = TableStyle(
             [
                 # First row in blue
-                ("BACKGROUND", (0, 0), (-1, 0), colors.mediumaquamarine),
+                ("BACKGROUND", (0, 0), (-1, 0), "#99ccff"),
                 ("GRID", (0, 0), (-1, -1), 0.25, black),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("ALIGN", (0, 0), (-1, -1), "CENTER"),
@@ -211,7 +225,7 @@ class PdfWriter(Logger, BaseDocTemplate):
         """
         matricule = data.get("matricule", UNKNOWN)
         self.log.info(f"Start Create pdf for matricule {matricule} with {len(data['missions'])} missions.")
-        filename = f"{data.get('agence', UNKNOWN)}_{matricule}_{self.date}"
+        filename = f"{data.get('agence', UNKNOWN)}_{matricule}_{self.date.strftime('%Y%m')}"
         path = self.check_path(filename)
 
         paragraphs = []
