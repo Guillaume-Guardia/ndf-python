@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
+from time import time
 from PyQt6 import QtCore
-from pyndf.reader.excel import ExcelReader
-from pyndf.writer.pdf import PdfWriter
+from pyndf.process.reader.excel import ExcelReader
+from pyndf.process.reader.csv import CSVReader
+from pyndf.process.writer.pdf import PdfWriter
 from pyndf.process.distance import DistanceMatrixAPI
-from pyndf.logbook import Logger, log_time
+from pyndf.logbook import Logger
+from pyndf.gui.items.api_item import APIItem
+from pyndf.gui.items.pdf_item import PDFItem
 
 
 class WorkerSignals(QtCore.QObject):
@@ -12,8 +16,10 @@ class WorkerSignals(QtCore.QObject):
     Defines the signals available from a running worker thread.
     """
 
-    finished = QtCore.pyqtSignal()
+    finished = QtCore.pyqtSignal(float)
     progressed = QtCore.pyqtSignal(float, str)
+    analysed_api = QtCore.pyqtSignal(object)
+    analysed_pdf = QtCore.pyqtSignal(object)
 
 
 class Thread(Logger, QtCore.QRunnable):
@@ -26,33 +32,46 @@ class Thread(Logger, QtCore.QRunnable):
     :param data: The data to add to the PDF for generating.
     """
 
-    def __init__(self, data_file, output_directory):
+    def __init__(self, excel_file, csv_file, output_directory):
         super().__init__()
-        self.data_file = data_file
+        self.excel_file = excel_file
+        self.csv_file = csv_file
         self.output_directory = output_directory
         self.signals = WorkerSignals()
 
-    @log_time
     @QtCore.pyqtSlot()
     def run(self):
         """Run method"""
         try:
+            start = time()
             # Read Excel file
-            reader = ExcelReader(self.data_file)
-            records = reader.read(progress_callback=self.signals.progressed.emit, p=20)
+            reader = ExcelReader(self.excel_file)
+            records, time_spend = reader.read(progress_callback=self.signals.progressed.emit, p=20)
+
+            # Read CSV file
+            reader = CSVReader(self.csv_file)
+            records_csv, time_spend = reader.read()
+            for matricule, record in records.items():
+                if int(matricule) in records_csv:
+                    record["montant_total"] = records_csv[int(matricule)]
 
             # Calcul distance between adresse_client and adresse_intervenant with google API
             api = DistanceMatrixAPI()
             n = len(records)
             for index, record in enumerate(records.values()):
                 for mission in record["missions"]:
-                    status, result = api.run(mission["adresse_client"], record["adresse_intervenant"])
+                    distance = None
+                    (status, result), time_spend = api.run(mission["adresse_client"], record["adresse_intervenant"])
                     mission["status"] = status
                     if result is not None:
                         distance, _ = result
 
                         mission["nbrkm_mois"] = mission["quantite_payee"] * 2 * distance
                         mission["forfait"] = mission["total"] / mission["nbrkm_mois"]
+
+                    self.signals.analysed_api.emit(
+                        APIItem(mission["adresse_client"], record["adresse_intervenant"], distance, status, time_spend)
+                    )
                 self.signals.progressed.emit(
                     20 + (index / n) * 50,
                     self.signals.tr(f"Get distance from Google API or DB or cache: {index} / {n}"),
@@ -62,11 +81,16 @@ class Thread(Logger, QtCore.QRunnable):
             writer = PdfWriter(directory=self.output_directory)
             n = len(records)
             for index, record in enumerate(records.values()):
-                writer.write(record)
+                (filename, total, status), time_spend = writer.write(record)
                 self.signals.progressed.emit(70 + (index / n) * 30, self.signals.tr(f"Create PDFs: {index} / {n}"))
+                self.signals.analysed_pdf.emit(
+                    PDFItem(
+                        filename, record.get("montant_total", 0), total, len(record["missions"]), status, time_spend
+                    )
+                )
 
         except Exception as error:
             self.log.exception(error)
         else:
             self.signals.progressed.emit(100, self.signals.tr("Done!"))
-            self.signals.finished.emit()
+            self.signals.finished.emit(round(time() - start, 2))

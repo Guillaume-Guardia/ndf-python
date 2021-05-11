@@ -200,7 +200,7 @@ class PdfWriter(Logger, BaseDocTemplate):
                 style.add("SPAN", (i, 1), (i, -1))
 
         table.setStyle(style)
-        return table
+        return table, total
 
     @log_time
     def write(self, data):
@@ -221,7 +221,8 @@ class PdfWriter(Logger, BaseDocTemplate):
         paragraphs.append(Paragraph(f"AGENCE D'ORIGINE: {data.get('agence_o', UNKNOWN)}", stylesheet["title"]))
 
         paragraphs.append(self.create_table_collaborator(data))
-        paragraphs.append(self.create_table_missions(data))
+        table, total = self.create_table_missions(data)
+        paragraphs.append(table)
 
         paragraphs.append(Paragraph("<b>NB: Carte grise à disposition de la direction.</b>", stylesheet["Normal"]))
 
@@ -229,6 +230,8 @@ class PdfWriter(Logger, BaseDocTemplate):
             self.build(paragraphs, path)
         except Exception as e:
             self.log.exception(e)
+            return filename, None, "error"
+        return filename, total, "OK"
 
     def check_path(self, filename, ext="pdf", force=True):
         """Check path method.

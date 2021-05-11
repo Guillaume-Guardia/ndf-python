@@ -3,7 +3,7 @@
 import os
 import yaml
 
-COL = "colonne"
+COL = "colonne_excel"
 COL_PERSO = "colonne_perso"
 COL_MISSION = "colonne_mission"
 

@@ -6,7 +6,7 @@ import tempfile
 import shutil
 import pandas as pd
 from pyndf.reader.excel import ExcelReader
-from pyndf.constants import CONFIG
+from pyndf.constants import CONFIG, COL
 
 
 class TestExcelReader(unittest.TestCase):
@@ -19,13 +19,13 @@ class TestExcelReader(unittest.TestCase):
         cls.reader = ExcelReader()
 
     def create_xl(self, filename, n_rows=10, change_matricule=False):
-        n_col = len(CONFIG["colonne"])
+        n_col = len(CONFIG[COL])
         list_df = list([[0 for i in range(n_col)] for j in range(n_rows)])
         for index, row in enumerate(list_df):
             if change_matricule:
                 row[2] = index
             row[18] = "INDEMNITE"
-        df = pd.DataFrame(list_df, columns=list(CONFIG["colonne"].values()))
+        df = pd.DataFrame(list_df, columns=list(CONFIG[COL].values()))
 
         with pd.ExcelWriter(filename, engine="xlsxwriter") as writer:
             df.to_excel(writer, sheet_name="A")
