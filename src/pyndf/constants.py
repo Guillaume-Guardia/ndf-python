@@ -38,3 +38,13 @@ DB_FILE = os.path.join(os.path.dirname(__file__), "db", "pydb.db")
 
 # Translation directory
 TRANSLATION_DIR = os.path.join(os.path.dirname(__file__), "data", "translations")
+
+# Colors analyse table
+COLORS = {"others": "#FFA500"}
+
+for i, color in enumerate(["#008000", "#32CD32", "#ADFF2F"]):
+    COLORS[CONFIG["good_status"][i]] = color
+
+for bad_status in CONFIG["bad_status"]:
+    for substatus in bad_status:
+        COLORS[substatus] = "#FFFF00"

@@ -5,6 +5,7 @@ import unittest
 import tempfile
 import shutil
 from pyndf.writer.pdf import PdfWriter
+from pyndf.constants import CONFIG
 
 
 class TestPdfWriter(unittest.TestCase):
@@ -32,7 +33,7 @@ class TestPdfWriter(unittest.TestCase):
                     "total": 64.8,
                     "nbrkm_mois": 92.85600000000001,
                     "forfait": 0.697854742827604,
-                    "status": "OK",
+                    "status": CONFIG["good_status"][0],
                 },
                 {
                     "client": "BREST 2",
@@ -43,7 +44,7 @@ class TestPdfWriter(unittest.TestCase):
                     "total": 80,
                     "nbrkm_mois": 85,
                     "forfait": 0.35,
-                    "status": "OK",
+                    "status": CONFIG["good_status"][0],
                 },
             ],
         }

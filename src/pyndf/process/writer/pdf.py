@@ -245,7 +245,7 @@ class PdfWriter(Logger, BaseDocTemplate):
         except Exception as e:
             self.log.exception(e)
             return filename, None, "error"
-        return filename, total, "OK"
+        return filename, total, CONFIG["good_status"][0]
 
     def check_path(self, filename, ext="pdf", force=True):
         """Check path method.

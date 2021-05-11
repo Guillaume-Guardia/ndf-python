@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from PyQt6 import QtWidgets
+from PyQt6 import QtWidgets, QtGui
+from pyndf.constants import CONFIG, COLORS
 
 
 class AnalyseTab(QtWidgets.QWidget):
@@ -28,12 +29,15 @@ class AnalyseTab(QtWidgets.QWidget):
         self.table.setRowCount(0)
 
     def analysed(self, obj):
-        row_count = self.table.rowCount()
-        self.table.insertRow(row_count)
+        row = self.table.rowCount()
+        self.table.insertRow(row)
 
         self.time_counter += obj.time
         for index, attribute in enumerate(self.headers):
-            self.table.setItem(row_count, index, QtWidgets.QTableWidgetItem(str(getattr(obj, attribute))))
+            self.table.setItem(row, index, QtWidgets.QTableWidgetItem(str(getattr(obj, attribute))))
+
+        # Set Color indicator
+        self.set_color_row(row, COLORS.get(obj.status, COLORS["others"]))
 
     def finished(self):
         row_count = self.table.rowCount()
@@ -41,4 +45,22 @@ class AnalyseTab(QtWidgets.QWidget):
         self.table.setVerticalHeaderItem(row_count, QtWidgets.QTableWidgetItem(self.tr("Total")))
         col_count = self.table.columnCount()
         self.table.setItem(row_count, col_count - 1, QtWidgets.QTableWidgetItem(str(round(self.time_counter, 2))))
-        self.show()
+
+        # Check is all are ok
+        check = all(
+            [
+                self.table.item(row, col_count - 2).text() in CONFIG["good_status"]
+                for row in range(self.table.rowCount() - 1)
+            ]
+        )
+
+        if check:
+            self.table.setItem(row_count, col_count - 2, QtWidgets.QTableWidgetItem(CONFIG["good_status"][0]))
+            self.set_color_row(row_count, COLORS[CONFIG["good_status"][0]])
+
+    def set_color_row(self, rowIndex, color):
+        for j in range(self.table.columnCount()):
+            try:
+                self.table.item(rowIndex, j).setBackground(QtGui.QColor(color))
+            except AttributeError:
+                pass
