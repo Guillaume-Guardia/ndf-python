@@ -23,6 +23,7 @@ class AnalyseTab(QtWidgets.QWidget):
         self.time_counter = 0
 
     def init_table(self):
+        self.time_counter = 0
         self.table.clear()
         self.table.setColumnCount(len(self.headers))
         self.table.setHorizontalHeaderLabels(self.headers)
@@ -34,7 +35,10 @@ class AnalyseTab(QtWidgets.QWidget):
 
         self.time_counter += obj.time
         for index, attribute in enumerate(self.headers):
-            self.table.setItem(row, index, QtWidgets.QTableWidgetItem(str(getattr(obj, attribute))))
+            attr = getattr(obj, attribute)
+            if isinstance(attr, float):
+                attr = round(attr, 2)
+            self.table.setItem(row, index, QtWidgets.QTableWidgetItem(str(attr)))
 
         # Set Color indicator
         self.set_color_row(row, COLORS.get(obj.status, COLORS["others"]))

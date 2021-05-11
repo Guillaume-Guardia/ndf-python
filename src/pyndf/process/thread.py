@@ -8,6 +8,7 @@ from pyndf.process.reader.csv import CSVReader
 from pyndf.process.writer.pdf import PdfWriter
 from pyndf.process.distance import DistanceMatrixAPI
 from pyndf.logbook import Logger
+from pyndf.gui.items.all_item import AllItem
 from pyndf.gui.items.api_item import APIItem
 from pyndf.gui.items.pdf_item import PDFItem
 
@@ -20,6 +21,7 @@ class WorkerSignals(QtCore.QObject):
     error = QtCore.pyqtSignal(object)
     finished = QtCore.pyqtSignal(float)
     progressed = QtCore.pyqtSignal(float, str)
+    analysed_all = QtCore.pyqtSignal(object)
     analysed_api = QtCore.pyqtSignal(object)
     analysed_pdf = QtCore.pyqtSignal(object)
 
@@ -49,6 +51,8 @@ class Thread(Logger, QtCore.QRunnable):
             # Read Excel file
             reader = ExcelReader(self.excel_file)
             records, time_spend = reader.read(progress_callback=self.signals.progressed.emit, p=20)
+            t1 = time()
+            self.signals.analysed_all.emit(AllItem("Read excel file", "OK", t1 - start))
 
             # Read CSV file
             reader = CSVReader(self.csv_file)
@@ -56,6 +60,8 @@ class Thread(Logger, QtCore.QRunnable):
             for matricule, record in records.items():
                 if int(matricule) in records_csv:
                     record["montant_total"] = records_csv[int(matricule)]
+            t2 = time()
+            self.signals.analysed_all.emit(AllItem("Read csv file", "OK", t2 - t1))
 
             # Calcul distance between adresse_client and adresse_intervenant with google API
             api = DistanceMatrixAPI()
@@ -78,6 +84,8 @@ class Thread(Logger, QtCore.QRunnable):
                     20 + (index / n) * 50,
                     self.signals.tr(f"Get distance from Google API or DB or cache: {index} / {n}"),
                 )
+            t3 = time()
+            self.signals.analysed_all.emit(AllItem("Get distance", "OK", t3 - t2))
 
             # Create PDF with data records and distance from the API
             date = os.path.basename(self.excel_file).split(".")[0].split("_")[1]
@@ -91,6 +99,8 @@ class Thread(Logger, QtCore.QRunnable):
                         filename, record.get("montant_total", 0), total, len(record["missions"]), status, time_spend
                     )
                 )
+            t4 = time()
+            self.signals.analysed_all.emit(AllItem("Write PDFs", "OK", t4 - t3))
 
         except Exception as error:
             self.log.exception(error)

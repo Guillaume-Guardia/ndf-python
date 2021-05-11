@@ -8,6 +8,7 @@ from pyndf.process.thread import Thread
 from pyndf.constants import CONFIG, TRANSLATION_DIR
 from pyndf.gui.tabs.analyse import AnalyseTab
 from pyndf.gui.tabs.process import ProcessTab
+from pyndf.gui.items.all_item import AllItem
 from pyndf.gui.items.api_item import APIItem
 from pyndf.gui.items.pdf_item import PDFItem
 
@@ -38,11 +39,12 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.tab_widget.addTab(self.tabs["process"], self.tabs["process"].title)
 
         # Analyse tabs
-        titles = (self.tr("Analyse Google API"), self.tr("Analyse PDF writer"))
-        items = (APIItem, PDFItem)
+        self.tabs["analyse"] = {}
+        titles = (self.tr("Analyse Global"), self.tr("Analyse Google API"), self.tr("Analyse PDF writer"))
+        items = (AllItem, APIItem, PDFItem)
         for title, item in zip(titles, items):
-            self.tabs[title] = AnalyseTab(self, title, item)
-            self.tab_widget.addTab(self.tabs[title], title)
+            self.tabs["analyse"][title] = AnalyseTab(self, title, item)
+            self.tab_widget.addTab(self.tabs["analyse"][title], title)
 
         # Progress Bar in status bar
         self.progress = QtWidgets.QProgressBar()
@@ -61,22 +63,23 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         self.progress.show()
         self.tabs["process"].buttons["generate"].setDisabled(True)
-        for title in (self.tr("Analyse Google API"), self.tr("Analyse PDF writer")):
-            self.tabs[title].init_table()
+        for tab in self.tabs["analyse"].values():
+            tab.init_table()
         process = Thread(*[t.text() for t in self.tabs["process"].texts.values()])
         process.signals.error.connect(self.error)
         process.signals.finished.connect(self.generated)
         process.signals.progressed.connect(self.progressed)
-        process.signals.analysed_api.connect(self.tabs[self.tr("Analyse Google API")].analysed)
-        process.signals.analysed_pdf.connect(self.tabs[self.tr("Analyse PDF writer")].analysed)
+        process.signals.analysed_all.connect(self.tabs["analyse"][self.tr("Analyse Global")].analysed)
+        process.signals.analysed_api.connect(self.tabs["analyse"][self.tr("Analyse Google API")].analysed)
+        process.signals.analysed_pdf.connect(self.tabs["analyse"][self.tr("Analyse PDF writer")].analysed)
         self.threadpool.start(process)
         return True
 
     def error(self, obj):
         self.progress.hide()
         self.progress.reset()
-        for title in (self.tr("Analyse Google API"), self.tr("Analyse PDF writer")):
-            self.tabs[title].finished()
+        for tab in self.tabs["analyse"].values():
+            tab.finished()
         self.tabs["process"].buttons["generate"].setDisabled(False)
         QtWidgets.QMessageBox.critical(self, self.tr("Error"), self.tr("Error: {}".format(obj)))
 
@@ -87,10 +90,11 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
     def generated(self, time):
         """Success methdod"""
+        print(time)
         self.progress.hide()
         self.progress.reset()
-        for title in (self.tr("Analyse Google API"), self.tr("Analyse PDF writer")):
-            self.tabs[title].finished()
+        for tab in self.tabs["analyse"].values():
+            tab.finished()
         self.tabs["process"].buttons["generate"].setDisabled(False)
         QtWidgets.QMessageBox.information(self, self.tr("Finished"), self.tr("PDFs have been generated !"))
 
