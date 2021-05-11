@@ -90,7 +90,6 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
     def generated(self, time):
         """Success methdod"""
-        print(time)
         self.progress.hide()
         self.progress.reset()
         for tab in self.tabs["analyse"].values():
