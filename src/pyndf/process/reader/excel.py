@@ -60,6 +60,6 @@ class ExcelReader(Logger, QtCore.QObject):
             records[matricule]["missions"].append(mission_record)
 
             if progress_callback:
-                progress_callback((0.1 + (index / n) * 0.9) * p, self.tr(f"Select info {index} / {n}"))
+                progress_callback((0.1 + (index / n) * 0.9) * p, self.tr("Select info {} / {}".format(index, n)))
 
         return records

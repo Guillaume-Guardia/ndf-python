@@ -10,7 +10,6 @@ class ProcessTab(QtWidgets.QWidget):
     def __init__(self, window, excel="", csv="", output=""):
         super().__init__()
         self.window = window
-        self.title = self.tr("Process")
 
         # Graphics elements
         self.labels = {}
@@ -18,8 +17,8 @@ class ProcessTab(QtWidgets.QWidget):
         self.texts = {}
 
         # Explorer buttons
-        self.add_button(self.tr("excel file"), "(*.xl* *.XLS)", default=excel)
-        self.add_button(self.tr("csv file"), "(*.csv)", default=csv)
+        self.add_button(self.tr("EXCEL file"), "(*.xl* *.XLS)", default=excel)
+        self.add_button(self.tr("CSV file"), "(*.csv)", default=csv)
         self.add_button(self.tr("output directory"), default=output)
 
         # Add grid layout

@@ -21,12 +21,10 @@ class WorkerSignals(QtCore.QObject):
     error = QtCore.pyqtSignal(object)
     finished = QtCore.pyqtSignal(float)
     progressed = QtCore.pyqtSignal(float, str)
-    analysed_all = QtCore.pyqtSignal(object)
-    analysed_api = QtCore.pyqtSignal(object)
-    analysed_pdf = QtCore.pyqtSignal(object)
+    analysed = QtCore.pyqtSignal(object)
 
 
-class Thread(Logger, QtCore.QRunnable):
+class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
     """
     Worker thread
 
@@ -52,7 +50,8 @@ class Thread(Logger, QtCore.QRunnable):
             reader = ExcelReader(self.excel_file)
             records, time_spend = reader.read(progress_callback=self.signals.progressed.emit, p=20)
             t1 = time()
-            self.signals.analysed_all.emit(AllItem("Read excel file", "OK", t1 - start))
+
+            self.signals.analysed.emit(AllItem(self.tr("Read EXCEL file"), "OK", t1 - start))
 
             # Read CSV file
             reader = CSVReader(self.csv_file)
@@ -61,7 +60,7 @@ class Thread(Logger, QtCore.QRunnable):
                 if int(matricule) in records_csv:
                     record["montant_total"] = records_csv[int(matricule)]
             t2 = time()
-            self.signals.analysed_all.emit(AllItem("Read csv file", "OK", t2 - t1))
+            self.signals.analysed.emit(AllItem(self.tr("Read CSV file"), "OK", t2 - t1))
 
             # Calcul distance between adresse_client and adresse_intervenant with google API
             api = DistanceMatrixAPI()
@@ -77,15 +76,15 @@ class Thread(Logger, QtCore.QRunnable):
                         mission["nbrkm_mois"] = mission["quantite_payee"] * 2 * distance
                         mission["forfait"] = mission["total"] / mission["nbrkm_mois"]
 
-                    self.signals.analysed_api.emit(
+                    self.signals.analysed.emit(
                         APIItem(mission["adresse_client"], record["adresse_intervenant"], distance, status, time_spend)
                     )
                 self.signals.progressed.emit(
                     20 + (index / n) * 50,
-                    self.signals.tr(f"Get distance from Google API or DB or cache: {index} / {n}"),
+                    self.tr("Get distance from Google API / DB / cache: {} / {}").format(index, n),
                 )
             t3 = time()
-            self.signals.analysed_all.emit(AllItem("Get distance", "OK", t3 - t2))
+            self.signals.analysed.emit(AllItem(self.tr("Get distance from Google API / DB / Cache"), "OK", t3 - t2))
 
             # Create PDF with data records and distance from the API
             date = os.path.basename(self.excel_file).split(".")[0].split("_")[1]
@@ -93,18 +92,17 @@ class Thread(Logger, QtCore.QRunnable):
             n = len(records)
             for index, record in enumerate(records.values()):
                 (filename, total, status), time_spend = writer.write(record)
-                self.signals.progressed.emit(70 + (index / n) * 30, self.signals.tr(f"Create PDFs: {index} / {n}"))
-                self.signals.analysed_pdf.emit(
+                self.signals.progressed.emit(70 + (index / n) * 30, self.tr("Create PDFs: {} / {}").format(index, n))
+                self.signals.analysed.emit(
                     PDFItem(
                         filename, record.get("montant_total", 0), total, len(record["missions"]), status, time_spend
                     )
                 )
-            t4 = time()
-            self.signals.analysed_all.emit(AllItem("Write PDFs", "OK", t4 - t3))
+            self.signals.analysed.emit(AllItem(self.tr("Write PDFs"), "OK", time() - t3))
 
         except Exception as error:
             self.log.exception(error)
             self.signals.error.emit(error)
         else:
-            self.signals.progressed.emit(100, self.signals.tr("Done!"))
+            self.signals.progressed.emit(100, self.tr("Done!"))
             self.signals.finished.emit(round(time() - start, 2))

@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from pyndf.gui.items.item import Item
 
-class AllItem:
+
+class AllItem(Item):
     """Class for storing data for analyse."""
+
+    headers = ["name", "status", "time"]
 
     def __init__(self, name, status, time):
         """Initialisation"""
@@ -11,6 +15,6 @@ class AllItem:
         self.time = time
 
     @classmethod
-    def headers(cls):
+    def headers_pretty(cls):
         # headers
-        return ["name", "status", "time"]
+        return [cls.tr("Process name"), cls.tr("Status"), cls.tr("Time (s)")]

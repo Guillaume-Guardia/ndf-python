@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 
 
-class APIItem:
+from pyndf.gui.items.item import Item
+
+
+class APIItem(Item):
     """Class for storing data for analyse."""
+
+    headers = ["addr_client", "addr_employee", "distance", "status", "time"]
 
     def __init__(self, addr_client, addr_employee, distance, status, time):
         """Initialisation"""
@@ -13,6 +18,12 @@ class APIItem:
         self.time = time
 
     @classmethod
-    def headers(cls):
+    def headers_pretty(cls):
         # headers
-        return ["addr_client", "addr_employee", "distance", "status", "time"]
+        return [
+            cls.tr("Client address"),
+            cls.tr("Employee address"),
+            cls.tr("Distance"),
+            cls.tr("Status"),
+            cls.tr("Time (s)"),
+        ]

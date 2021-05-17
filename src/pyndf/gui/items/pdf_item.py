@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 
 
-class PDFItem:
+from pyndf.gui.items.item import Item
+
+
+class PDFItem(Item):
     """Class for storing data for analyse."""
+
+    headers = ["filename", "total_db", "total", "nbr_missions", "status", "time"]
 
     def __init__(self, filename, total_db, total, nbr_missions, status, time):
         """Initialisation"""
@@ -14,6 +19,13 @@ class PDFItem:
         self.time = time
 
     @classmethod
-    def headers(cls):
+    def headers_pretty(cls):
         # headers
-        return ["filename", "total_db", "total", "nbr_missions", "status", "time"]
+        return [
+            cls.tr("Filename"),
+            cls.tr("DB Total"),
+            cls.tr("Total"),
+            cls.tr("Number of missions"),
+            cls.tr("Status"),
+            cls.tr("Time (s)"),
+        ]

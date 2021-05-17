@@ -3,13 +3,10 @@
 import os
 import yaml
 
+# configuration file
 COL = "colonne_excel"
 COL_PERSO = "colonne_perso"
 COL_MISSION = "colonne_mission"
-
-LOGO = os.path.join(os.path.dirname(__file__), "data", "apside-logo.png")
-
-# configuration file
 CONF_FILE = os.path.join(os.path.dirname(__file__), "conf", "conf.yaml")
 with open(CONF_FILE, "rt", encoding="utf-8") as opened_file:
     CONFIG = yaml.safe_load(opened_file)
@@ -33,6 +30,9 @@ CONFIG[
   }
   """
 
+# Logo Apside
+LOGO = os.path.join(os.path.dirname(__file__), "data", "apside-logo.png")
+
 # DB file
 DB_FILE = os.path.join(os.path.dirname(__file__), "db", "pydb.db")
 
@@ -48,3 +48,10 @@ for i, color in enumerate(["#008000", "#32CD32", "#ADFF2F"]):
 for bad_status in CONFIG["bad_status"]:
     for substatus in bad_status:
         COLORS[substatus] = "#FFFF00"
+
+# Title app
+TITLE_APP = "PYNDF"
+
+# Title tabs
+TAB_PRO = "process"
+TAB_ANA = "analyse"
