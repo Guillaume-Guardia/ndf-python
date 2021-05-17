@@ -3,7 +3,7 @@
 import re
 from collections import defaultdict
 import pandas as pd
-from PyQt6 import QtCore
+from pyndf.qtlib import QtCore
 from pyndf.logbook import Logger, log_time
 from pyndf.constants import CONFIG, COL, COL_PERSO, COL_MISSION
 
@@ -32,19 +32,21 @@ class ExcelReader(Logger, QtCore.QObject):
         # Initialisation variables
         records = defaultdict(dict)
 
+        print("coucou")
         # Get the data on excel file in dataframe format.
         dataframe = pd.read_excel(path, sheet_name=sheet, na_filter=False, dtype={"matricule": str})
-
+        print("coucou")
         if progress_callback:
-            progress_callback(0.1 * p, self.tr("Load Excel file with pandas..."))
-
+            print("im here")
+            progress_callback.emit(0.1 * p, self.tr("Load Excel file with pandas..."))
+        print("coucou")
         n = len(dataframe.to_dict("records"))
         for index, record in enumerate(dataframe.to_dict("records")):
             matricule = record[CONFIG[COL]["matricule"]]
 
             if self.reg.match(str(record[CONFIG[COL]["libelle"]])) is None:
                 continue
-
+            print("coucou")
             if matricule not in records:
                 # Personal info
                 for key in CONFIG[COL_PERSO]:
@@ -60,6 +62,6 @@ class ExcelReader(Logger, QtCore.QObject):
             records[matricule]["missions"].append(mission_record)
 
             if progress_callback:
-                progress_callback((0.1 + (index / n) * 0.9) * p, self.tr("Select info {} / {}".format(index, n)))
-
+                progress_callback.emit((0.1 + (index / n) * 0.9) * p, self.tr("Select info {} / {}".format(index, n)))
+        print("coucou")
         return records

@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import sys
-import argparse
-from PyQt6 import QtWidgets, QtCore
+from pyndf.qtlib import QtWidgets, QtCore, QtGui
 from pyndf.logbook import Logger
 from pyndf.process.thread import Thread
-from pyndf.constants import CONFIG, TRANSLATION_DIR, TITLE_APP, TAB_PRO, TAB_ANA
+from pyndf.constants import COMPANY, TITLE_APP, TAB_PRO, TAB_ANA
 from pyndf.gui.tabs.analyse import AnalyseTab
 from pyndf.gui.tabs.process import ProcessTab
 from pyndf.gui.items.all_item import AllItem
@@ -26,17 +24,60 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             self.setMinimumWidth(int(resolution.width() / 1.5))
             self.setMinimumHeight(int(resolution.height() / 3))
 
+        self.read_settings()
+
         # Initialisation attributes
         self.threadpool = QtCore.QThreadPool()
 
+        # Menu bar
+        self._create_menu_bar()
+
         # Tabs
-        self.tab_widget = QtWidgets.QTabWidget()
-        self.setCentralWidget(self.tab_widget)
         self.tabs = {}
+        self._create_tabs(excel, csv, output)
+
+        # Progress Bar in status bar
+        self.progress = QtWidgets.QProgressBar()
+        self._create_status_bar()
+
+        self.ctrl_enabled = False
+
+    def _create_menu_bar(self):
+        menu = self.menuBar()
+
+        # file
+        file = menu.addMenu(self.tr("File"))
+
+        # Select language
+        menu.addAction(self.tr("Select language"), self.change_language)
+
+        file.addSeparator()
+        exit_action = QtGui.QAction(self.tr("Exit"), menu)
+        exit_action.setShortcut("Ctrl+Q")
+        exit_action.triggered.connect(self.close)
+        file.addAction(exit_action)
+
+        # views
+        views = menu.addMenu(self.tr("Views"))
+
+        # Help
+        action = QtGui.QAction(
+            self.style().standardIcon(self.style().StandardPixmap.SP_MessageBoxQuestion), "Help", menu
+        )
+        action.triggered.connect(self.open_help)
+
+        self.setMenuWidget(menu)
+
+    def change_language(self):
+        self.log.info("language change")
+
+    def _create_tabs(self, excel, csv, output):
+        widget = QtWidgets.QTabWidget()
+        self.setCentralWidget(widget)
 
         # Process tab
         self.tabs[TAB_PRO] = ProcessTab(self, excel=excel, csv=csv, output=output)
-        self.tab_widget.addTab(self.tabs[TAB_PRO], self.tr("Process"))
+        widget.addTab(self.tabs[TAB_PRO], self.tr("Process"))
 
         # Analyse tabs
         self.tabs[TAB_ANA] = {}
@@ -48,20 +89,19 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         for key, value in info_dict.items():
             self.tabs[TAB_ANA][key] = AnalyseTab(self, value["item"])
-            self.tab_widget.addTab(self.tabs[TAB_ANA][key], value["title"])
+            widget.addTab(self.tabs[TAB_ANA][key], value["title"])
 
-        # Progress Bar in status bar
-        self.progress = QtWidgets.QProgressBar()
-        self.set_progress_bar()
-
-    def set_progress_bar(self):
+    def _create_status_bar(self):
         self.progress.hide()
         status_bar = QtWidgets.QStatusBar()
         status_bar.addPermanentWidget(self.progress, 0)
         self.setStatusBar(status_bar)
 
+    def open_help(self):
+        self.log.info("Help open!")
+
     def generate(self):
-        """Method triggered with the button to start the generation of pdf."""
+        """Method triggered with the button to start the generation of pdf. In process tab"""
         if not all([t.text() for t in self.tabs[TAB_PRO].texts.values()]):
             return None  # If one field is empty, ignore.
 
@@ -77,6 +117,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.threadpool.start(process)
         return True
 
+    @QtCore.pyqtSlot(object)
     def analysed(self, obj):
         if isinstance(obj, AllItem):
             self.tabs[TAB_ANA]["global"].table.add(obj)
@@ -85,6 +126,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         elif isinstance(obj, PDFItem):
             self.tabs[TAB_ANA]["pdf"].table.add(obj)
 
+    @QtCore.pyqtSlot(float, str)
     def progressed(self, value, text):
         if value <= 100:
             self.progress.setValue(int(value))
@@ -98,53 +140,28 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             tab.table.finished()
         self.tabs[TAB_PRO].buttons["generate"].setDisabled(False)
 
+    @QtCore.pyqtSlot(object)
     def error(self, obj):
         self.tear_down()
         QtWidgets.QMessageBox.critical(self, self.tr("Error"), self.tr("Error: {}").format(obj))
 
+    @QtCore.pyqtSlot(float)
     def generated(self, time):
         """Success methdod"""
         self.tear_down()
         QtWidgets.QMessageBox.information(self, self.tr("Finished"), self.tr("PDFs have been generated !"))
 
+    def read_settings(self):
+        settings = QtCore.QSettings(COMPANY, TITLE_APP)
+        geo = settings.value("geometry")
+        state = settings.value("windowState")
+        if geo is not None:
+            self.restoreGeometry(geo)
+        if state is not None:
+            self.restoreState(state)
 
-def main(language="", **kwargs):
-    app = QtWidgets.QApplication([])
-
-    translator = QtCore.QTranslator()
-
-    # Load translator
-    locale = QtCore.QLocale()
-    if language:
-        locale = QtCore.QLocale(language)
-
-    if translator.load(locale, "pyndf", "_", TRANSLATION_DIR, ".qm"):
-        # Install translator
-        app.installTranslator(translator)
-
-    res = app.primaryScreen().availableSize()
-    w = MainWindow(**kwargs, resolution=res)
-
-    w.show()
-    sys.exit(app.exec())
-
-
-def cmdline():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-v", "--verbosity", help="increase output verbosity", action="store_true")
-    parser.add_argument("-e", "--excel", help="Excel file to parse", type=str)
-    parser.add_argument("-c", "--csv", help="CSV file to parse", type=str)
-    parser.add_argument("-o", "--output", help="Output directory", type=str)
-    parser.add_argument("-l", "--language", help="Select language (en, fr)", type=str)
-
-    args = parser.parse_args()
-
-    args.excel = r"C:\Users\guill\Documents\Projets\NDF_python\venv\src\ndf-python\data\FRAIS_202011.XLS"
-    args.csv = r"C:\Users\guill\Documents\Projets\NDF_python\venv\src\ndf-python\data\RE NDF\GA327122020 test.CSV"
-    args.output = "C:/Users/guill/Documents/Projets/NDF_python/venv/src/test2"
-
-    main(excel=args.excel, csv=args.csv, output=args.output, language=args.language)
-
-
-if __name__ == "__main__":
-    cmdline()
+    def closeEvent(self, event):
+        settings = QtCore.QSettings(COMPANY, TITLE_APP)
+        settings.setValue("geometry", self.saveGeometry())
+        settings.setValue("windowState", self.saveState())
+        super().closeEvent(event)

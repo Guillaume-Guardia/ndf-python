@@ -49,8 +49,8 @@ for bad_status in CONFIG["bad_status"]:
     for substatus in bad_status:
         COLORS[substatus] = "#FFFF00"
 
-# Title app
 TITLE_APP = "PYNDF"
+COMPANY = "APSIDE"
 
 # Title tabs
 TAB_PRO = "process"

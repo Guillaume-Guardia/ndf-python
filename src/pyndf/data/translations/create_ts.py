@@ -1,7 +1,7 @@
 import os
 from glob import glob
 import argparse
-from PyQt6.lupdate import lupdate
+from pyndf.qtlib import lupdate
 
 
 def write_ts_files(verbosity=False):

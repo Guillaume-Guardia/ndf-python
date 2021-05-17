@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from PyQt6 import QtCore, QtWidgets, QtGui
-from pyndf.constants import CONFIG, COLORS
-from pyndf.gui.items.total_item import TotalItem
-from pyndf.gui.table.analyse import AnalyseTable
+from pyndf.qtlib import QtWidgets
+from pyndf.gui.tables.analyse import AnalyseTable
 
 
 class AnalyseTab(QtWidgets.QWidget):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from PyQt6 import QtWidgets, QtGui, QtCore
+from pyndf.qtlib import QtWidgets, QtGui, QtCore
 from pyndf.constants import COLORS
 
 
@@ -25,7 +25,7 @@ class Item(QtCore.QObject):
         widget = QtWidgets.QTableWidgetItem(str(value))
 
         if name == "status" or isinstance(value, (int, float)):
-            widget.setTextAlignment(QtCore.Qt.Alignment.AlignCenter)
+            widget.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
         if name == "status":
             widget.setFont(QtGui.QFont(self.font, self.font_size, self.font_weight))

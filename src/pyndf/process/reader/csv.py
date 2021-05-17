@@ -2,7 +2,7 @@
 
 import math
 import pandas as pd
-from PyQt6 import QtCore
+from pyndf.qtlib import QtCore
 from pyndf.logbook import Logger, log_time
 from pyndf.constants import CONFIG
 

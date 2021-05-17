@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from PyQt6 import QtWidgets
+from pyndf.qtlib import QtWidgets
 from pyndf.constants import CONFIG
 from pyndf.gui.items.total_item import TotalItem
 

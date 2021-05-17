@@ -11,6 +11,7 @@ class PDFItem(Item):
 
     def __init__(self, filename, total_db, total, nbr_missions, status, time):
         """Initialisation"""
+        super().__init__()
         self.filename = filename
         self.total_db = total_db
         self.total = total

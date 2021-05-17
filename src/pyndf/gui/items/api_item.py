@@ -11,6 +11,7 @@ class APIItem(Item):
 
     def __init__(self, addr_client, addr_employee, distance, status, time):
         """Initialisation"""
+        super().__init__()
         self.addr_client = addr_client
         self.addr_employee = addr_employee
         self.distance = distance

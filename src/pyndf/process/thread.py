@@ -2,7 +2,7 @@
 
 import os
 from time import time
-from PyQt6 import QtCore
+from pyndf.qtlib import QtCore
 from pyndf.process.reader.excel import ExcelReader
 from pyndf.process.reader.csv import CSVReader
 from pyndf.process.writer.pdf import PdfWriter
@@ -48,7 +48,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
             start = time()
             # Read Excel file
             reader = ExcelReader(self.excel_file)
-            records, time_spend = reader.read(progress_callback=self.signals.progressed.emit, p=20)
+            records, time_spend = reader.read(progress_callback=self.signals.progressed, p=20)
             t1 = time()
 
             self.signals.analysed.emit(AllItem(self.tr("Read EXCEL file"), "OK", t1 - start))

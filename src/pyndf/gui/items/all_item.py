@@ -10,6 +10,7 @@ class AllItem(Item):
 
     def __init__(self, name, status, time):
         """Initialisation"""
+        super().__init__()
         self.name = name
         self.status = status
         self.time = time
