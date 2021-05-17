@@ -5,9 +5,10 @@ from pyndf.gui.tables.analyse import AnalyseTable
 
 
 class AnalyseTab(QtWidgets.QWidget):
-    def __init__(self, window, *args):
+    def __init__(self, window, title, *args):
         super().__init__()
         self.window = window
+        self.title = title
 
         # Create table
         self.table = AnalyseTable(self, *args)

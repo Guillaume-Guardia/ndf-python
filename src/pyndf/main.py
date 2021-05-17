@@ -1,30 +1,54 @@
 # -*- coding: utf-8 -*-
 
+import os
 import sys
 import argparse
+from glob import glob
 from pyndf.qtlib import QtWidgets, QtCore
 from pyndf.constants import TRANSLATION_DIR
 from pyndf.gui.windows.main_window import MainWindow
 
 
+class App(QtWidgets.QApplication):
+    def __init__(self, *args, language="", **kwargs):
+        super().__init__(*args)
+
+        self.locale = QtCore.QLocale()
+        self.set_locale(language)
+
+        self.language_available = []
+
+        ts_files = glob(os.path.join(TRANSLATION_DIR, "*.ts"))
+        for ts_file in ts_files:
+            self.language_available.append(os.path.basename(ts_file).split(".")[0].split("_")[1])
+
+        self.resolution = self.primaryScreen().availableSize()
+
+        self.translator = None
+
+    def set_locale(self, language):
+        if language:
+            self.locale = QtCore.QLocale(language)
+
+    def set_translator(self):
+
+        if self.translator is not None:
+            self.removeTranslator(self.translator)
+
+        translator = QtCore.QTranslator()
+
+        # Load translator
+        if translator.load(self.locale, "pyndf", "_", TRANSLATION_DIR, ".qm"):
+            # Install translator
+            self.installTranslator(translator)
+            self.translator = translator
+
+
 def main(language="", **kwargs):
-    app = QtWidgets.QApplication([])
+    app = App([], language=language)
 
-    translator = QtCore.QTranslator()
-
-    # Load translator
-    locale = QtCore.QLocale()
-    if language:
-        locale = QtCore.QLocale(language)
-
-    if translator.load(locale, "pyndf", "_", TRANSLATION_DIR, ".qm"):
-        # Install translator
-        app.installTranslator(translator)
-
-    res = app.primaryScreen().availableSize()
-    w = MainWindow(**kwargs, resolution=res)
-
-    w.show()
+    window = MainWindow(app, **kwargs)
+    window.show()
     sys.exit(app.exec())
 
 

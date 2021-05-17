@@ -14,27 +14,32 @@ from pyndf.gui.items.pdf_item import PDFItem
 class MainWindow(Logger, QtWidgets.QMainWindow):
     """Main window of the app"""
 
-    def __init__(self, excel="", csv="", output="", resolution=None):
+    def __init__(self, app, excel="", csv="", output=""):
         super().__init__()
+        self.app = app
+
+        self.excel = excel
+        self.csv = csv
+        self.output = output
 
         # Window parameters
         self.setWindowTitle(TITLE_APP)
         self.setWindowIcon(self.style().standardIcon(self.style().StandardPixmap.SP_TitleBarMenuButton))
-        if resolution:
-            self.setMinimumWidth(int(resolution.width() / 1.5))
-            self.setMinimumHeight(int(resolution.height() / 3))
+        if app.resolution:
+            self.setMinimumWidth(int(app.resolution.width() / 1.5))
+            self.setMinimumHeight(int(app.resolution.height() / 3))
 
         self.read_settings()
 
         # Initialisation attributes
         self.threadpool = QtCore.QThreadPool()
 
-        # Menu bar
-        self._create_menu_bar()
-
         # Tabs
         self.tabs = {}
         self._create_tabs(excel, csv, output)
+
+        # Menu bar
+        self._create_menu_bar()
 
         # Progress Bar in status bar
         self.progress = QtWidgets.QProgressBar()
@@ -49,7 +54,10 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         file = menu.addMenu(self.tr("File"))
 
         # Select language
-        menu.addAction(self.tr("Select language"), self.change_language)
+        language = menu.addMenu(self.tr("Select language"))
+
+        for lang in self.app.language_available:
+            language.addAction(lang, lambda l=lang: self.change_language(l))
 
         file.addSeparator()
         exit_action = QtGui.QAction(self.tr("Exit"), menu)
@@ -59,25 +67,42 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         # views
         views = menu.addMenu(self.tr("Views"))
+        for tab in [self.tabs[TAB_PRO]] + list(self.tabs[TAB_ANA].values()):
+            new_action = QtGui.QAction(tab.title, views)
+            new_action.setCheckable(True)
+            new_action.setChecked(True)
+            new_action.toggled.connect(lambda boolean, tab_=tab: self.toggled_tab(tab_, boolean))
+            views.addAction(new_action)
 
         # Help
+        help = menu.addMenu(self.tr("Help"))
         action = QtGui.QAction(
-            self.style().standardIcon(self.style().StandardPixmap.SP_MessageBoxQuestion), "Help", menu
+            self.style().standardIcon(self.style().StandardPixmap.SP_MessageBoxQuestion), "Help", help
         )
         action.triggered.connect(self.open_help)
 
         self.setMenuWidget(menu)
 
-    def change_language(self):
-        self.log.info("language change")
+    def toggled_tab(self, tab, boolean):
+        widget = self.centralWidget()
+        widget.setTabVisible(tab.index, boolean)
+
+    def change_language(self, language):
+        self.app.set_locale(language)
+        self.app.set_translator()
+
+        new_window = MainWindow(self.app, self.excel, self.csv, self.output)
+        new_window.show()
+
+        self.deleteLater()
 
     def _create_tabs(self, excel, csv, output):
         widget = QtWidgets.QTabWidget()
         self.setCentralWidget(widget)
 
         # Process tab
-        self.tabs[TAB_PRO] = ProcessTab(self, excel=excel, csv=csv, output=output)
-        widget.addTab(self.tabs[TAB_PRO], self.tr("Process"))
+        self.tabs[TAB_PRO] = ProcessTab(self, self.tr("Process"), excel=excel, csv=csv, output=output)
+        self.tabs[TAB_PRO].index = widget.addTab(self.tabs[TAB_PRO], self.tabs[TAB_PRO].title)
 
         # Analyse tabs
         self.tabs[TAB_ANA] = {}
@@ -88,8 +113,8 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         }
 
         for key, value in info_dict.items():
-            self.tabs[TAB_ANA][key] = AnalyseTab(self, value["item"])
-            widget.addTab(self.tabs[TAB_ANA][key], value["title"])
+            self.tabs[TAB_ANA][key] = AnalyseTab(self, value["title"], value["item"])
+            self.tabs[TAB_ANA][key].index = widget.addTab(self.tabs[TAB_ANA][key], self.tabs[TAB_ANA][key].title)
 
     def _create_status_bar(self):
         self.progress.hide()

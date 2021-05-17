@@ -7,9 +7,10 @@ from pyndf.constants import CONFIG
 
 
 class ProcessTab(QtWidgets.QWidget):
-    def __init__(self, window, excel="", csv="", output=""):
+    def __init__(self, window, title, excel="", csv="", output=""):
         super().__init__()
         self.window = window
+        self.title = title
 
         # Graphics elements
         self.labels = {}

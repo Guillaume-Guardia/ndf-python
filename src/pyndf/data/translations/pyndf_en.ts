@@ -4,27 +4,27 @@
 <context>
     <name>APIItem</name>
     <message>
-        <location filename="../../gui/items/api_item.py" line="24"/>
+        <location filename="../../gui/items/api_item.py" line="25"/>
         <source>Client address</source>
         <translation>Client address</translation>
     </message>
     <message>
-        <location filename="../../gui/items/api_item.py" line="25"/>
+        <location filename="../../gui/items/api_item.py" line="26"/>
         <source>Employee address</source>
         <translation>Employee address</translation>
     </message>
     <message>
-        <location filename="../../gui/items/api_item.py" line="26"/>
+        <location filename="../../gui/items/api_item.py" line="27"/>
         <source>Distance</source>
         <translation>Distance</translation>
     </message>
     <message>
-        <location filename="../../gui/items/api_item.py" line="27"/>
+        <location filename="../../gui/items/api_item.py" line="28"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../../gui/items/api_item.py" line="28"/>
+        <location filename="../../gui/items/api_item.py" line="29"/>
         <source>Time (s)</source>
         <translation>Time (s)</translation>
     </message>
@@ -32,17 +32,17 @@
 <context>
     <name>AllItem</name>
     <message>
-        <location filename="../../gui/items/all_item.py" line="23"/>
+        <location filename="../../gui/items/all_item.py" line="21"/>
         <source>Process name</source>
         <translation>Process name</translation>
     </message>
     <message>
-        <location filename="../../gui/items/all_item.py" line="23"/>
+        <location filename="../../gui/items/all_item.py" line="21"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../../gui/items/all_item.py" line="23"/>
+        <location filename="../../gui/items/all_item.py" line="21"/>
         <source>Time (s)</source>
         <translation>Time (s)</translation>
     </message>
@@ -50,15 +50,14 @@
 <context>
     <name>AnalyseTab</name>
     <message>
-        <location filename="../../gui/tabs/analyse.py" line="52"/>
         <source>Total</source>
-        <translation>Total</translation>
+        <translation type="vanished">Total</translation>
     </message>
 </context>
 <context>
     <name>ExcelReader</name>
     <message>
-        <location filename="../../process/reader/excel.py" line="39"/>
+        <location filename="../../process/reader/excel.py" line="41"/>
         <source>Load Excel file with pandas...</source>
         <translation>Load Excel file with pandas...</translation>
     </message>
@@ -70,42 +69,67 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../app.py" line="39"/>
+        <location filename="../../gui/windows/main_window.py" line="54"/>
+        <source>File</source>
+        <translation>File</translation>
+    </message>
+    <message>
+        <location filename="../../gui/windows/main_window.py" line="57"/>
+        <source>Select language</source>
+        <translation>Select language</translation>
+    </message>
+    <message>
+        <location filename="../../gui/windows/main_window.py" line="63"/>
+        <source>Exit</source>
+        <translation>Exit</translation>
+    </message>
+    <message>
+        <location filename="../../gui/windows/main_window.py" line="69"/>
+        <source>Views</source>
+        <translation>Views</translation>
+    </message>
+    <message>
+        <location filename="../../gui/windows/main_window.py" line="72"/>
+        <source>Help</source>
+        <translation>Help</translation>
+    </message>
+    <message>
+        <location filename="../../gui/windows/main_window.py" line="95"/>
         <source>Process</source>
         <translation>Process</translation>
     </message>
     <message>
-        <location filename="../../app.py" line="44"/>
+        <location filename="../../gui/windows/main_window.py" line="100"/>
         <source>Global Analyse</source>
         <translation>Global Analyse</translation>
     </message>
     <message>
-        <location filename="../../app.py" line="45"/>
+        <location filename="../../gui/windows/main_window.py" line="101"/>
         <source>Distance Google API Analyse</source>
         <translation>Distance Google API Analyse</translation>
     </message>
     <message>
-        <location filename="../../app.py" line="46"/>
+        <location filename="../../gui/windows/main_window.py" line="102"/>
         <source>PDF Writer Analyse</source>
         <translation>PDF Writer Analyse</translation>
     </message>
     <message>
-        <location filename="../../app.py" line="103"/>
+        <location filename="../../gui/windows/main_window.py" line="161"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../../app.py" line="103"/>
+        <location filename="../../gui/windows/main_window.py" line="161"/>
         <source>Error: {}</source>
         <translation>Error: {}</translation>
     </message>
     <message>
-        <location filename="../../app.py" line="108"/>
+        <location filename="../../gui/windows/main_window.py" line="167"/>
         <source>Finished</source>
         <translation>Finished</translation>
     </message>
     <message>
-        <location filename="../../app.py" line="108"/>
+        <location filename="../../gui/windows/main_window.py" line="167"/>
         <source>PDFs have been generated !</source>
         <translation>PDFs have been generated !</translation>
     </message>
@@ -153,32 +177,32 @@
 <context>
     <name>PDFItem</name>
     <message>
-        <location filename="../../gui/items/pdf_item.py" line="25"/>
+        <location filename="../../gui/items/pdf_item.py" line="26"/>
         <source>Filename</source>
         <translation>Filename</translation>
     </message>
     <message>
-        <location filename="../../gui/items/pdf_item.py" line="26"/>
+        <location filename="../../gui/items/pdf_item.py" line="27"/>
         <source>DB Total</source>
         <translation>DB Total</translation>
     </message>
     <message>
-        <location filename="../../gui/items/pdf_item.py" line="27"/>
+        <location filename="../../gui/items/pdf_item.py" line="28"/>
         <source>Total</source>
         <translation>Total</translation>
     </message>
     <message>
-        <location filename="../../gui/items/pdf_item.py" line="28"/>
+        <location filename="../../gui/items/pdf_item.py" line="29"/>
         <source>Number of missions</source>
         <translation>Number of missions</translation>
     </message>
     <message>
-        <location filename="../../gui/items/pdf_item.py" line="29"/>
+        <location filename="../../gui/items/pdf_item.py" line="30"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../../gui/items/pdf_item.py" line="30"/>
+        <location filename="../../gui/items/pdf_item.py" line="31"/>
         <source>Time (s)</source>
         <translation>Time (s)</translation>
     </message>
@@ -268,6 +292,14 @@
     <message>
         <source>Get distance</source>
         <translation type="vanished">Get distance</translation>
+    </message>
+</context>
+<context>
+    <name>TotalItem</name>
+    <message>
+        <location filename="../../gui/items/total_item.py" line="17"/>
+        <source>Total</source>
+        <translation>Total</translation>
     </message>
 </context>
 </TS>
