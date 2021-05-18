@@ -9,15 +9,6 @@ class APIItem(Item):
 
     headers = ["addr_client", "addr_employee", "distance", "status", "time"]
 
-    def __init__(self, addr_client, addr_employee, distance, status, time):
-        """Initialisation"""
-        super().__init__()
-        self.addr_client = addr_client
-        self.addr_employee = addr_employee
-        self.distance = distance
-        self.status = status
-        self.time = time
-
     @classmethod
     def headers_pretty(cls):
         # headers

@@ -12,6 +12,13 @@ class Item(QtCore.QObject):
     font_weight = QtGui.QFont.Weight.Bold
     headers = []
 
+    def __init__(self, *args):
+        """Initialisation"""
+        super().__init__()
+
+        for index, arg in enumerate(args):
+            setattr(self, self.headers[index], arg)
+
     @classmethod
     def column_count(cls):
         return len(cls.headers)

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from contextlib import contextmanager
-from sqlite3 import IntegrityError
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 

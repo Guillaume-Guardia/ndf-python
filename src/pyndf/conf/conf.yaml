@@ -89,6 +89,7 @@ colonne_csv:
   agence: 'Intitul� �tablissement'
   unite: 'Unit� du salari�'
   matricule: Matricule
+  nom: Nom
   prenom: 'Pr�nom'
   quantite1: 'Nombre Ind. D�plac. 82000'
   montant1: 'Montant salarial Ind. D�plac. 82000'

@@ -46,6 +46,8 @@ class PdfWriter(Logger, BaseDocTemplate):
         self.version = "1.0"
         self.fund = "fund"
 
+        self.log.info("Create PDFs")
+
     def all_page_setup(self, canvas, doc, add_header=True, add_footer=True, add_watermark=False):
         """Set up page.
 
@@ -224,7 +226,7 @@ class PdfWriter(Logger, BaseDocTemplate):
             data (dict): record data with personnal info of collaborator and his missions info.
         """
         matricule = data.get("matricule", UNKNOWN)
-        self.log.info(f"Start Create pdf for matricule {matricule} with {len(data['missions'])} missions.")
+        self.log.debug(f"Create pdf for matricule {matricule} with {len(data['missions'])} missions.")
         filename = f"{data.get('agence', UNKNOWN)}_{matricule}_{self.date.strftime('%Y%m')}"
         path = self.check_path(filename)
 

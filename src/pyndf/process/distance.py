@@ -19,13 +19,15 @@ class DistanceMatrixAPI(Logger):
 
     _cache = {}
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.key = CONFIG["distance_params"]["key"]
         self.language = CONFIG["distance_params"]["language"]
         self.mode = CONFIG["distance_params"]["mode"]
         self.unit = CONFIG["distance_params"]["unit"]
         self.client = googlemaps.Client(self.key)
+
+        self.log.info("Get distance with API or DB or cache from Excel file")
 
     def format_address(self, addr):
         """Formatter of addresses. Each address is returned like:
@@ -57,13 +59,13 @@ class DistanceMatrixAPI(Logger):
         Returns:
             (tuple): Returned the result of API: distance between the client_address and employee_address with duration.
         """
-        self.log.debug(f"Start calcul the distance between {client_address} and {employee_address}.")
+        self.log.debug(f"Get the distance between {client_address} and {employee_address}.")
         client_address = self.format_address(client_address)
         employee_address = self.format_address(employee_address)
 
         # Check cache
         if (client_address, employee_address) in self._cache:
-            self.log.info(
+            self.log.debug(
                 f"Status: {CONFIG['good_status'][1]} || Result: {self._cache[(client_address, employee_address)]}"
             )
             return CONFIG["good_status"][1], self._cache[(client_address, employee_address)]
@@ -81,7 +83,7 @@ class DistanceMatrixAPI(Logger):
                 # Add in cache
                 self._cache[(client_address, employee_address)] = (measure.distance, measure.duration)
 
-                self.log.info(f"Status: {CONFIG['good_status'][2]} || Result: {(measure.distance, measure.duration)}")
+                self.log.debug(f"Status: {CONFIG['good_status'][2]} || Result: {(measure.distance, measure.duration)}")
                 return CONFIG["good_status"][2], (measure.distance, measure.duration)
 
         dict_params = dict(
@@ -121,12 +123,12 @@ class DistanceMatrixAPI(Logger):
             # Check if client or employee exists
             new_client = Client(address=client_address)
             if session.query(Client).filter(Client.address == client_address).first() is None:
-                self.log.info(f"Add new client {new_client}")
+                self.log.debug(f"Add new client {new_client}")
                 session.add(new_client)
 
             new_employee = Employee(address=employee_address)
             if session.query(Employee).filter(Employee.address == employee_address).first() is None:
-                self.log.info(f"Add new employee {new_employee}")
+                self.log.debug(f"Add new employee {new_employee}")
                 session.add(new_employee)
 
             session.flush()
@@ -144,8 +146,8 @@ class DistanceMatrixAPI(Logger):
                 distance=distance,
                 duration=duration,
             )
-            self.log.info(f"Add new measure {new_measure}")
+            self.log.debug(f"Add new measure {new_measure}")
             session.add(new_measure)
 
-        self.log.info(f"Status: {element_status} || Result: {(distance, duration)}")
+        self.log.debug(f"Status: {element_status} || Result: {(distance, duration)}")
         return element_status, (distance, duration)

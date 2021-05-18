@@ -18,9 +18,9 @@ class ProcessTab(QtWidgets.QWidget):
         self.texts = {}
 
         # Explorer buttons
-        self.add_button(self.tr("EXCEL file"), "(*.xl* *.XLS)", default=excel)
-        self.add_button(self.tr("CSV file"), "(*.csv)", default=csv)
-        self.add_button(self.tr("output directory"), default=output)
+        self.add_button("excel", self.tr("EXCEL file"), "(*.xl* *.XLS)", default=excel)
+        self.add_button("csv", self.tr("CSV file"), "(*.csv)", default=csv)
+        self.add_button("output", self.tr("output directory"), default=output)
 
         # Add grid layout
         grid_layout = QtWidgets.QGridLayout()
@@ -47,23 +47,24 @@ class ProcessTab(QtWidgets.QWidget):
 
         self.setLayout(layout)
 
-    def add_button(self, name, _format=None, default=""):
+    def add_button(self, name_env, name, _format=None, default=""):
         """Add label, text + button
 
         Args:
+            name_env (str): name of button in app
             name (str): name of the button
             _format (str, optional): format of file. Defaults to None.
             default (str, optional): default text. Defaults to "".
         """
-        self.labels[name] = QtWidgets.QLabel(name.capitalize())
-        self.texts[name] = QtWidgets.QLineEdit()
-        self.texts[name].setText(default)
-        self.texts[name].setFixedHeight(30)
-        self.texts[name].setDisabled(True)  # must use the file finder to select a valid file.
+        self.labels[name_env] = QtWidgets.QLabel(name.capitalize())
+        self.texts[name_env] = QtWidgets.QLineEdit()
+        self.texts[name_env].setText(default)
+        self.texts[name_env].setFixedHeight(30)
+        self.texts[name_env].setDisabled(True)  # must use the file finder to select a valid file.
 
-        self.buttons[name] = QtWidgets.QPushButton("...")
-        self.buttons[name].setFixedHeight(30)
-        self.buttons[name].pressed.connect(lambda: self.choose(name, _format))
+        self.buttons[name_env] = QtWidgets.QPushButton("...")
+        self.buttons[name_env].setFixedHeight(30)
+        self.buttons[name_env].pressed.connect(lambda: self.choose(name_env, name, _format))
 
     def add_widget(self, widgets):
         """add widget in center of Horizontal layout
@@ -91,7 +92,7 @@ class ProcessTab(QtWidgets.QWidget):
         widget.setLayout(layout)
         return widget
 
-    def choose(self, name, _format):
+    def choose(self, name_env, name, _format):
         """Method which call the native file dialog to choose file."""
         if _format is None:
             path = QtWidgets.QFileDialog.getExistingDirectory(self, self.tr("Select a folder"))
@@ -100,4 +101,5 @@ class ProcessTab(QtWidgets.QWidget):
                 self, self.tr("Select a file"), filter=f"{name.capitalize()} {_format}"
             )
         if path:
-            self.texts[name].setText(path)
+            self.texts[name_env].setText(path)
+            setattr(self.window, name_env, path)

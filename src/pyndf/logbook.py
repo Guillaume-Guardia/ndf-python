@@ -8,10 +8,10 @@ from colorlog import ColoredFormatter
 class Logger:
     """Log class"""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, log_level=None, **kwargs):
         """Initialisation method"""
         super().__init__(*args, **kwargs)
-        self.log_level = logging.INFO
+        self.log_level = log_level or logging.INFO
         self.log = self.setup_logger()
 
     def setup_logger(self):
@@ -54,7 +54,7 @@ def log_time(func):
         start = time()
         result = func(*args, **kwargs)
         end = round(time() - start, 5)
-        args[0].log.info(f"END {func.__name__:*<70} {end}s")
+        args[0].log.debug(f"END {func.__name__:*<70} {end}s")
         return result, end
 
     return wrapper

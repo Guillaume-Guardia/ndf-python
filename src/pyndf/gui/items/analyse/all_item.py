@@ -8,13 +8,6 @@ class AllItem(Item):
 
     headers = ["name", "status", "time"]
 
-    def __init__(self, name, status, time):
-        """Initialisation"""
-        super().__init__()
-        self.name = name
-        self.status = status
-        self.time = time
-
     @classmethod
     def headers_pretty(cls):
         # headers

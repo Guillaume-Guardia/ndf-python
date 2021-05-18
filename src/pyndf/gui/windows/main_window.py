@@ -6,18 +6,19 @@ from pyndf.process.thread import Thread
 from pyndf.constants import COMPANY, TITLE_APP, TAB_PRO, TAB_ANA
 from pyndf.gui.tabs.analyse import AnalyseTab
 from pyndf.gui.tabs.process import ProcessTab
-from pyndf.gui.items.all_item import AllItem
-from pyndf.gui.items.api_item import APIItem
-from pyndf.gui.items.pdf_item import PDFItem
+from pyndf.gui.items.analyse.all_item import AllItem
+from pyndf.gui.items.analyse.api_item import APIItem
+from pyndf.gui.items.analyse.pdf_item import PDFItem
+from pyndf.gui.items.reader.excel_item import ExcelItem
+from pyndf.gui.items.reader.csv_item import CSVItem
 
 
 class MainWindow(Logger, QtWidgets.QMainWindow):
     """Main window of the app"""
 
-    def __init__(self, app, excel="", csv="", output=""):
-        super().__init__()
+    def __init__(self, app, excel=None, csv=None, output=None, **kwargs):
+        super().__init__(**kwargs)
         self.app = app
-
         self.excel = excel
         self.csv = csv
         self.output = output
@@ -36,7 +37,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         # Tabs
         self.tabs = {}
-        self._create_tabs(excel, csv, output)
+        self._create_tabs()
 
         # Menu bar
         self._create_menu_bar()
@@ -44,8 +45,6 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         # Progress Bar in status bar
         self.progress = QtWidgets.QProgressBar()
         self._create_status_bar()
-
-        self.ctrl_enabled = False
 
     def _create_menu_bar(self):
         menu = self.menuBar()
@@ -88,20 +87,19 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         widget.setTabVisible(tab.index, boolean)
 
     def change_language(self, language):
-        self.app.set_locale(language)
-        self.app.set_translator()
+        self.app.language = language
+        self.app.load_translator()
+        self.app.window = MainWindow(self.app, self.excel, self.csv, self.output, log_level=self.log_level)
 
-        new_window = MainWindow(self.app, self.excel, self.csv, self.output)
-        new_window.show()
-
+        # self.blockSignals(True)
         self.deleteLater()
 
-    def _create_tabs(self, excel, csv, output):
+    def _create_tabs(self):
         widget = QtWidgets.QTabWidget()
         self.setCentralWidget(widget)
 
         # Process tab
-        self.tabs[TAB_PRO] = ProcessTab(self, self.tr("Process"), excel=excel, csv=csv, output=output)
+        self.tabs[TAB_PRO] = ProcessTab(self, self.tr("Process"), excel=self.excel, csv=self.csv, output=self.output)
         self.tabs[TAB_PRO].index = widget.addTab(self.tabs[TAB_PRO], self.tabs[TAB_PRO].title)
 
         # Analyse tabs
@@ -110,6 +108,8 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             "global": {"title": self.tr("Global Analyse"), "item": AllItem},
             "api": {"title": self.tr("Distance Google API Analyse"), "item": APIItem},
             "pdf": {"title": self.tr("PDF Writer Analyse"), "item": PDFItem},
+            "excel": {"title": self.tr("Excel Reader"), "item": ExcelItem},
+            "csv": {"title": self.tr("CSV Reader"), "item": CSVItem},
         }
 
         for key, value in info_dict.items():
@@ -134,7 +134,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.tabs[TAB_PRO].buttons["generate"].setDisabled(True)
         for tab in self.tabs[TAB_ANA].values():
             tab.table.init()
-        process = Thread(*[t.text() for t in self.tabs[TAB_PRO].texts.values()])
+        process = Thread(*[t.text() for t in self.tabs[TAB_PRO].texts.values()], log_level=self.log_level)
         process.signals.error.connect(self.error)
         process.signals.finished.connect(self.generated)
         process.signals.progressed.connect(self.progressed)
@@ -150,6 +150,10 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             self.tabs[TAB_ANA]["api"].table.add(obj)
         elif isinstance(obj, PDFItem):
             self.tabs[TAB_ANA]["pdf"].table.add(obj)
+        elif isinstance(obj, ExcelItem):
+            self.tabs[TAB_ANA]["excel"].table.add(obj)
+        elif isinstance(obj, CSVItem):
+            self.tabs[TAB_ANA]["csv"].table.add(obj)
 
     @QtCore.pyqtSlot(float, str)
     def progressed(self, value, text):
@@ -179,14 +183,24 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
     def read_settings(self):
         settings = QtCore.QSettings(COMPANY, TITLE_APP)
         geo = settings.value("geometry")
-        state = settings.value("windowState")
         if geo is not None:
             self.restoreGeometry(geo)
+
+        state = settings.value("windowState")
         if state is not None:
             self.restoreState(state)
+
+        for name in ("excel", "csv", "output"):
+            attr = settings.value(name)
+            if attr is not None and getattr(self, name) is None:
+                setattr(self, name, attr)
 
     def closeEvent(self, event):
         settings = QtCore.QSettings(COMPANY, TITLE_APP)
         settings.setValue("geometry", self.saveGeometry())
         settings.setValue("windowState", self.saveState())
+
+        # Memory
+        for name in ("excel", "csv", "output"):
+            settings.setValue(name, getattr(self, name))
         super().closeEvent(event)
