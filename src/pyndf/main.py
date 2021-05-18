@@ -3,6 +3,7 @@
 import os
 import sys
 import argparse
+import tempfile
 from glob import glob
 import logging
 from pyndf.qtlib import QtWidgets, QtCore
@@ -13,6 +14,8 @@ from pyndf.gui.windows.main_window import MainWindow
 class App(QtWidgets.QApplication):
     def __init__(self, language, *args):
         super().__init__(*args)
+
+        self.temp_dir = tempfile.mkdtemp()
 
         self.__window = None
         self.__language = None
@@ -67,7 +70,8 @@ def main(language, **kwargs):
     app = App(language, [])
     app.load_translator()
     app.window = MainWindow(app, **kwargs)
-    sys.exit(app.exec())
+
+    return app.exec()
 
 
 def cmdline():
@@ -85,8 +89,8 @@ def cmdline():
     else:
         level = logging.INFO
 
-    main(args.language, excel=args.excel, csv=args.csv, output=args.output, log_level=level)
+    return main(args.language, excel=args.excel, csv=args.csv, output=args.output, log_level=level)
 
 
 if __name__ == "__main__":
-    cmdline()
+    sys.exit(cmdline())

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import shutil
 from pyndf.qtlib import QtWidgets, QtCore, QtGui
 from pyndf.logbook import Logger
 from pyndf.process.thread import Thread
@@ -81,6 +82,9 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         action.triggered.connect(self.open_help)
 
         self.setMenuWidget(menu)
+
+    def set_excel_from_writer(self, path):
+        self.tabs[TAB_PRO].texts["excel"].setText(path)
 
     def toggled_tab(self, tab, boolean):
         widget = self.centralWidget()
@@ -199,6 +203,9 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         settings = QtCore.QSettings(COMPANY, TITLE_APP)
         settings.setValue("geometry", self.saveGeometry())
         settings.setValue("windowState", self.saveState())
+
+        # Remove temp directory
+        shutil.rmtree(self.app.temp_dir, ignore_errors=True)
 
         # Memory
         for name in ("excel", "csv", "output"):
