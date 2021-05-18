@@ -18,7 +18,7 @@ class CSVReader(Logger, QtCore.QObject):
         self.filename = filename
 
     @log_time
-    def read(self, filename=None, analysed=None):
+    def read(self, filename=None, analysed=None, just_read=False):
         # Initialisation variables
         records = {}
 
@@ -30,7 +30,11 @@ class CSVReader(Logger, QtCore.QObject):
         n = len(dataframe.to_dict("records"))
         for index, record in enumerate(dataframe.to_dict("records")):
             montant_total = 0
-            analysed.emit(CSVItem(*list(record.values())))
+            analysed(CSVItem(*list(record.values())))
+
+            if just_read:
+                continue
+
             for i in range(1, 4):
                 montant = record[CONFIG["colonne_csv"][f"montant{i}"]]
                 if not math.isnan(montant):

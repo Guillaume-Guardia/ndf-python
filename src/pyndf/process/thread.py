@@ -19,7 +19,7 @@ class WorkerSignals(QtCore.QObject):
     """
 
     error = QtCore.pyqtSignal(object)
-    finished = QtCore.pyqtSignal(float)
+    finished = QtCore.pyqtSignal()
     progressed = QtCore.pyqtSignal(float, str)
     analysed = QtCore.pyqtSignal(object)
 
@@ -50,15 +50,14 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
             # Read Excel file
             reader = ExcelReader(self.excel_file, log_level=self.log_level)
             records, time_spend = reader.read(
-                progress_callback=self.signals.progressed, p=20, analysed=self.signals.analysed
+                progress_callback=self.signals.progressed, p=20, analysed=self.signals.analysed.emit
             )
             t1 = time()
-
             self.signals.analysed.emit(AllItem(self.tr("Read EXCEL file"), "OK", t1 - start))
 
             # Read CSV file
             reader = CSVReader(self.csv_file, log_level=self.log_level)
-            records_csv, time_spend = reader.read(analysed=self.signals.analysed)
+            records_csv, time_spend = reader.read(analysed=self.signals.analysed.emit)
             for matricule, record in records.items():
                 if int(matricule) in records_csv:
                     record["montant_total"] = records_csv[int(matricule)]
@@ -109,4 +108,4 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
         else:
             self.log.info("End process")
             self.signals.progressed.emit(100, self.tr("Done!"))
-            self.signals.finished.emit(round(time() - start, 2))
+            self.signals.finished.emit()

@@ -27,7 +27,7 @@ class ExcelReader(Logger, QtCore.QObject):
         self.reg = re.compile(regex_libelle)
 
     @log_time
-    def read(self, filename=None, sheet_name=0, progress_callback=None, p=100, analysed=None):
+    def read(self, filename=None, sheet_name=0, progress_callback=None, p=100, analysed=None, just_read=False):
         path = filename or self.filename
         sheet = sheet_name or self.sheet_name
         self.log.info(f"Extract Data from sheet {sheet} and excel file {os.path.basename(path)}")
@@ -42,10 +42,10 @@ class ExcelReader(Logger, QtCore.QObject):
 
         n = len(dataframe.to_dict("records"))
         for index, record in enumerate(dataframe.to_dict("records")):
-            analysed.emit(ExcelItem(*list(record.values())))
+            analysed(ExcelItem(*list(record.values())))
             matricule = record[CONFIG[COL]["matricule"]]
 
-            if self.reg.match(str(record[CONFIG[COL]["libelle"]])) is None:
+            if self.reg.match(str(record[CONFIG[COL]["libelle"]])) is None or just_read:
                 continue
 
             if matricule not in records:

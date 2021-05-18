@@ -7,7 +7,6 @@ from pyndf.gui.items.analyse.all_item import AllItem
 from pyndf.gui.items.analyse.api_item import APIItem
 from pyndf.gui.items.analyse.pdf_item import PDFItem
 from pyndf.gui.items.reader.excel_item import ExcelItem
-from pyndf.gui.tables.excel import ExcelTable
 
 
 def tables_factory(tab, item):

@@ -102,10 +102,6 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         widget = QtWidgets.QTabWidget()
         self.setCentralWidget(widget)
 
-        # Process tab
-        self.tabs[TAB_PRO] = ProcessTab(self, self.tr("Process"), excel=self.excel, csv=self.csv, output=self.output)
-        self.tabs[TAB_PRO].index = widget.addTab(self.tabs[TAB_PRO], self.tabs[TAB_PRO].title)
-
         # Analyse tabs
         self.tabs[TAB_ANA] = {}
         info_dict = {
@@ -116,9 +112,17 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             "csv": {"title": self.tr("CSV Reader"), "item": CSVItem},
         }
 
-        for key, value in info_dict.items():
+        for index, (key, value) in enumerate(info_dict.items()):
             self.tabs[TAB_ANA][key] = AnalyseTab(self, value["title"], value["item"])
-            self.tabs[TAB_ANA][key].index = widget.addTab(self.tabs[TAB_ANA][key], self.tabs[TAB_ANA][key].title)
+            self.tabs[TAB_ANA][key].index = widget.insertTab(
+                index + 1, self.tabs[TAB_ANA][key], self.tabs[TAB_ANA][key].title
+            )
+
+        # Process tab
+        self.tabs[TAB_PRO] = ProcessTab(self, self.tr("Process"), excel=self.excel, csv=self.csv, output=self.output)
+        self.tabs[TAB_PRO].index = widget.insertTab(0, self.tabs[TAB_PRO], self.tabs[TAB_PRO].title)
+
+        widget.setCurrentIndex(0)
 
     def _create_status_bar(self):
         self.progress.hide()
@@ -178,8 +182,8 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.tear_down()
         QtWidgets.QMessageBox.critical(self, self.tr("Error"), self.tr("Error: {}").format(obj))
 
-    @QtCore.pyqtSlot(float)
-    def generated(self, time):
+    @QtCore.pyqtSlot()
+    def generated(self):
         """Success methdod"""
         self.tear_down()
         QtWidgets.QMessageBox.information(self, self.tr("Finished"), self.tr("PDFs have been generated !"))
