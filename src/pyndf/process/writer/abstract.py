@@ -10,16 +10,9 @@ class AbstractWriter(Logger, QtCore.QObject):
 
     ext = None
 
-    def __init__(self, filename=None, dir=None, ext=None, **kwargs):
-        """Initialisation
-
-        Args:
-            filename (string, optional): file to read. Defaults to None.
-            sheet_name (int or string, optional): Sheet to read. Defaults to 0 -> First Sheet.
-            regex_libelle (str, optional): Regex. Defaults to "INDEMNITE.*".
-        """
-        super().__init__(**kwargs)
-        self.filename = filename
+    def __init__(self, *args, dir=None, **kwargs):
+        """Initialisation"""
+        super().__init__(*args, **kwargs)
         self.dir = dir
 
     def create_path(self, filename, dir=None, ext=None, force=True):

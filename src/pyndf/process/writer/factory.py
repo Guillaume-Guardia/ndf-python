@@ -17,4 +17,4 @@ def writer_factory(item, *args, **kwargs):
     else:
         writer = AbstractWriter
 
-    return writer(item, *args, **kwargs)
+    return writer(*args, **kwargs)

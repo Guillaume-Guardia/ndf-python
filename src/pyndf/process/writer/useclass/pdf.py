@@ -31,10 +31,12 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         BaseDocTemplate (object): object from reportlab.
     """
 
+    ext = ".pdf"
+
     def __init__(self, date, **kwargs):
         kwargs["pagesize"] = landscape(A4)
 
-        super().__init__(**kwargs)
+        super().__init__(filename="", **kwargs)
 
         self.date = datetime(year=int(date[:4]), month=int(date[4:6]), day=1) + relativedelta(months=+1)
         self.version = VERSION
