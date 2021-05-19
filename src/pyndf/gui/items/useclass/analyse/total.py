@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from pyndf.gui.items.item import Item
+from pyndf.gui.items.abstract import AbstractItem
 
 
-class TotalItem(Item):
+class TotalItem(AbstractItem):
     """Class for storing data for analyse."""
 
     headers = ["status", "time"]

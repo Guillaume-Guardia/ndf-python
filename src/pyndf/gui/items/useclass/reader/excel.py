@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from pyndf.constants import CONFIG, COL
-from pyndf.gui.items.item import Item
+from pyndf.gui.items.abstract import AbstractItem
 
 
-class ExcelItem(Item):
+class ExcelItem(AbstractItem):
     """Class for storing data for analyse."""
 
     headers = list(CONFIG[COL].values())

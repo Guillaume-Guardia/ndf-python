@@ -4,7 +4,7 @@ from pyndf.qtlib import QtWidgets, QtGui, QtCore
 from pyndf.constants import COLORS
 
 
-class Item(QtCore.QObject):
+class AbstractItem(QtCore.QObject):
     """Class for storing data for analyse."""
 
     font = "Helvetica [Cronyx]"

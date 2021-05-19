@@ -2,15 +2,16 @@
 
 import os
 from time import time
+from pyndf.process.reader.factory import reader_factory
 from pyndf.qtlib import QtCore
-from pyndf.process.reader.excel import ExcelReader
-from pyndf.process.reader.csv import CSVReader
-from pyndf.process.writer.pdf import PdfWriter
+from pyndf.process.reader.useclass.excel import ExcelReader
+from pyndf.process.reader.useclass.csv import CSVReader
+from pyndf.process.writer.useclass.pdf import PdfWriter
 from pyndf.process.distance import DistanceMatrixAPI
 from pyndf.logbook import Logger
-from pyndf.gui.items.analyse.all_item import AllItem
-from pyndf.gui.items.analyse.api_item import APIItem
-from pyndf.gui.items.analyse.pdf_item import PDFItem
+from pyndf.gui.items.useclass.analyse.all import AllItem
+from pyndf.gui.items.useclass.analyse.api import ApiItem
+from pyndf.gui.items.useclass.analyse.pdf import PdfItem
 
 
 class WorkerSignals(QtCore.QObject):
@@ -47,17 +48,22 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
         try:
             self.log.info("Start process")
             start = time()
+
             # Read Excel file
-            reader = ExcelReader(self.excel_file, log_level=self.log_level)
-            records, time_spend = reader.read(
-                progress_callback=self.signals.progressed, p=20, analysed=self.signals.analysed.emit
+            records, time_spend = reader_factory(
+                self.excel_file,
+                progress_callback=self.signals.progressed,
+                p=20,
+                analysed=self.signals.analysed.emit,
+                log_level=self.log_level,
             )
             t1 = time()
             self.signals.analysed.emit(AllItem(self.tr("Read EXCEL file"), "OK", t1 - start))
 
             # Read CSV file
-            reader = CSVReader(self.csv_file, log_level=self.log_level)
-            records_csv, time_spend = reader.read(analysed=self.signals.analysed.emit)
+            records_csv, time_spend = reader_factory(
+                self.csv_file, analysed=self.signals.analysed.emit, log_level=self.log_level
+            )
             for matricule, record in records.items():
                 if int(matricule) in records_csv:
                     record["montant_total"] = records_csv[int(matricule)]
@@ -79,7 +85,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
                         mission["forfait"] = mission["total"] / mission["nbrkm_mois"]
 
                     self.signals.analysed.emit(
-                        APIItem(mission["adresse_client"], record["adresse_intervenant"], distance, status, time_spend)
+                        ApiItem(mission["adresse_client"], record["adresse_intervenant"], distance, status, time_spend)
                     )
                 self.signals.progressed.emit(
                     20 + (index / n) * 50,
@@ -90,13 +96,13 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
 
             # Create PDF with data records and distance from the API
             date = os.path.basename(self.excel_file).split(".")[0].split("_")[1]
-            writer = PdfWriter(date, directory=self.output_directory, log_level=self.log_level)
+            writer = PdfWriter(date, dir=self.output_directory, log_level=self.log_level)
             n = len(records)
             for index, record in enumerate(records.values()):
                 (filename, total, status), time_spend = writer.write(record)
                 self.signals.progressed.emit(70 + (index / n) * 30, self.tr("Create PDFs: {} / {}").format(index, n))
                 self.signals.analysed.emit(
-                    PDFItem(
+                    PdfItem(
                         filename, record.get("montant_total", 0), total, len(record["missions"]), status, time_spend
                     )
                 )

@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from pyndf.gui.tables.analyse import AnalyseTable
+from pyndf.gui.tables.useclass.analyse import AnalyseTable
 from pyndf.gui.tables.abstract import AbstractTable
-from pyndf.gui.tables.excel import ExcelTable
-from pyndf.gui.items.analyse.all_item import AllItem
-from pyndf.gui.items.analyse.api_item import APIItem
-from pyndf.gui.items.analyse.pdf_item import PDFItem
-from pyndf.gui.items.reader.excel_item import ExcelItem
+from pyndf.gui.tables.useclass.smart.excel import ExcelSmartTable
+from pyndf.gui.items.useclass.analyse.all import AllItem
+from pyndf.gui.items.useclass.analyse.api import ApiItem
+from pyndf.gui.items.useclass.analyse.pdf import PdfItem
+from pyndf.gui.items.useclass.reader.excel import ExcelItem
 
 
 def tables_factory(tab, item):
-    if item in (AllItem, APIItem, PDFItem):
+    if item in (AllItem, ApiItem, PdfItem):
         table = AnalyseTable
     elif item is ExcelItem:
-        table = ExcelTable
+        table = ExcelSmartTable
     else:
         table = AbstractTable
 

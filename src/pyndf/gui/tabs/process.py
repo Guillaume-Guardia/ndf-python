@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 
+from pyndf.process.reader.factory import reader_factory
 from pyndf.qtlib import QtWidgets
 
 from pyndf.constants import CONFIG, TAB_ANA
-from pyndf.process.reader.excel import ExcelReader
-from pyndf.process.reader.csv import CSVReader
+from pyndf.process.reader.useclass.excel import ExcelReader
+from pyndf.process.reader.useclass.csv import CSVReader
 
 
 class ProcessTab(QtWidgets.QWidget):
@@ -13,11 +14,6 @@ class ProcessTab(QtWidgets.QWidget):
         super().__init__()
         self.window = window
         self.title = title
-
-        # Reader
-        self.readers = {}
-        self.readers["excel"] = ExcelReader(log_level=window.log_level)
-        self.readers["csv"] = CSVReader(log_level=window.log_level)
 
         # Graphics elements
         self.labels = {}
@@ -55,13 +51,19 @@ class ProcessTab(QtWidgets.QWidget):
         self.setLayout(layout)
 
     def add_data(self, filename, name):
-        if name not in self.readers:
+        if filename == "" or name not in self.window.tabs[TAB_ANA]:
             return
 
         self.window.tabs[TAB_ANA][name].table.init()
-        result, time_spend = self.readers[name].read(
-            filename, analysed=self.window.tabs[TAB_ANA][name].table.add, just_read=True
+        result, _ = reader_factory(
+            filename,
+            analysed=self.window.tabs[TAB_ANA][name].table.add,
+            just_read=True,
+            log_level=self.window.log_level,
         )
+        if result is None:
+            setattr(self.window, name, "")
+            self.texts[name].setText("")
         self.window.tabs[TAB_ANA][name].table.finished()
 
     def add_button(self, name_env, name, _format=None, default=""):

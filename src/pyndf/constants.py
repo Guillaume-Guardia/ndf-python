@@ -3,6 +3,8 @@
 import os
 import yaml
 
+VERSION = "1.0"
+
 # configuration file
 COL = "colonne_excel"
 COL_PERSO = "colonne_perso"

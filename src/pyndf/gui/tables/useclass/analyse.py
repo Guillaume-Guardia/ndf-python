@@ -2,7 +2,7 @@
 
 from pyndf.gui.tables.abstract import AbstractTable
 from pyndf.constants import CONFIG
-from pyndf.gui.items.analyse.total_item import TotalItem
+from pyndf.gui.items.useclass.analyse.total import TotalItem
 
 
 class AnalyseTable(AbstractTable):
@@ -23,6 +23,7 @@ class AnalyseTable(AbstractTable):
     def finished(self):
         row = self.add_row()
 
+        # Check all status
         status = all(
             [
                 self.item(r, self.custom_item.headers.index("status")).text() in CONFIG["good_status"]
@@ -31,7 +32,10 @@ class AnalyseTable(AbstractTable):
         )
         total_item = TotalItem(status, self.time)
 
+        # Set total at the end
         self.setVerticalHeaderItem(row, total_item.vheaders_pretty)
 
+        # Add the value from item
         for name, widget in total_item:
             self.setItem(row, self.custom_item.headers.index(name), widget)
+        super().finished()

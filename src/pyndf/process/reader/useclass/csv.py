@@ -1,36 +1,33 @@
 # -*- coding: utf-8 -*-
 
-import os
 import math
 import pandas as pd
-from pyndf.qtlib import QtCore
-from pyndf.logbook import Logger, log_time
+from pyndf.logbook import log_time
 from pyndf.constants import CONFIG
-from pyndf.gui.items.reader.csv_item import CSVItem
+from pyndf.gui.items.useclass.reader.csv import CsvItem
+from pyndf.process.reader.abstract import AbstractReader
 
 
-class CSVReader(Logger, QtCore.QObject):
+class CSVReader(AbstractReader):
     """Class for reading csv file."""
 
-    def __init__(self, filename=None, **kwargs):
-        """Initialisation"""
-        super().__init__(**kwargs)
-        self.filename = filename
+    type = "CSV"
 
     @log_time
     def read(self, filename=None, analysed=None, just_read=False):
+        if self.check_path(filename) is False:
+            return
+
         # Initialisation variables
         records = {}
 
-        path = filename or self.filename
-        self.log.info(f"Extract Data in csv file: {os.path.basename(path)}")
         # Get the data on csv file in dataframe format.
-        dataframe = pd.read_csv(path, sep=";", decimal=",")
+        dataframe = pd.read_csv(filename, sep=";", decimal=",")
 
         n = len(dataframe.to_dict("records"))
         for index, record in enumerate(dataframe.to_dict("records")):
             montant_total = 0
-            analysed(CSVItem(*list(record.values())))
+            analysed(CsvItem(*list(record.values())))
 
             if just_read:
                 continue

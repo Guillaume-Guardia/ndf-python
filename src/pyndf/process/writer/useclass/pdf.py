@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import os
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from dateutil.parser import isoparse
 
-from reportlab.lib.units import cm, inch
-from reportlab.lib import colors
+from reportlab.lib.units import cm
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
@@ -16,8 +13,9 @@ from reportlab.platypus.doctemplate import BaseDocTemplate, PageTemplate
 from reportlab.platypus.tables import Table, TableStyle
 from reportlab.platypus.paragraph import Paragraph
 
-from pyndf.logbook import Logger, log_time
-from pyndf.constants import LOGO, CONFIG
+from pyndf.process.writer.abstract import AbstractWriter
+from pyndf.logbook import log_time
+from pyndf.constants import LOGO, CONFIG, VERSION
 
 UNKNOWN = "Inconnu"
 stylesheet = getSampleStyleSheet()
@@ -25,7 +23,7 @@ stylesheet.add(ParagraphStyle(name="Justify", parent=stylesheet["Normal"], align
 stylesheet.add(ParagraphStyle(name="Center", parent=stylesheet["Normal"], alignment=TA_CENTER))
 
 
-class PdfWriter(Logger, BaseDocTemplate):
+class PdfWriter(AbstractWriter, BaseDocTemplate):
     """NDF template adapted for the NDF apside based on BaseDocTemplate.
 
     Args:
@@ -33,18 +31,13 @@ class PdfWriter(Logger, BaseDocTemplate):
         BaseDocTemplate (object): object from reportlab.
     """
 
-    def __init__(self, date, filename="", directory=".", **kwargs):
+    def __init__(self, date, **kwargs):
         kwargs["pagesize"] = landscape(A4)
 
-        # Define for pylint
-        self.pagesize = []
-        self.bottomMargin = None
-        self.leftMargin = None
-        super().__init__(filename, **kwargs)
-        self.directory = directory
+        super().__init__(**kwargs)
+
         self.date = datetime(year=int(date[:4]), month=int(date[4:6]), day=1) + relativedelta(months=+1)
-        self.version = "1.0"
-        self.fund = "fund"
+        self.version = VERSION
 
         self.log.info("Create PDFs")
 
@@ -228,7 +221,7 @@ class PdfWriter(Logger, BaseDocTemplate):
         matricule = data.get("matricule", UNKNOWN)
         self.log.debug(f"Create pdf for matricule {matricule} with {len(data['missions'])} missions.")
         filename = f"{data.get('agence', UNKNOWN)}_{matricule}_{self.date.strftime('%Y%m')}"
-        path = self.check_path(filename)
+        path = self.create_path(filename)
 
         paragraphs = []
         # add some flowables
@@ -248,25 +241,3 @@ class PdfWriter(Logger, BaseDocTemplate):
             self.log.exception(e)
             return filename, None, "error"
         return filename, total, CONFIG["good_status"][0]
-
-    def check_path(self, filename, ext="pdf", force=True):
-        """Check path method.
-
-        Args:
-            filename (string): just the basename of the wanted file
-            ext (str, optional): extension of the file added to filename. Defaults to "pdf".
-            force (bool, optional): Force the creation of file. Defaults to True.
-
-        Raises:
-            FileExistsError: If force is deactivate, raise the error if the filename already exists.
-
-        Returns:
-            string: Path of the file
-        """
-        filename = ".".join([str(filename), ext])
-        path = os.path.join(self.directory, filename)
-
-        # Check if the file exists
-        if os.path.exists(path) and not force:
-            raise FileExistsError
-        return path

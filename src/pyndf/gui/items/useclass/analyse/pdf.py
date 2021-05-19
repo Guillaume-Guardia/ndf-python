@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
-from pyndf.gui.items.item import Item
+from pyndf.gui.items.abstract import AbstractItem
 
 
-class PDFItem(Item):
+class PdfItem(AbstractItem):
     """Class for storing data for analyse."""
 
     headers = ["filename", "total_db", "total", "nbr_missions", "status", "time"]

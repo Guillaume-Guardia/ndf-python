@@ -14,7 +14,7 @@ class TestPdfWriter(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.directory = tempfile.mkdtemp()
-        cls.writer = PdfWriter(directory=cls.directory)
+        cls.writer = PdfWriter(dir=cls.directory)
 
         cls.data = {
             "nom": "Moise",

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
-from pyndf.gui.items.item import Item
+from pyndf.gui.items.abstract import AbstractItem
 
 
-class APIItem(Item):
+class ApiItem(AbstractItem):
     """Class for storing data for analyse."""
 
     headers = ["addr_client", "addr_employee", "distance", "status", "time"]

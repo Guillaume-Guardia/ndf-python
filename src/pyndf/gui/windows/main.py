@@ -7,11 +7,11 @@ from pyndf.process.thread import Thread
 from pyndf.constants import COMPANY, TITLE_APP, TAB_PRO, TAB_ANA
 from pyndf.gui.tabs.analyse import AnalyseTab
 from pyndf.gui.tabs.process import ProcessTab
-from pyndf.gui.items.analyse.all_item import AllItem
-from pyndf.gui.items.analyse.api_item import APIItem
-from pyndf.gui.items.analyse.pdf_item import PDFItem
-from pyndf.gui.items.reader.excel_item import ExcelItem
-from pyndf.gui.items.reader.csv_item import CSVItem
+from pyndf.gui.items.useclass.analyse.all import AllItem
+from pyndf.gui.items.useclass.analyse.api import ApiItem
+from pyndf.gui.items.useclass.analyse.pdf import PdfItem
+from pyndf.gui.items.useclass.reader.excel import ExcelItem
+from pyndf.gui.items.useclass.reader.csv import CsvItem
 
 
 class MainWindow(Logger, QtWidgets.QMainWindow):
@@ -93,9 +93,8 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
     def change_language(self, language):
         self.app.language = language
         self.app.load_translator()
-        self.app.window = MainWindow(self.app, self.excel, self.csv, self.output, log_level=self.log_level)
+        self.app.load_window(self.excel, self.csv, self.output, log_level=self.log_level)
 
-        # self.blockSignals(True)
         self.deleteLater()
 
     def _create_tabs(self):
@@ -106,10 +105,10 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.tabs[TAB_ANA] = {}
         info_dict = {
             "global": {"title": self.tr("Global Analyse"), "item": AllItem},
-            "api": {"title": self.tr("Distance Google API Analyse"), "item": APIItem},
-            "pdf": {"title": self.tr("PDF Writer Analyse"), "item": PDFItem},
+            "api": {"title": self.tr("Distance Google API Analyse"), "item": ApiItem},
+            "pdf": {"title": self.tr("PDF Writer Analyse"), "item": PdfItem},
             "excel": {"title": self.tr("Excel Reader"), "item": ExcelItem},
-            "csv": {"title": self.tr("CSV Reader"), "item": CSVItem},
+            "csv": {"title": self.tr("CSV Reader"), "item": CsvItem},
         }
 
         for index, (key, value) in enumerate(info_dict.items()):
@@ -154,13 +153,13 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
     def analysed(self, obj):
         if isinstance(obj, AllItem):
             self.tabs[TAB_ANA]["global"].table.add(obj)
-        elif isinstance(obj, APIItem):
+        elif isinstance(obj, ApiItem):
             self.tabs[TAB_ANA]["api"].table.add(obj)
-        elif isinstance(obj, PDFItem):
+        elif isinstance(obj, PdfItem):
             self.tabs[TAB_ANA]["pdf"].table.add(obj)
         elif isinstance(obj, ExcelItem):
             self.tabs[TAB_ANA]["excel"].table.add(obj)
-        elif isinstance(obj, CSVItem):
+        elif isinstance(obj, CsvItem):
             self.tabs[TAB_ANA]["csv"].table.add(obj)
 
     @QtCore.pyqtSlot(float, str)

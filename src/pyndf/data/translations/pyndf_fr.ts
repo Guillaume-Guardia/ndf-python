@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
-    <name>APIItem</name>
+    <name>ApiItem</name>
     <message>
         <location filename="../../gui/items/api_item.py" line="25"/>
         <source>Client address</source>
@@ -175,7 +175,7 @@
     </message>
 </context>
 <context>
-    <name>PDFItem</name>
+    <name>PdfItem</name>
     <message>
         <location filename="../../gui/items/pdf_item.py" line="26"/>
         <source>Filename</source>

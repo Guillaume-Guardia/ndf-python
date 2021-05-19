@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from pyndf.constants import CONFIG, COL_CSV
-from pyndf.gui.items.item import Item
+from pyndf.gui.items.abstract import AbstractItem
 
 
-class CSVItem(Item):
+class CsvItem(AbstractItem):
     """Class for storing data for analyse."""
 
     headers = list(CONFIG[COL_CSV].values())
