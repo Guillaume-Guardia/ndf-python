@@ -83,8 +83,8 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         self.setMenuWidget(menu)
 
-    def set_excel_from_writer(self, path):
-        self.tabs[TAB_PRO].texts["excel"].setText(path)
+    def set_path(self, name, path):
+        self.tabs[TAB_PRO].texts[name].setText(path)
 
     def toggled_tab(self, tab, boolean):
         widget = self.centralWidget()

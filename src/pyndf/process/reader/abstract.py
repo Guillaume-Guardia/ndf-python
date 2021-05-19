@@ -17,5 +17,5 @@ class AbstractReader(Logger, QtCore.QObject):
             self.log.warning(f"The file ' {filename} ' doesn't exists !")
             return False
 
-        self.log.info(f"Extract Data from {self.type} file: {os.path.basename(filename)}")
+        self.log.info(f"Extract Data from {self.type.upper()} file: {os.path.basename(filename)}")
         return True

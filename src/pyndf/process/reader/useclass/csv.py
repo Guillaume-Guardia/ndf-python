@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import math
 import pandas as pd
 from pyndf.logbook import log_time
-from pyndf.constants import CONFIG
+from pyndf.constants import CONFIG, COL_CSV
 from pyndf.gui.items.useclass.reader.csv import CsvItem
 from pyndf.process.reader.abstract import AbstractReader
 
@@ -11,7 +10,7 @@ from pyndf.process.reader.abstract import AbstractReader
 class CSVReader(AbstractReader):
     """Class for reading csv file."""
 
-    type = "CSV"
+    type = "csv"
 
     @log_time
     def read(self, filename=None, analysed=None, just_read=False):
@@ -22,7 +21,7 @@ class CSVReader(AbstractReader):
         records = {}
 
         # Get the data on csv file in dataframe format.
-        dataframe = pd.read_csv(filename, sep=";", decimal=",")
+        dataframe = pd.read_csv(filename, sep=";", decimal=",", na_filter=False)
 
         n = len(dataframe.to_dict("records"))
         for index, record in enumerate(dataframe.to_dict("records")):
@@ -33,9 +32,9 @@ class CSVReader(AbstractReader):
                 continue
 
             for i in range(1, 4):
-                montant = record[CONFIG["colonne_csv"][f"montant{i}"]]
-                if not math.isnan(montant):
-                    montant_total += montant
-            records[record[CONFIG["colonne_csv"]["matricule"]]] = round(montant_total, 2)
+                montant = record[CONFIG[COL_CSV][f"montant{i}"]]
+                if montant.isdigit():
+                    montant_total += float(montant)
+            records[record[CONFIG[COL_CSV]["matricule"]]] = round(montant_total, 2)
 
         return records

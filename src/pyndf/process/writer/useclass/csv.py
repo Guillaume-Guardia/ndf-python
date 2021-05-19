@@ -13,6 +13,6 @@ class CsvWriter(AbstractWriter):
         path = self.create_path(filename)
 
         df = pd.DataFrame(data)
-        df.to_csv(path, sep=";", decimal=",")
+        df.to_csv(path, sep=";", decimal=",", index=False)
 
         return path

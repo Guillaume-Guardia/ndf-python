@@ -6,6 +6,8 @@ from pyndf.constants import CONFIG, COL
 
 
 class ExcelSmartTable(AbstractSmartTable):
+    type = "excel"
+
     def on_item_changed(self, *args):
         # table to dataframe
         data = defaultdict(list)
@@ -15,11 +17,12 @@ class ExcelSmartTable(AbstractSmartTable):
                 value = self.item(row, col).text()
 
                 if header != CONFIG[COL]["matricule"]:
-                    try:
-                        value = float(value)
-                    except ValueError:
-                        pass
+                    if value.isdigit():
+                        if float(value) == int(value):
+                            value = int(value)
+                        else:
+                            value = float(value)
 
                 data[header].append(value)
 
-        self.tab.window.set_excel_from_writer(self.writer.write(data, self.tab.window.excel))
+        super().on_item_changed(data)

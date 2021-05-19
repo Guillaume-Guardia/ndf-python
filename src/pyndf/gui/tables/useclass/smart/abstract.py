@@ -5,6 +5,8 @@ from pyndf.process.writer.factory import writer_factory
 
 
 class AbstractSmartTable(AbstractTable):
+    type = None
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -12,8 +14,8 @@ class AbstractSmartTable(AbstractTable):
 
         self.itemChanged.connect(self.on_item_changed)
 
-    def on_item_changed(self, *args):
-        pass
+    def on_item_changed(self, data):
+        self.tab.window.set_path(self.type, self.writer.write(data, getattr(self.tab.window, self.type)))
 
     def init(self):
         self.blockSignals(True)

@@ -12,7 +12,7 @@ from pyndf.process.reader.abstract import AbstractReader
 class ExcelReader(AbstractReader):
     """Class for reading excel file."""
 
-    type = "EXCEL"
+    type = "excel"
 
     @log_time
     def read(self, filename=None, sheet_name=0, progress_callback=None, p=100, analysed=None, just_read=False):
