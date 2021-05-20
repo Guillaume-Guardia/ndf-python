@@ -15,7 +15,7 @@ from reportlab.platypus.paragraph import Paragraph
 
 from pyndf.process.writer.abstract import AbstractWriter
 from pyndf.logbook import log_time
-from pyndf.constants import LOGO, CONFIG, VERSION
+from pyndf.constants import LOGO, CONFIG, VERSION, PDF_COLOR
 
 UNKNOWN = "Inconnu"
 stylesheet = getSampleStyleSheet()
@@ -33,13 +33,12 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
 
     ext = ".pdf"
 
-    def __init__(self, date, **kwargs):
+    def __init__(self, date, color, **kwargs):
         kwargs["pagesize"] = landscape(A4)
 
         super().__init__(filename="", **kwargs)
-
+        self.color = color or PDF_COLOR
         self.date = datetime(year=int(date[:4]), month=int(date[4:6]), day=1) + relativedelta(months=+1)
-        self.version = VERSION
 
         self.log.info("Create PDFs")
 
@@ -77,7 +76,7 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
             # footer
             canvas.drawString(left, bottom, "Apside Groupe")
             canvas.drawCentredString(x_center, bottom - cm, f"- {doc.page} -")
-            canvas.drawRightString(right, bottom, f"{self.version}")
+            canvas.drawRightString(right, bottom, f"{VERSION}")
 
         if add_watermark:
             # Move the origin to middle, and after rotate the image
@@ -198,7 +197,7 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         style = TableStyle(
             [
                 # First row in blue
-                ("BACKGROUND", (0, 0), (-1, 0), "#99ccff"),
+                ("BACKGROUND", (0, 0), (-1, 0), self.color),
                 ("GRID", (0, 0), (-1, -1), 0.25, black),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("ALIGN", (0, 0), (-1, -1), "CENTER"),

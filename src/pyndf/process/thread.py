@@ -4,8 +4,6 @@ import os
 from time import time
 from pyndf.process.reader.factory import reader_factory
 from pyndf.qtlib import QtCore
-from pyndf.process.reader.useclass.excel import ExcelReader
-from pyndf.process.reader.useclass.csv import CSVReader
 from pyndf.process.writer.useclass.pdf import PdfWriter
 from pyndf.process.distance import DistanceMatrixAPI
 from pyndf.logbook import Logger
@@ -35,11 +33,12 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
     :param data: The data to add to the PDF for generating.
     """
 
-    def __init__(self, excel_file, csv_file, output_directory, **kwargs):
+    def __init__(self, excel_file, csv_file, output_directory, color, **kwargs):
         super().__init__(**kwargs)
         self.excel_file = excel_file
         self.csv_file = csv_file
         self.output_directory = output_directory
+        self.color = color
         self.signals = WorkerSignals()
 
     @QtCore.pyqtSlot()
@@ -96,7 +95,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
 
             # Create PDF with data records and distance from the API
             date = os.path.basename(self.excel_file).split(".")[0].split("_")[1]
-            writer = PdfWriter(date, dir=self.output_directory, log_level=self.log_level)
+            writer = PdfWriter(date, dir=self.output_directory, color=self.color, log_level=self.log_level)
             n = len(records)
             for index, record in enumerate(records.values()):
                 (filename, total, status), time_spend = writer.write(record)

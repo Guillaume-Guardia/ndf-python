@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import shutil
-from pyndf.qtlib import QtWidgets, QtCore, QtGui
+from pyndf.qtlib import QtWidgets, QtCore
 from pyndf.logbook import Logger
 from pyndf.process.thread import Thread
 from pyndf.constants import COMPANY, TITLE_APP, TAB_PRO, TAB_ANA
@@ -12,17 +12,19 @@ from pyndf.gui.items.useclass.analyse.api import ApiItem
 from pyndf.gui.items.useclass.analyse.pdf import PdfItem
 from pyndf.gui.items.useclass.reader.excel import ExcelItem
 from pyndf.gui.items.useclass.reader.csv import CsvItem
+from pyndf.gui.menus.menu import MainMenu
 
 
 class MainWindow(Logger, QtWidgets.QMainWindow):
     """Main window of the app"""
 
-    def __init__(self, app, excel=None, csv=None, output=None, **kwargs):
+    def __init__(self, app, excel=None, csv=None, output=None, color=None, **kwargs):
         super().__init__(**kwargs)
         self.app = app
         self.excel = excel
         self.csv = csv
         self.output = output
+        self.color = color
 
         # Window parameters
         self.setWindowTitle(TITLE_APP)
@@ -41,47 +43,11 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self._create_tabs()
 
         # Menu bar
-        self._create_menu_bar()
+        self.setMenuWidget(MainMenu(self))
 
         # Progress Bar in status bar
         self.progress = QtWidgets.QProgressBar()
         self._create_status_bar()
-
-    def _create_menu_bar(self):
-        menu = self.menuBar()
-
-        # file
-        file = menu.addMenu(self.tr("File"))
-
-        # Select language
-        language = menu.addMenu(self.tr("Select language"))
-
-        for lang in self.app.language_available:
-            language.addAction(lang, lambda l=lang: self.change_language(l))
-
-        file.addSeparator()
-        exit_action = QtGui.QAction(self.tr("Exit"), menu)
-        exit_action.setShortcut("Ctrl+Q")
-        exit_action.triggered.connect(self.close)
-        file.addAction(exit_action)
-
-        # views
-        views = menu.addMenu(self.tr("Views"))
-        for tab in [self.tabs[TAB_PRO]] + list(self.tabs[TAB_ANA].values()):
-            new_action = QtGui.QAction(tab.title, views)
-            new_action.setCheckable(True)
-            new_action.setChecked(True)
-            new_action.toggled.connect(lambda boolean, tab_=tab: self.toggled_tab(tab_, boolean))
-            views.addAction(new_action)
-
-        # Help
-        help = menu.addMenu(self.tr("Help"))
-        action = QtGui.QAction(
-            self.style().standardIcon(self.style().StandardPixmap.SP_MessageBoxQuestion), "Help", help
-        )
-        action.triggered.connect(self.open_help)
-
-        self.setMenuWidget(menu)
 
     def set_path(self, name, path):
         self.tabs[TAB_PRO].texts[name].setText(path)
@@ -93,7 +59,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
     def change_language(self, language):
         self.app.language = language
         self.app.load_translator()
-        self.app.load_window(self.excel, self.csv, self.output, log_level=self.log_level)
+        self.app.load_window(self.excel, self.csv, self.output, self.color, log_level=self.log_level)
 
         self.deleteLater()
 
@@ -129,9 +95,6 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         status_bar.addPermanentWidget(self.progress, 0)
         self.setStatusBar(status_bar)
 
-    def open_help(self):
-        self.log.info("Help open!")
-
     def generate(self):
         """Method triggered with the button to start the generation of pdf. In process tab"""
         if not all([t.text() for t in self.tabs[TAB_PRO].texts.values()]):
@@ -141,7 +104,9 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.tabs[TAB_PRO].buttons["generate"].setDisabled(True)
         for tab in self.tabs[TAB_ANA].values():
             tab.table.init()
-        process = Thread(*[t.text() for t in self.tabs[TAB_PRO].texts.values()], log_level=self.log_level)
+        process = Thread(
+            *[t.text() for t in self.tabs[TAB_PRO].texts.values()], color=self.color, log_level=self.log_level
+        )
         process.signals.error.connect(self.error)
         process.signals.finished.connect(self.generated)
         process.signals.progressed.connect(self.progressed)
@@ -197,7 +162,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         if state is not None:
             self.restoreState(state)
 
-        for name in ("excel", "csv", "output"):
+        for name in ("excel", "csv", "output", "color"):
             attr = settings.value(name)
             if attr is not None and getattr(self, name) is None:
                 setattr(self, name, attr)
@@ -211,6 +176,6 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         shutil.rmtree(self.app.temp_dir, ignore_errors=True)
 
         # Memory
-        for name in ("excel", "csv", "output"):
+        for name in ("excel", "csv", "output", "color"):
             settings.setValue(name, getattr(self, name))
         super().closeEvent(event)

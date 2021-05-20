@@ -42,6 +42,13 @@ DB_FILE = os.path.join(os.path.dirname(__file__), "db", "pydb.db")
 # Translation directory
 TRANSLATION_DIR = os.path.join(os.path.dirname(__file__), "data", "translations")
 
+# README path
+README_FILE = os.path.join(__file__, "..", "..", "..", "README.md")
+
+# default parameters PDF
+DEFAULT_FONT = ["Helvetica", 10]
+PDF_COLOR = "#99ccff"  # Blue
+
 # Colors analyse table
 COLORS = {"others": "#FFA500"}
 
