@@ -2,11 +2,8 @@
 
 
 from pyndf.process.reader.factory import reader_factory
-from pyndf.qtlib import QtWidgets
-
-from pyndf.constants import CONFIG, TAB_ANA
-from pyndf.process.reader.useclass.excel import ExcelReader
-from pyndf.process.reader.useclass.csv import CSVReader
+from pyndf.qtlib import QtWidgets, QtGui
+from pyndf.constants import CONFIG, TAB_RW, ICONS
 
 
 class ProcessTab(QtWidgets.QWidget):
@@ -16,6 +13,7 @@ class ProcessTab(QtWidgets.QWidget):
         self.title = title
 
         # Graphics elements
+        self.icons = {}
         self.labels = {}
         self.buttons = {}
         self.texts = {}
@@ -27,19 +25,21 @@ class ProcessTab(QtWidgets.QWidget):
 
         # Add grid layout
         grid_layout = QtWidgets.QGridLayout()
-        for row, widgets in enumerate(zip(self.labels.values(), self.texts.values(), self.buttons.values())):
+        for row, widgets in enumerate(
+            zip(self.icons.values(), self.labels.values(), self.texts.values(), self.buttons.values())
+        ):
             for col, widget in enumerate(widgets):
                 grid_layout.addWidget(widget, row, col)
         grid_widget = QtWidgets.QWidget()
         grid_widget.setLayout(grid_layout)
 
         # Generate button
-        self.buttons["generate"] = QtWidgets.QPushButton(self.tr("Generate PDFs"))
-        self.buttons["generate"].pressed.connect(self.window.generate)
-        self.buttons["generate"].setMinimumWidth(120)
-        self.buttons["generate"].setMinimumHeight(40)
-        self.buttons["generate"].setStyleSheet(CONFIG["buttonstyle"])
-        generate_widget = self.add_widget([self.buttons["generate"]])
+        self.buttons["pdf"] = QtWidgets.QPushButton()
+        self.buttons["pdf"].pressed.connect(self.window.generate)
+        self.buttons["pdf"].setMinimumWidth(120)
+        self.buttons["pdf"].setMinimumHeight(40)
+        self.buttons["pdf"].setStyleSheet(CONFIG["buttonstyle"])
+        generate_widget = self.add_widget([self.buttons["pdf"]])
 
         # Create vertical layout
         layout = QtWidgets.QVBoxLayout()
@@ -51,20 +51,20 @@ class ProcessTab(QtWidgets.QWidget):
         self.setLayout(layout)
 
     def add_data(self, filename, name):
-        if filename == "" or name not in self.window.tabs[TAB_ANA]:
+        if filename == "" or name not in self.window.tabs[TAB_RW]:
             return
 
-        self.window.tabs[TAB_ANA][name].table.init()
+        self.window.tabs[TAB_RW][name].table.init()
         result, _ = reader_factory(
             filename,
-            analysed=self.window.tabs[TAB_ANA][name].table.add,
+            analysed=self.window.tabs[TAB_RW][name].table.add,
             just_read=True,
             log_level=self.window.log_level,
         )
         if result is None:
             setattr(self.window, name, "")
             self.texts[name].setText("")
-        self.window.tabs[TAB_ANA][name].table.finished()
+        self.window.tabs[TAB_RW][name].table.finished()
 
     def add_button(self, name_env, name, _format=None, default=""):
         """Add label, text + button
@@ -75,6 +75,9 @@ class ProcessTab(QtWidgets.QWidget):
             _format (str, optional): format of file. Defaults to None.
             default (str, optional): default text. Defaults to "".
         """
+        self.icons[name_env] = QtWidgets.QLabel()
+        pix = QtGui.QPixmap(getattr(ICONS, name_env))
+        self.icons[name_env].setPixmap(pix.scaledToHeight(15))
         self.labels[name_env] = QtWidgets.QLabel(name.capitalize())
         self.texts[name_env] = QtWidgets.QLineEdit()
         self.texts[name_env].textChanged.connect(lambda filename: self.add_data(filename, name_env))

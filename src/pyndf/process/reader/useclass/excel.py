@@ -19,16 +19,14 @@ class ExcelReader(AbstractReader):
         if self.check_path(filename) is False:
             return
 
-        sheet = sheet_name
+        if progress_callback:
+            progress_callback.emit(0.1 * p, self.tr("Load Excel file with pandas..."))
 
         # Initialisation variables
         records = defaultdict(dict)
 
         # Get the data on excel file in dataframe format.
-        dataframe = pd.read_excel(filename, sheet_name=sheet, na_filter=False, dtype={"matricule": str})
-
-        if progress_callback:
-            progress_callback.emit(0.1 * p, self.tr("Load Excel file with pandas..."))
+        dataframe = pd.read_excel(filename, sheet_name=sheet_name, na_filter=False, dtype={"matricule": str})
 
         n = len(dataframe.to_dict("records"))
         reg = re.compile("INDEMNITE.*")

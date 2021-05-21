@@ -3,6 +3,7 @@
 from collections import defaultdict
 from pyndf.gui.tables.useclass.smart.abstract import AbstractSmartTable
 from pyndf.constants import CONFIG, COL
+from pyndf.process.utils import Utils
 
 
 class ExcelSmartTable(AbstractSmartTable):
@@ -17,11 +18,7 @@ class ExcelSmartTable(AbstractSmartTable):
                 value = self.item(row, col).text()
 
                 if header != CONFIG[COL]["matricule"]:
-                    if value.isdigit():
-                        if float(value) == int(value):
-                            value = int(value)
-                        else:
-                            value = float(value)
+                    value = Utils.type(value)
 
                 data[header].append(value)
 

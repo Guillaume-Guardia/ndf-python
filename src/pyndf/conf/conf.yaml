@@ -34,7 +34,7 @@ bad_status:
 # Excel params
 colonne_excel:
   nom: Nom
-  code: Code\nIntervenant
+  code: "Code\nIntervenant"
   matricule: Matricule
   compte: Compte
   type: Type
@@ -58,7 +58,7 @@ colonne_excel:
   tva_recuperer: "TVA\nRécupérer"
   ordre_mission: Ordre mission
   client: Nom Client
-  type_adresse: Type\nAdresse
+  type_adresse: "Type\nAdresse"
   adresse_client: "Adresse\nClient"
   adresse_intervenant: "Adresse\nIntervenant"
   responsable: Responsable
@@ -86,15 +86,15 @@ colonne_mission:
 
 # CSV params
 colonne_csv:
-  agence: 'Intitul� �tablissement'
-  unite: 'Unit� du salari�'
+  agence: 'Intitulé établissement'
+  unite: 'Unité du salarié'
   matricule: Matricule
   nom: Nom
-  prenom: 'Pr�nom'
-  quantite1: 'Nombre Ind. D�plac. 82000'
-  montant1: 'Montant salarial Ind. D�plac. 82000'
-  quantite2: 'Nombre Ind. D�plac. 83250'
-  montant2: 'Montant salarial Ind. D�plac. 83250'
-  quantite3: 'Nombre Ind. D�plac. 83000'
-  montant3: 'Montant salarial Ind. D�plac. 83000'
-  date_depart: 'Date d�part'
+  prenom: 'Prénom'
+  quantite1: 'Nombre Ind. Déplac. 82000'
+  montant1: 'Montant salarial Ind. Déplac. 82000'
+  quantite2: 'Nombre Ind. Déplac. 83250'
+  montant2: 'Montant salarial Ind. Déplac. 83250'
+  quantite3: 'Nombre Ind. Déplac. 83000'
+  montant3: 'Montant salarial Ind. Déplac. 83000'
+  date_depart: 'Date départ'

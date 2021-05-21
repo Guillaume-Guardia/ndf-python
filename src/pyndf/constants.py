@@ -65,3 +65,18 @@ COMPANY = "APSIDE"
 # Title tabs
 TAB_PRO = "process"
 TAB_ANA = "analyse"
+TAB_RW = "reader/writer"
+
+# Icons
+class ICONS:
+    excel = "src\pyndf\data\icons\excel.png"
+    csv = "src\pyndf\data\icons\csv.png"
+    close = "src\pyndf\data\icons\close.png"
+    fr = r"src\pyndf\data\icons\fr.png"
+    help = "src\pyndf\data\icons\help.png"
+    language = "src\pyndf\data\icons\language.png"
+    output = "src\pyndf\data\icons\output.png"
+    pdf = "src\pyndf\data\icons\pdf.png"
+    en = "src\pyndf\data\icons\en.png"
+    color = "src\pyndf\data\icons\color.png"
+    manual = "src\pyndf\data\icons\manual.png"

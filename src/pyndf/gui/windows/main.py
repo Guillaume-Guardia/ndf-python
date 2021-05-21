@@ -4,7 +4,7 @@ import shutil
 from pyndf.qtlib import QtWidgets, QtCore
 from pyndf.logbook import Logger
 from pyndf.process.thread import Thread
-from pyndf.constants import COMPANY, TITLE_APP, TAB_PRO, TAB_ANA
+from pyndf.constants import COMPANY, TITLE_APP, TAB_PRO, TAB_ANA, TAB_RW
 from pyndf.gui.tabs.analyse import AnalyseTab
 from pyndf.gui.tabs.process import ProcessTab
 from pyndf.gui.items.useclass.analyse.all import AllItem
@@ -54,7 +54,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
     def toggled_tab(self, tab, boolean):
         widget = self.centralWidget()
-        widget.setTabVisible(tab.index, boolean)
+        widget.setTabVisible(widget.indexOf(tab), boolean)
 
     def change_language(self, language):
         self.app.language = language
@@ -69,23 +69,22 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         # Analyse tabs
         self.tabs[TAB_ANA] = {}
+        self.tabs[TAB_RW] = {}
         info_dict = {
-            "global": {"title": self.tr("Global Analyse"), "item": AllItem},
-            "api": {"title": self.tr("Distance Google API Analyse"), "item": ApiItem},
-            "pdf": {"title": self.tr("PDF Writer Analyse"), "item": PdfItem},
-            "excel": {"title": self.tr("Excel Reader"), "item": ExcelItem},
-            "csv": {"title": self.tr("CSV Reader"), "item": CsvItem},
+            "excel": {"title": self.tr("Excel Reader"), "item": ExcelItem, "tab": TAB_RW},
+            "csv": {"title": self.tr("CSV Reader"), "item": CsvItem, "tab": TAB_RW},
+            "global": {"title": self.tr("Global Analyse"), "item": AllItem, "tab": TAB_ANA},
+            "api": {"title": self.tr("Distance Google API Analyse"), "item": ApiItem, "tab": TAB_ANA},
+            "pdf": {"title": self.tr("PDF Writer Analyse"), "item": PdfItem, "tab": TAB_ANA},
         }
 
         for index, (key, value) in enumerate(info_dict.items()):
-            self.tabs[TAB_ANA][key] = AnalyseTab(self, value["title"], value["item"])
-            self.tabs[TAB_ANA][key].index = widget.insertTab(
-                index + 1, self.tabs[TAB_ANA][key], self.tabs[TAB_ANA][key].title
-            )
+            self.tabs[value["tab"]][key] = AnalyseTab(self, value["title"], value["item"])
+            widget.insertTab(index + 1, self.tabs[value["tab"]][key], self.tabs[value["tab"]][key].title)
 
         # Process tab
         self.tabs[TAB_PRO] = ProcessTab(self, self.tr("Process"), excel=self.excel, csv=self.csv, output=self.output)
-        self.tabs[TAB_PRO].index = widget.insertTab(0, self.tabs[TAB_PRO], self.tabs[TAB_PRO].title)
+        widget.insertTab(0, self.tabs[TAB_PRO], self.tabs[TAB_PRO].title)
 
         widget.setCurrentIndex(0)
 
@@ -101,8 +100,8 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             return None  # If one field is empty, ignore.
 
         self.progress.show()
-        self.tabs[TAB_PRO].buttons["generate"].setDisabled(True)
-        for tab in self.tabs[TAB_ANA].values():
+        self.tabs[TAB_PRO].buttons["pdf"].setDisabled(True)
+        for tab in list(self.tabs[TAB_ANA].values()) + list(self.tabs[TAB_RW].values()):
             tab.table.init()
         process = Thread(
             *[t.text() for t in self.tabs[TAB_PRO].texts.values()], color=self.color, log_level=self.log_level
@@ -123,9 +122,9 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         elif isinstance(obj, PdfItem):
             self.tabs[TAB_ANA]["pdf"].table.add(obj)
         elif isinstance(obj, ExcelItem):
-            self.tabs[TAB_ANA]["excel"].table.add(obj)
+            self.tabs[TAB_RW]["excel"].table.add(obj)
         elif isinstance(obj, CsvItem):
-            self.tabs[TAB_ANA]["csv"].table.add(obj)
+            self.tabs[TAB_RW]["csv"].table.add(obj)
 
     @QtCore.pyqtSlot(float, str)
     def progressed(self, value, text):
@@ -137,9 +136,9 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
     def tear_down(self):
         self.progress.hide()
         self.progress.reset()
-        for tab in self.tabs[TAB_ANA].values():
+        for tab in list(self.tabs[TAB_ANA].values()) + list(self.tabs[TAB_RW].values()):
             tab.table.finished()
-        self.tabs[TAB_PRO].buttons["generate"].setDisabled(False)
+        self.tabs[TAB_PRO].buttons["pdf"].setDisabled(False)
 
     @QtCore.pyqtSlot(object)
     def error(self, obj):

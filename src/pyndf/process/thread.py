@@ -52,7 +52,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
             records, time_spend = reader_factory(
                 self.excel_file,
                 progress_callback=self.signals.progressed,
-                p=20,
+                p=10,
                 analysed=self.signals.analysed.emit,
                 log_level=self.log_level,
             )
@@ -61,7 +61,11 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
 
             # Read CSV file
             records_csv, time_spend = reader_factory(
-                self.csv_file, analysed=self.signals.analysed.emit, log_level=self.log_level
+                self.csv_file,
+                progress_callback=self.signals.progressed,
+                p=10,
+                analysed=self.signals.analysed.emit,
+                log_level=self.log_level,
             )
             for matricule, record in records.items():
                 if int(matricule) in records_csv:
@@ -87,8 +91,8 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
                         ApiItem(mission["adresse_client"], record["adresse_intervenant"], distance, status, time_spend)
                     )
                 self.signals.progressed.emit(
-                    20 + (index / n) * 50,
-                    self.tr("Get distance from Google API / DB / cache: {} / {}").format(index, n),
+                    20 + (index / n) * 40,
+                    self.tr("Get distance from Google API/DB/cache: {} / {}").format(index, n),
                 )
             t3 = time()
             self.signals.analysed.emit(AllItem(self.tr("Get distance from Google API / DB / Cache"), "OK", t3 - t2))
@@ -99,7 +103,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
             n = len(records)
             for index, record in enumerate(records.values()):
                 (filename, total, status), time_spend = writer.write(record)
-                self.signals.progressed.emit(70 + (index / n) * 30, self.tr("Create PDFs: {} / {}").format(index, n))
+                self.signals.progressed.emit(60 + (index / n) * 40, self.tr("Create PDFs: {} / {}").format(index, n))
                 self.signals.analysed.emit(
                     PdfItem(
                         filename, record.get("montant_total", 0), total, len(record["missions"]), status, time_spend

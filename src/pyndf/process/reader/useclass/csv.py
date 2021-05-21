@@ -5,6 +5,7 @@ from pyndf.logbook import log_time
 from pyndf.constants import CONFIG, COL_CSV
 from pyndf.gui.items.useclass.reader.csv import CsvItem
 from pyndf.process.reader.abstract import AbstractReader
+from pyndf.process.utils import Utils
 
 
 class CSVReader(AbstractReader):
@@ -13,28 +14,36 @@ class CSVReader(AbstractReader):
     type = "csv"
 
     @log_time
-    def read(self, filename=None, analysed=None, just_read=False):
+    def read(self, filename=None, progress_callback=None, p=100, analysed=None, just_read=False):
         if self.check_path(filename) is False:
             return
+
+        if progress_callback:
+            progress_callback.emit(0.1 * p, self.tr("Load CSV file with pandas..."))
 
         # Initialisation variables
         records = {}
 
         # Get the data on csv file in dataframe format.
-        dataframe = pd.read_csv(filename, sep=";", decimal=",", na_filter=False)
+        dataframe = pd.read_csv(filename, sep=";", decimal=",", na_filter=False, encoding="latin1")
 
         n = len(dataframe.to_dict("records"))
         for index, record in enumerate(dataframe.to_dict("records")):
-            montant_total = 0
+            matricule = record[CONFIG[COL_CSV]["matricule"]]
+            total = 0
             analysed(CsvItem(*list(record.values())))
 
             if just_read:
                 continue
 
             for i in range(1, 4):
-                montant = record[CONFIG[COL_CSV][f"montant{i}"]]
-                if montant.isdigit():
-                    montant_total += float(montant)
-            records[record[CONFIG[COL_CSV]["matricule"]]] = round(montant_total, 2)
+                montant = Utils.type(record[CONFIG[COL_CSV][f"montant{i}"]], decimal=",")
+
+                if isinstance(montant, (int, float)):
+                    total += montant
+            records[matricule] = round(total, 2)
+
+            if progress_callback:
+                progress_callback.emit((0.1 + (index / n) * 0.9) * p, self.tr("Select info {} / {}".format(index, n)))
 
         return records

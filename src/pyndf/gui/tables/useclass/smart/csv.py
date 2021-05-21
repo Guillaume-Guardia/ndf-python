@@ -2,6 +2,7 @@
 
 from collections import defaultdict
 from pyndf.gui.tables.useclass.smart.abstract import AbstractSmartTable
+from pyndf.process.utils import Utils
 
 
 class CsvSmartTable(AbstractSmartTable):
@@ -14,13 +15,6 @@ class CsvSmartTable(AbstractSmartTable):
             for col in range(self.columnCount()):
                 header = self.custom_item.headers[col]
                 value = self.item(row, col).text()
-
-                if value.isdigit():
-                    if float(value) == int(value):
-                        value = int(value)
-                    else:
-                        value = float(value)
-
-                data[header].append(value)
+                data[header].append(Utils.type(value))
 
         super().on_item_changed(data)

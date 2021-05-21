@@ -15,7 +15,9 @@ def main(language, **kwargs):
 
 def cmdline():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-v", "--verbosity", help="increase output verbosity", action="store_true")
+    parser.add_argument(
+        "--log", help="level log", choices=["NOTSET", "DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"], type=str
+    )
     parser.add_argument("-e", "--excel", help="Excel file to parse", type=str)
     parser.add_argument("-c", "--csv", help="CSV file to parse", type=str)
     parser.add_argument("-o", "--output", help="Output directory", type=str)
@@ -23,10 +25,7 @@ def cmdline():
 
     args = parser.parse_args()
 
-    if args.verbosity:
-        level = logging.DEBUG
-    else:
-        level = logging.INFO
+    level = getattr(logging, args.log)
 
     return main(args.language, excel=args.excel, csv=args.csv, output=args.output, log_level=level)
 

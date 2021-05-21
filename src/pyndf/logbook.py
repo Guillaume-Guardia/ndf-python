@@ -11,7 +11,7 @@ class Logger:
     def __init__(self, *args, log_level=None, **kwargs):
         """Initialisation method"""
         super().__init__(*args, **kwargs)
-        self.log_level = log_level or logging.INFO
+        self.log_level = log_level if log_level is not None else logging.INFO
         self.log = self.setup_logger()
 
     def setup_logger(self):
