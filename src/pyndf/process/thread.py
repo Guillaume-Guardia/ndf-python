@@ -51,9 +51,8 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
             # Read Excel file
             records, time_spend = reader_factory(
                 self.excel_file,
-                progress_callback=self.signals.progressed,
+                progress_callback=self.signals.progressed.emit,
                 p=10,
-                analysed=self.signals.analysed.emit,
                 log_level=self.log_level,
             )
             t1 = time()
@@ -62,9 +61,8 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
             # Read CSV file
             records_csv, time_spend = reader_factory(
                 self.csv_file,
-                progress_callback=self.signals.progressed,
+                progress_callback=self.signals.progressed.emit,
                 p=10,
-                analysed=self.signals.analysed.emit,
                 log_level=self.log_level,
             )
             for matricule, record in records.items():
@@ -90,12 +88,17 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
                     self.signals.analysed.emit(
                         ApiItem(mission["adresse_client"], record["adresse_intervenant"], distance, status, time_spend)
                     )
+
+                # Check agence d'origine/address are in missions:
+                for mission in record["missions"]:
+                    pass
+
                 self.signals.progressed.emit(
                     20 + (index / n) * 40,
                     self.tr("Get distance from Google API/DB/cache: {} / {}").format(index, n),
                 )
             t3 = time()
-            self.signals.analysed.emit(AllItem(self.tr("Get distance from Google API / DB / Cache"), "OK", t3 - t2))
+            self.signals.analysed.emit(AllItem(self.tr("Get distance from Google API/DB/Cache"), "OK", t3 - t2))
 
             # Create PDF with data records and distance from the API
             date = os.path.basename(self.excel_file).split(".")[0].split("_")[1]

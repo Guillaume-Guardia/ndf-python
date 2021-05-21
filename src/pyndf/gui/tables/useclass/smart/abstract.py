@@ -17,11 +17,10 @@ class AbstractSmartTable(AbstractTable):
     def on_item_changed(self, data):
         self.tab.window.set_path(self.type, self.writer.write(data, getattr(self.tab.window, self.type)))
 
-    def init(self):
+    def init(self, clear=False):
         self.blockSignals(True)
-        return super().init()
+        if clear:
+            super().init()
 
     def finished(self):
-        result = super().finished()
         self.blockSignals(False)
-        return result

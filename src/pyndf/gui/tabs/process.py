@@ -54,11 +54,10 @@ class ProcessTab(QtWidgets.QWidget):
         if filename == "" or name not in self.window.tabs[TAB_RW]:
             return
 
-        self.window.tabs[TAB_RW][name].table.init()
+        self.window.tabs[TAB_RW][name].table.init(clear=True)
         result, _ = reader_factory(
             filename,
-            analysed=self.window.tabs[TAB_RW][name].table.add,
-            just_read=True,
+            analyse_callback=self.window.tabs[TAB_RW][name].table.add,
             log_level=self.window.log_level,
         )
         if result is None:

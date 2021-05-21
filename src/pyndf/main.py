@@ -25,7 +25,10 @@ def cmdline():
 
     args = parser.parse_args()
 
-    level = getattr(logging, args.log)
+    if args.log:
+        level = getattr(logging, args.log)
+    else:
+        level = logging.INFO
 
     return main(args.language, excel=args.excel, csv=args.csv, output=args.output, log_level=level)
 

@@ -15,12 +15,12 @@ class ExcelReader(AbstractReader):
     type = "excel"
 
     @log_time
-    def read(self, filename=None, sheet_name=0, progress_callback=None, p=100, analysed=None, just_read=False):
+    def read(self, filename=None, sheet_name=0, progress_callback=None, p=100, analyse_callback=None):
         if self.check_path(filename) is False:
             return
 
         if progress_callback:
-            progress_callback.emit(0.1 * p, self.tr("Load Excel file with pandas..."))
+            progress_callback(0.1 * p, self.tr("Load Excel file with pandas..."))
 
         # Initialisation variables
         records = defaultdict(dict)
@@ -32,11 +32,14 @@ class ExcelReader(AbstractReader):
         reg = re.compile("INDEMNITE.*")
 
         for index, record in enumerate(dataframe.to_dict("records")):
-            analysed(ExcelItem(*list(record.values())))
-            matricule = record[CONFIG[COL]["matricule"]]
-
-            if reg.match(str(record[CONFIG[COL]["libelle"]])) is None or just_read:
+            if analyse_callback:
+                analyse_callback(ExcelItem(*list(record.values())))
                 continue
+
+            if reg.match(str(record[CONFIG[COL]["libelle"]])) is None:
+                continue
+
+            matricule = record[CONFIG[COL]["matricule"]]
 
             if matricule not in records:
                 # Personal info
@@ -53,5 +56,5 @@ class ExcelReader(AbstractReader):
             records[matricule]["missions"].append(mission_record)
 
             if progress_callback:
-                progress_callback.emit((0.1 + (index / n) * 0.9) * p, self.tr("Select info {} / {}".format(index, n)))
+                progress_callback((0.1 + (index / n) * 0.9) * p, self.tr("Select info {} / {}".format(index, n)))
         return records

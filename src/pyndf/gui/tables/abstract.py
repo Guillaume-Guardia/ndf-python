@@ -9,13 +9,14 @@ class AbstractTable(QtWidgets.QTableWidget):
         self.tab = tab
 
         self.custom_item = item
-        self.column_count = item.column_count()
+
+        headers = self.custom_item.headers_pretty()
+        self.setColumnCount(len(headers))
+        self.setHorizontalHeaderLabels(headers)
 
     def init(self):
-        self.clear()
-        self.setColumnCount(self.column_count)
+        self.clearContents()
         self.setRowCount(0)
-        self.setHorizontalHeaderLabels(self.custom_item.headers_pretty())
 
     def add_row(self):
         row = self.rowCount()

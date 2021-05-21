@@ -14,12 +14,12 @@ class CSVReader(AbstractReader):
     type = "csv"
 
     @log_time
-    def read(self, filename=None, progress_callback=None, p=100, analysed=None, just_read=False):
+    def read(self, filename=None, progress_callback=None, p=100, analyse_callback=None):
         if self.check_path(filename) is False:
             return
 
         if progress_callback:
-            progress_callback.emit(0.1 * p, self.tr("Load CSV file with pandas..."))
+            progress_callback(0.1 * p, self.tr("Load CSV file with pandas..."))
 
         # Initialisation variables
         records = {}
@@ -29,12 +29,12 @@ class CSVReader(AbstractReader):
 
         n = len(dataframe.to_dict("records"))
         for index, record in enumerate(dataframe.to_dict("records")):
+            if analyse_callback:
+                analyse_callback(CsvItem(*list(record.values())))
+                continue
+
             matricule = record[CONFIG[COL_CSV]["matricule"]]
             total = 0
-            analysed(CsvItem(*list(record.values())))
-
-            if just_read:
-                continue
 
             for i in range(1, 4):
                 montant = Utils.type(record[CONFIG[COL_CSV][f"montant{i}"]], decimal=",")
@@ -44,6 +44,6 @@ class CSVReader(AbstractReader):
             records[matricule] = round(total, 2)
 
             if progress_callback:
-                progress_callback.emit((0.1 + (index / n) * 0.9) * p, self.tr("Select info {} / {}".format(index, n)))
+                progress_callback((0.1 + (index / n) * 0.9) * p, self.tr("Select info {} / {}".format(index, n)))
 
         return records
