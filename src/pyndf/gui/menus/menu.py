@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from pyndf.qtlib import QtWidgets, QtGui
-from pyndf.constants import PDF_COLOR, TAB_PRO, TAB_ANA, TAB_RW, ICONS
+from pyndf.constants import CONST
 from pyndf.gui.dialogs.manual import ManualDialog
 
 
@@ -28,17 +28,17 @@ class MainMenu(QtWidgets.QMenuBar):
         menu = QtWidgets.QMenu(self.tr("File"), self)
 
         string = self.tr("Select")
-        for name_env, label in self.window.tabs[TAB_PRO].labels.items():
+        for name_env, label in self.window.tabs[CONST.TYPE.PRO].labels.items():
             menu.addAction(
-                QtGui.QIcon(getattr(ICONS, name_env)),
+                QtGui.QIcon(getattr(CONST.UI.ICONS, name_env)),
                 " ".join([string, label.text()]),
-                self.window.tabs[TAB_PRO].buttons[name_env].pressed.emit,
+                self.window.tabs[CONST.TYPE.PRO].buttons[name_env].pressed.emit,
             )
         menu.addSeparator()
-        menu.addAction(QtGui.QIcon(ICONS.pdf), self.tr("Generate PDFs"), self.window.generate)
+        menu.addAction(QtGui.QIcon(CONST.UI.ICONS.PDF), self.tr("Generate PDFs"), self.window.generate)
 
         menu.addSeparator()
-        menu.addAction(QtGui.QIcon(ICONS.close), self.tr("Exit"), self.window.close, "Ctrl+Q")
+        menu.addAction(QtGui.QIcon(CONST.UI.ICONS.CLO), self.tr("Exit"), self.window.close, "Ctrl+Q")
 
         return menu
 
@@ -47,12 +47,14 @@ class MainMenu(QtWidgets.QMenuBar):
 
         # Language
         sub_menu = menu.addMenu(self.tr("Select language"))
-        sub_menu.setIcon(QtGui.QIcon(ICONS.language))
+        sub_menu.setIcon(QtGui.QIcon(CONST.UI.ICONS.LAN))
         for lang in self.window.app.language_available:
-            sub_menu.addAction(QtGui.QIcon(getattr(ICONS, lang)), lang, lambda l=lang: self.window.change_language(l))
+            sub_menu.addAction(
+                QtGui.QIcon(getattr(CONST.UI.ICONS, lang)), lang, lambda l=lang: self.window.change_language(l)
+            )
 
         # Color PDF
-        menu.addAction(QtGui.QIcon(ICONS.color), self.tr("Select Color PDF"), self.change_color_pdf)
+        menu.addAction(QtGui.QIcon(CONST.UI.ICONS.COL), self.tr("Select Color PDF"), self.change_color_pdf)
 
         return menu
 
@@ -60,17 +62,17 @@ class MainMenu(QtWidgets.QMenuBar):
         menu = QtWidgets.QMenu(self.tr("Views"), self)
 
         # Process
-        self.create_action(menu, self.window.tabs[TAB_PRO])
+        self.create_action(menu, self.window.tabs[CONST.TYPE.PRO])
         menu.addSeparator()
 
         # Reader/Writer TAB_RW
-        for tab in self.window.tabs[TAB_RW].values():
-            self.create_action(menu, tab)
+        for reader in CONST.TAB.READER:
+            self.create_action(menu, self.window.tabs[reader])
         menu.addSeparator()
 
         # Analyse
-        for tab in self.window.tabs[TAB_ANA].values():
-            self.create_action(menu, tab)
+        for analyse in CONST.TAB.ANALYSE:
+            self.create_action(menu, self.window.tabs[analyse])
 
         return menu
 
@@ -83,8 +85,8 @@ class MainMenu(QtWidgets.QMenuBar):
 
     def create_help_menu(self):
         menu = QtWidgets.QMenu(self.tr("Help"), self)
-        menu.setIcon(QtGui.QIcon(ICONS.help))
-        action = QtGui.QAction(QtGui.QIcon(ICONS.manual), self.tr("Manual"), self)
+        menu.setIcon(QtGui.QIcon(CONST.UI.ICONS.HEL))
+        action = QtGui.QAction(QtGui.QIcon(CONST.UI.ICONS.MAN), self.tr("Manual"), self)
         action.setShortcut("F1")
         action.triggered.connect(self.open_manual)
         menu.addAction(action)
@@ -97,7 +99,7 @@ class MainMenu(QtWidgets.QMenuBar):
         try:
             initial = QtGui.QColor(self.window.color)
         except TypeError:
-            initial = QtGui.QColor(PDF_COLOR)
+            initial = QtGui.QColor(CONST.WRITER.PDF.COLOR)
 
         color = QtWidgets.QColorDialog.getColor(initial=initial, title=title)
 

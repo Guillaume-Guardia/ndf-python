@@ -1,17 +1,23 @@
 # -*- coding: utf-8 -*-
 
-import re
 from pyndf.process.reader.useclass.csv import CSVReader
 from pyndf.process.reader.useclass.excel import ExcelReader
-
-reader_regex = {
-    ExcelReader: re.compile(".*[.][xX][lL]*"),
-    CSVReader: re.compile(".*[.][cC][sS][vV]"),
-}
+from pyndf.utils import Factory
 
 
-def reader_factory(filename, *args, log_level=None, **kwargs):
-    for reader, regex in reader_regex.items():
-        if regex.match(filename):
-            return reader(log_level=log_level).read(filename, *args, **kwargs)
-    return None, None
+class Reader(Factory):
+    class_list = [ExcelReader, CSVReader]
+
+    def __new__(cls, filename, *args, log_level=None, **kwargs):
+        instance = None, None
+        for reader in cls.class_list:
+            if reader.can_read(filename):
+                instance = reader.__new__(reader, log_level=log_level)
+                instance.__init__()
+                return instance.read(filename, *args, **kwargs)
+        return instance
+
+
+if __name__ == "__main__":
+    a = Reader("fhfh.csv")
+    print(a)

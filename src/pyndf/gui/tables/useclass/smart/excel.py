@@ -2,12 +2,12 @@
 
 from collections import defaultdict
 from pyndf.gui.tables.useclass.smart.abstract import AbstractSmartTable
-from pyndf.constants import CONFIG, COL
-from pyndf.process.utils import Utils
+from pyndf.constants import CONST
+from pyndf.utils import Utils
 
 
 class ExcelSmartTable(AbstractSmartTable):
-    type = "excel"
+    type = CONST.TYPE.EXC
 
     def on_item_changed(self, *args):
         # table to dataframe
@@ -17,7 +17,7 @@ class ExcelSmartTable(AbstractSmartTable):
                 header = self.custom_item.headers[col]
                 value = self.item(row, col).text()
 
-                if header != CONFIG[COL]["matricule"]:
+                if header != CONST.FILE.YAML[CONST.READER.EXC.COL]["matricule"]:
                     value = Utils.type(value)
 
                 data[header].append(value)

@@ -15,7 +15,7 @@ from reportlab.platypus.paragraph import Paragraph
 
 from pyndf.process.writer.abstract import AbstractWriter
 from pyndf.logbook import log_time
-from pyndf.constants import LOGO, CONFIG, VERSION, PDF_COLOR
+from pyndf.constants import CONST
 
 UNKNOWN = "Inconnu"
 stylesheet = getSampleStyleSheet()
@@ -31,13 +31,13 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         BaseDocTemplate (object): object from reportlab.
     """
 
-    ext = ".pdf"
+    ext = CONST.EXT.PDF
 
     def __init__(self, date, color, **kwargs):
         kwargs["pagesize"] = landscape(A4)
 
         super().__init__(filename="", **kwargs)
-        self.color = color or PDF_COLOR
+        self.color = color or CONST.WRITER.PDF.COLOR
         self.date = datetime(year=int(date[:4]), month=int(date[4:6]), day=1) + relativedelta(months=+1)
 
         self.log.info("Create PDFs")
@@ -70,13 +70,15 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
             # header
             canvas.drawRightString(right, top, f"{self.date.strftime('%B %Y')}")
             # Set Image
-            canvas.drawImage(LOGO, left, top + cm, width=2.5 * cm, height=-2.5 * cm, preserveAspectRatio=True)
+            canvas.drawImage(
+                CONST.FILE.LOGO, left, top + cm, width=2.5 * cm, height=-2.5 * cm, preserveAspectRatio=True
+            )
 
         if add_footer:
             # footer
             canvas.drawString(left, bottom, "Apside Groupe")
             canvas.drawCentredString(x_center, bottom - cm, f"- {doc.page} -")
-            canvas.drawRightString(right, bottom, f"{VERSION}")
+            canvas.drawRightString(right, bottom, f"{CONST.VERSION}")
 
         if add_watermark:
             # Move the origin to middle, and after rotate the image
@@ -143,7 +145,8 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         error = False
 
         for mission in record.get("missions", {}):
-            if mission["status"] not in CONFIG["good_status"]:
+            print(mission, getattr(CONST.STATUS, mission["status"]))
+            if not getattr(CONST.STATUS, mission["status"]).STATE:
                 error = True
                 break
 
@@ -157,7 +160,7 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         prix_unitaire = round(prix_unitaire, 2)
         total = round(total, 2)
 
-        if nbrkm_mois / quantite_payee > 100:
+        if quantite_payee > 0 and nbrkm_mois / quantite_payee > 100:
             nbrkm_mois = f"> {100 * quantite_payee}"
 
         for mission in record.get("missions", {}):
@@ -241,4 +244,4 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         except Exception as e:
             self.log.exception(e)
             return filename, None, "error"
-        return filename, total, CONFIG["good_status"][0]
+        return filename, total, CONST.STATUS.OK.NAME

@@ -11,10 +11,19 @@ class Utils:
 
             if float_value == int_value:
                 return int_value
-            else:
-                return float_value
+            return float_value
         except ValueError:
             return value
+
+
+class Factory:
+    def __new__(cls, type, *args, **kwargs):
+        _class = cls.class_dico[type]
+        if len(args) + len(kwargs) <= 0:
+            return _class
+        instance = _class.__new__(_class, *args, **kwargs)
+        instance.__init__(*args, **kwargs)
+        return instance
 
 
 if __name__ == "__main__":

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from collections import defaultdict
+from pyndf.constants import CONST
 from pyndf.gui.tables.useclass.smart.abstract import AbstractSmartTable
-from pyndf.process.utils import Utils
+from pyndf.utils import Utils
 
 
 class CsvSmartTable(AbstractSmartTable):
-    type = "csv"
+    type = CONST.TYPE.CSV
 
     def on_item_changed(self, *args):
         # table to dataframe

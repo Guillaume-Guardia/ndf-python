@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from pyndf.gui.items.abstract import AbstractItem
+from pyndf.constants import CONST
 
 
 class TotalItem(AbstractItem):
     """Class for storing data for analyse."""
 
+    type = CONST.TYPE.TOT
     headers = ["status", "time"]
     vheaders = ["total"]
 

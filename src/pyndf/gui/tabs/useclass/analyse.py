@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 
 from pyndf.qtlib import QtWidgets
-from pyndf.gui.tables.factory import tables_factory
+from pyndf.gui.tabs.abstract import AbstractTab
+from pyndf.gui.tables.factory import Table
 
 
-class AnalyseTab(QtWidgets.QWidget):
+class AnalyseTab(AbstractTab):
     def __init__(self, window, title, item):
-        super().__init__()
-        self.window = window
-        self.title = title
+        super().__init__(window, title)
 
         # Create table
-        self.table = tables_factory(self, item)
+        self.table = Table(item.type, self, item)
 
         # Add table
         layout = QtWidgets.QHBoxLayout()

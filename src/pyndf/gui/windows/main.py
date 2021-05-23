@@ -4,14 +4,10 @@ import shutil
 from pyndf.qtlib import QtWidgets, QtCore
 from pyndf.logbook import Logger
 from pyndf.process.thread import Thread
-from pyndf.constants import COMPANY, TITLE_APP, TAB_PRO, TAB_ANA, TAB_RW
-from pyndf.gui.tabs.analyse import AnalyseTab
-from pyndf.gui.tabs.process import ProcessTab
-from pyndf.gui.items.useclass.analyse.all import AllItem
-from pyndf.gui.items.useclass.analyse.api import ApiItem
-from pyndf.gui.items.useclass.analyse.pdf import PdfItem
-from pyndf.gui.items.useclass.reader.excel import ExcelItem
-from pyndf.gui.items.useclass.reader.csv import CsvItem
+from pyndf.constants import CONST
+from pyndf.gui.tabs.useclass.analyse import AnalyseTab
+from pyndf.gui.tabs.useclass.process import ProcessTab
+from pyndf.gui.items.factory import Items
 from pyndf.gui.menus.menu import MainMenu
 
 
@@ -27,7 +23,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.color = color
 
         # Window parameters
-        self.setWindowTitle(TITLE_APP)
+        self.setWindowTitle(CONST.TITLE_APP)
         self.setWindowIcon(self.style().standardIcon(self.style().StandardPixmap.SP_TitleBarMenuButton))
         if app.resolution:
             self.setMinimumWidth(int(app.resolution.width() / 1.5))
@@ -50,7 +46,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self._create_status_bar()
 
     def set_path(self, name, path):
-        self.tabs[TAB_PRO].texts[name].setText(path)
+        self.tabs[CONST.TYPE.PRO].texts[name].setText(path)
 
     def toggled_tab(self, tab, boolean):
         widget = self.centralWidget()
@@ -68,23 +64,23 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.setCentralWidget(widget)
 
         # Analyse tabs
-        self.tabs[TAB_ANA] = {}
-        self.tabs[TAB_RW] = {}
+        self.tabs = {}
         info_dict = {
-            "excel": {"title": self.tr("Excel Reader"), "item": ExcelItem, "tab": TAB_RW},
-            "csv": {"title": self.tr("CSV Reader"), "item": CsvItem, "tab": TAB_RW},
-            "global": {"title": self.tr("Global Analyse"), "item": AllItem, "tab": TAB_ANA},
-            "api": {"title": self.tr("Distance Google API Analyse"), "item": ApiItem, "tab": TAB_ANA},
-            "pdf": {"title": self.tr("PDF Writer Analyse"), "item": PdfItem, "tab": TAB_ANA},
+            CONST.TYPE.EXC: self.tr("Excel Reader"),
+            CONST.TYPE.CSV: self.tr("CSV Reader"),
+            CONST.TYPE.ALL: self.tr("Global Analyse"),
+            CONST.TYPE.API: self.tr("Distance Google API Analyse"),
+            CONST.TYPE.PDF: self.tr("PDF Writer Analyse"),
         }
 
-        for index, (key, value) in enumerate(info_dict.items()):
-            self.tabs[value["tab"]][key] = AnalyseTab(self, value["title"], value["item"])
-            widget.insertTab(index + 1, self.tabs[value["tab"]][key], self.tabs[value["tab"]][key].title)
+        for index, (key, title) in enumerate(info_dict.items()):
+            self.tabs[key] = AnalyseTab(self, title, Items(key))
+            widget.insertTab(index + 1, self.tabs[key], title)
 
         # Process tab
-        self.tabs[TAB_PRO] = ProcessTab(self, self.tr("Process"), excel=self.excel, csv=self.csv, output=self.output)
-        widget.insertTab(0, self.tabs[TAB_PRO], self.tabs[TAB_PRO].title)
+        title = self.tr("Process")
+        self.tabs[CONST.TYPE.PRO] = ProcessTab(self, title, excel=self.excel, csv=self.csv, output=self.output)
+        widget.insertTab(0, self.tabs[CONST.TYPE.PRO], title)
 
         widget.setCurrentIndex(0)
 
@@ -96,15 +92,15 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
     def generate(self):
         """Method triggered with the button to start the generation of pdf. In process tab"""
-        if not all([t.text() for t in self.tabs[TAB_PRO].texts.values()]):
+        if not all([t.text() for t in self.tabs[CONST.TYPE.PRO].texts.values()]):
             return None  # If one field is empty, ignore.
 
         self.progress.show()
-        self.tabs[TAB_PRO].buttons["pdf"].setDisabled(True)
-        for tab in list(self.tabs[TAB_ANA].values()) + list(self.tabs[TAB_RW].values()):
-            tab.table.init()
+        self.tabs[CONST.TYPE.PRO].buttons[CONST.TYPE.PDF].setDisabled(True)
+        for name in CONST.TAB.ANALYSE + CONST.TAB.READER:
+            self.tabs[name].table.init()
         process = Thread(
-            *[t.text() for t in self.tabs[TAB_PRO].texts.values()], color=self.color, log_level=self.log_level
+            *[t.text() for t in self.tabs[CONST.TYPE.PRO].texts.values()], color=self.color, log_level=self.log_level
         )
         process.signals.error.connect(self.error)
         process.signals.finished.connect(self.generated)
@@ -115,16 +111,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(object)
     def analysed(self, obj):
-        if isinstance(obj, AllItem):
-            self.tabs[TAB_ANA]["global"].table.add(obj)
-        elif isinstance(obj, ApiItem):
-            self.tabs[TAB_ANA]["api"].table.add(obj)
-        elif isinstance(obj, PdfItem):
-            self.tabs[TAB_ANA]["pdf"].table.add(obj)
-        elif isinstance(obj, ExcelItem):
-            self.tabs[TAB_RW]["excel"].table.add(obj)
-        elif isinstance(obj, CsvItem):
-            self.tabs[TAB_RW]["csv"].table.add(obj)
+        self.tabs[obj.type].table.add(obj)
 
     @QtCore.pyqtSlot(float, str)
     def progressed(self, value, text):
@@ -136,9 +123,9 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
     def tear_down(self):
         self.progress.hide()
         self.progress.reset()
-        for tab in list(self.tabs[TAB_ANA].values()) + list(self.tabs[TAB_RW].values()):
-            tab.table.finished()
-        self.tabs[TAB_PRO].buttons["pdf"].setDisabled(False)
+        for name in CONST.TAB.ANALYSE + CONST.TAB.READER:
+            self.tabs[name].table.finished()
+        self.tabs[CONST.TYPE.PRO].buttons[CONST.TYPE.PDF].setDisabled(False)
 
     @QtCore.pyqtSlot(object)
     def error(self, obj):
@@ -152,7 +139,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.information(self, self.tr("Finished"), self.tr("PDFs have been generated !"))
 
     def read_settings(self):
-        settings = QtCore.QSettings(COMPANY, TITLE_APP)
+        settings = QtCore.QSettings(CONST.COMPANY, CONST.TITLE_APP)
         geo = settings.value("geometry")
         if geo is not None:
             self.restoreGeometry(geo)
@@ -161,13 +148,13 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         if state is not None:
             self.restoreState(state)
 
-        for name in ("excel", "csv", "output", "color"):
+        for name in (CONST.TYPE.EXC, CONST.TYPE.CSV, CONST.TYPE.OUT, CONST.TYPE.COL):
             attr = settings.value(name)
             if attr is not None and getattr(self, name) is None:
                 setattr(self, name, attr)
 
     def closeEvent(self, event):
-        settings = QtCore.QSettings(COMPANY, TITLE_APP)
+        settings = QtCore.QSettings(CONST.COMPANY, CONST.TITLE_APP)
         settings.setValue("geometry", self.saveGeometry())
         settings.setValue("windowState", self.saveState())
 
@@ -175,6 +162,6 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         shutil.rmtree(self.app.temp_dir, ignore_errors=True)
 
         # Memory
-        for name in ("excel", "csv", "output", "color"):
+        for name in (CONST.TYPE.EXC, CONST.TYPE.CSV, CONST.TYPE.OUT, CONST.TYPE.COL):
             settings.setValue(name, getattr(self, name))
         super().closeEvent(event)

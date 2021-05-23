@@ -2,11 +2,13 @@
 
 
 from pyndf.gui.items.abstract import AbstractItem
+from pyndf.constants import CONST
 
 
 class ApiItem(AbstractItem):
     """Class for storing data for analyse."""
 
+    type = CONST.TYPE.API
     headers = ["addr_client", "addr_employee", "distance", "status", "time"]
 
     @classmethod

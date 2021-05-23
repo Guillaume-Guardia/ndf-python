@@ -3,14 +3,18 @@
 import os
 from pyndf.qtlib import QtCore
 from pyndf.logbook import Logger
-from pyndf.constants import CONFIG
-from pyndf.gui.items.useclass.reader.csv import CsvItem
 
 
 class AbstractReader(Logger, QtCore.QObject):
     """Abstract class for reading file."""
 
     type = None
+
+    @classmethod
+    def can_read(cls, filename):
+        if cls.regex.match(filename):
+            return cls.type
+        return None
 
     def check_path(self, filename=None):
         if not os.path.exists(filename):

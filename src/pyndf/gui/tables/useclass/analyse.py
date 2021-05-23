@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from pyndf.gui.tables.abstract import AbstractTable
-from pyndf.constants import CONFIG
-from pyndf.gui.items.useclass.analyse.total import TotalItem
+from pyndf.constants import CONST
+from pyndf.gui.items.factory import Items
 
 
 class AnalyseTable(AbstractTable):
@@ -26,11 +26,11 @@ class AnalyseTable(AbstractTable):
         # Check all status
         status = all(
             [
-                self.item(r, self.custom_item.headers.index("status")).text() in CONFIG["good_status"]
+                getattr(CONST.STATUS, self.item(r, self.custom_item.headers.index("status")).text()).STATE
                 for r in range(self.rowCount() - 1)
             ]
         )
-        total_item = TotalItem(status, self.time)
+        total_item = Items(CONST.TYPE.TOT, status, self.time)
 
         # Set total at the end
         self.setVerticalHeaderItem(row, total_item.vheaders_pretty)

@@ -3,7 +3,7 @@
 import re
 import googlemaps
 from pyndf.logbook import Logger, log_time
-from pyndf.constants import CONFIG
+from pyndf.constants import CONST
 from pyndf.db.session import db
 from pyndf.db.client import Client
 from pyndf.db.employee import Employee
@@ -21,10 +21,9 @@ class DistanceMatrixAPI(Logger):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.key = CONFIG["distance_params"]["key"]
-        self.language = CONFIG["distance_params"]["language"]
-        self.mode = CONFIG["distance_params"]["mode"]
-        self.unit = CONFIG["distance_params"]["unit"]
+
+        for key, value in CONST.FILE.YAML[CONST.TYPE.API].items():
+            setattr(self, key, value)
         self.client = googlemaps.Client(self.key)
 
         self.log.info("Get distance with API or DB or cache from Excel file")
@@ -66,9 +65,9 @@ class DistanceMatrixAPI(Logger):
         # Check cache
         if (client_address, employee_address) in self._cache:
             self.log.debug(
-                f"Status: {CONFIG['good_status'][1]} || Result: {self._cache[(client_address, employee_address)]}"
+                f"Status: {CONST.STATUS.CACHE.NAME} || Result: {self._cache[(client_address, employee_address)]}"
             )
-            return CONFIG["good_status"][1], self._cache[(client_address, employee_address)]
+            return CONST.STATUS.CACHE.NAME, self._cache[(client_address, employee_address)]
 
         # Check DB
         with db.session_scope() as session:
@@ -83,8 +82,8 @@ class DistanceMatrixAPI(Logger):
                 # Add in cache
                 self._cache[(client_address, employee_address)] = (measure.distance, measure.duration)
 
-                self.log.debug(f"Status: {CONFIG['good_status'][2]} || Result: {(measure.distance, measure.duration)}")
-                return CONFIG["good_status"][2], (measure.distance, measure.duration)
+                self.log.debug(f"Status: {CONST.STATUS.DB.NAME} || Result: {(measure.distance, measure.duration)}")
+                return CONST.STATUS.DB.NAME, (measure.distance, measure.duration)
 
         dict_params = dict(
             origins=client_address,
@@ -98,7 +97,7 @@ class DistanceMatrixAPI(Logger):
         # Check status result
         top_status = result["status"]
 
-        if top_status in CONFIG["bad_status"]["Top"]:
+        if not getattr(CONST.STATUS, top_status).STATE:
             self.log.warning(f"Status: {top_status} || Result: None")
             return top_status, None
 
@@ -107,7 +106,7 @@ class DistanceMatrixAPI(Logger):
         element = result["rows"][0]["elements"][0]
         element_status = element["status"]
 
-        if element_status in CONFIG["bad_status"]["Element"]:
+        if not getattr(CONST.STATUS, element_status).STATE:
             self.log.warning(f"Status: {element_status} || Result: None")
             return element_status, None
 

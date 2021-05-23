@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from pyndf.constants import CONFIG, COL
+from pyndf.constants import CONST
 from pyndf.gui.items.abstract import AbstractItem
 
 
 class ExcelItem(AbstractItem):
     """Class for storing data for analyse."""
 
-    headers = list(CONFIG[COL].values())
+    type = CONST.TYPE.EXC
+    headers = list(CONST.FILE.YAML[CONST.TYPE.EXC].values())
 
     @classmethod
     def headers_pretty(cls):

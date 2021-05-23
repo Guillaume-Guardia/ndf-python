@@ -1,38 +1,12 @@
 # Google API params
-distance_params:
+api:
   key: AIzaSyBxHUFfYitI-doxwvyAv04rJwop13ktzcM
   language: fr
   mode: driving # driving, walking, bicycling, transit
   unit: metric # metric, imperial
 
-good_status:
-  - OK  # indicates the response contains a valid result.
-  - CACHE # indicates no use of API, use cache class.
-  - DB # indicates no use of API, use cache class.
-
-bad_status:
-  Top:
-    - INVALID_REQUEST  # indicates that the provided request was invalid.
-    - MAX_ELEMENTS_EXCEEDED # > 100 elements by request
-    - MAX_DIMENSIONS_EXCEEDED # rqt > 25 origins or 25 detinations
-    - OVER_QUERY_LIMIT # > 1000 elements / second
-    - REQUEST_DENIED
-    - UNKNOWN_ERROR # Server Error -> Try again.
-
-    # indicates any of the following:
-    # The API key is missing or invalid.
-    # Billing has not been enabled on your account.
-    # A self-imposed usage cap has been exceeded.
-    # The provided method of payment is no longer valid (for example, a credit card has expired).
-    - OVER_DAILY_LIMIT
-
-  Element:
-    - NOT_FOUND  # indicates that the origin and/or destination of this pairing could not be geocoded.
-    - ZERO_RESULTS  # indicates no route could be found between the origin and destination.
-    - MAX_ROUTE_LENGTH_EXCEEDED # indicates the requested route is too long and cannot be processed.
-
-# Excel params
-colonne_excel:
+# Excel colonnes
+excel:
   nom: Nom
   code: "Code\nIntervenant"
   matricule: Matricule
@@ -68,24 +42,8 @@ colonne_excel:
   analytique_4: Analytique 4
   analytique_5: Analytique 5
 
-colonne_perso:
-  - nom
-  - matricule
-  - societe
-  - agence
-  - agence_o
-  - adresse_intervenant
-
-colonne_mission:
-  - periode_production
-  - client
-  - adresse_client
-  - quantite_payee
-  - prix_unitaire
-  - total
-
-# CSV params
-colonne_csv:
+# CSV colonnes
+csv:
   agence: 'Intitulé établissement'
   unite: 'Unité du salarié'
   matricule: Matricule

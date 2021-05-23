@@ -4,7 +4,7 @@ import os
 import tempfile
 from glob import glob
 from pyndf.qtlib import QtWidgets, QtCore
-from pyndf.constants import TRANSLATION_DIR
+from pyndf.constants import CONST
 from pyndf.gui.windows.main import MainWindow
 
 
@@ -24,7 +24,7 @@ class App(QtWidgets.QApplication):
 
     def get_available_language(self):
         language_available = []
-        ts_files = glob(os.path.join(TRANSLATION_DIR, "*.ts"))
+        ts_files = glob(os.path.join(CONST.FILE.TRANSLATION_DIR, "*.ts"))
         for ts_file in ts_files:
             language_available.append(os.path.basename(ts_file).split(".")[0].split("_")[1])
 
@@ -57,7 +57,7 @@ class App(QtWidgets.QApplication):
         translator = QtCore.QTranslator()
 
         # Load translator
-        if translator.load(self.language, "pyndf", "_", TRANSLATION_DIR, ".qm"):
+        if translator.load(self.language, "pyndf", "_", CONST.FILE.TRANSLATION_DIR, ".qm"):
             # Install translator
             self.installTranslator(translator)
             self.translator = translator

@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from pyndf.constants import DB_FILE
+from pyndf.constants import CONST
 from pyndf.logbook import Logger
 from pyndf.db.base import Base
 from pyndf.db.client import Client
@@ -46,4 +46,4 @@ class Database(Logger):
             db_session.close()
 
 
-db = Database(dbtype="sqlite", dbname=DB_FILE, base=Base)
+db = Database(dbtype="sqlite", dbname=CONST.FILE.DB, base=Base)

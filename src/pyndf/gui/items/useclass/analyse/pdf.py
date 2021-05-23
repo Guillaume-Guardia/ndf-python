@@ -2,11 +2,13 @@
 
 
 from pyndf.gui.items.abstract import AbstractItem
+from pyndf.constants import CONST
 
 
 class PdfItem(AbstractItem):
     """Class for storing data for analyse."""
 
+    type = CONST.TYPE.PDF
     headers = ["filename", "total_db", "total", "nbr_missions", "status", "time"]
 
     @classmethod

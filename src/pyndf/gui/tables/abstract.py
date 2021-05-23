@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from pyndf.qtlib import QtWidgets
+from pyndf.qtlib import QtWidgets, QtCore
 
 
 class AbstractTable(QtWidgets.QTableWidget):
+    _cache = {}
+
+    sort_order = {True: QtCore.Qt.SortOrder.AscendingOrder, False: QtCore.Qt.SortOrder.DescendingOrder}
+
     def __init__(self, tab, item):
         super().__init__(tab)
         self.tab = tab
@@ -30,4 +34,12 @@ class AbstractTable(QtWidgets.QTableWidget):
             self.setItem(row, index, widget)
 
     def finished(self):
-        pass
+        self.cellClicked.connect(self.on_header_clicked)
+
+    def on_header_clicked(self, row, col):
+        if col in self._cache:
+            self._cache[col] = not self._cache[col]
+        else:
+            self._cache[col] = True
+        sort = self.sort_order[self._cache[col]]
+        self.sortItems(col, sort)

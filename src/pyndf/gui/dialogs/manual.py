@@ -2,7 +2,7 @@
 
 from markdown import markdown
 from pyndf.qtlib import QtWidgets, QtGui, QtCore
-from pyndf.constants import LOGO, README_FILE, TITLE_APP, VERSION, DEFAULT_FONT
+from pyndf.constants import CONST
 
 
 class ManualDialog(QtWidgets.QDialog):
@@ -26,18 +26,18 @@ class ManualDialog(QtWidgets.QDialog):
         layout = QtWidgets.QVBoxLayout()
 
         # Title label
-        title = QtWidgets.QLabel(f"{TITLE_APP}")
-        title.setFont(QtGui.QFont(DEFAULT_FONT[0], 20))
+        title = QtWidgets.QLabel(f"{CONST.TITLE_APP}")
+        title.setFont(QtGui.QFont(CONST.WRITER.PDF.FONT[0], 20))
 
         # Image
         image = QtWidgets.QLabel()
-        pixmap = QtGui.QPixmap(LOGO)
+        pixmap = QtGui.QPixmap(CONST.LOGO)
         pixmap.scaledToWidth(50)
         image.setPixmap(pixmap)
         image.setScaledContents(False)
 
         # Version
-        version = QtWidgets.QLabel(f"version: {VERSION}")
+        version = QtWidgets.QLabel(f"version: {CONST.VERSION}")
 
         # Add widget to layout
         layout.addWidget(title)
@@ -51,9 +51,8 @@ class ManualDialog(QtWidgets.QDialog):
 
     def create_manual_layout(self):
         layout = QtWidgets.QVBoxLayout()
-        with open(README_FILE, encoding="utf-8") as opened_file:
+        with open(CONST.FILE.README, encoding="utf-8") as opened_file:
             for line in opened_file.readlines():
-                print(line)
                 layout.addWidget(QtWidgets.QLabel(markdown(line)))
 
         return layout

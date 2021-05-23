@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from pyndf.constants import CONFIG, COL_CSV
+from pyndf.constants import CONST
 from pyndf.gui.items.abstract import AbstractItem
 
 
 class CsvItem(AbstractItem):
     """Class for storing data for analyse."""
 
-    headers = list(CONFIG[COL_CSV].values())
+    type = CONST.TYPE.CSV
+    headers = list(CONST.FILE.YAML[CONST.TYPE.CSV].values())
 
     @classmethod
     def headers_pretty(cls):

@@ -2,14 +2,13 @@
 
 import os
 from time import time
-from pyndf.process.reader.factory import reader_factory
+from pyndf.constants import CONST
+from pyndf.process.reader.factory import Reader
+from pyndf.gui.items.factory import Items
+from pyndf.process.writer.factory import Writer
 from pyndf.qtlib import QtCore
-from pyndf.process.writer.useclass.pdf import PdfWriter
 from pyndf.process.distance import DistanceMatrixAPI
 from pyndf.logbook import Logger
-from pyndf.gui.items.useclass.analyse.all import AllItem
-from pyndf.gui.items.useclass.analyse.api import ApiItem
-from pyndf.gui.items.useclass.analyse.pdf import PdfItem
 
 
 class WorkerSignals(QtCore.QObject):
@@ -49,17 +48,17 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
             start = time()
 
             # Read Excel file
-            records, time_spend = reader_factory(
+            records, time_spend = Reader(
                 self.excel_file,
                 progress_callback=self.signals.progressed.emit,
                 p=10,
                 log_level=self.log_level,
             )
             t1 = time()
-            self.signals.analysed.emit(AllItem(self.tr("Read EXCEL file"), "OK", t1 - start))
+            self.signals.analysed.emit(Items(CONST.TYPE.ALL, self.tr("Read EXCEL file"), "OK", t1 - start))
 
             # Read CSV file
-            records_csv, time_spend = reader_factory(
+            records_csv, time_spend = Reader(
                 self.csv_file,
                 progress_callback=self.signals.progressed.emit,
                 p=10,
@@ -69,7 +68,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
                 if int(matricule) in records_csv:
                     record["montant_total"] = records_csv[int(matricule)]
             t2 = time()
-            self.signals.analysed.emit(AllItem(self.tr("Read CSV file"), "OK", t2 - t1))
+            self.signals.analysed.emit(Items(CONST.TYPE.ALL, self.tr("Read CSV file"), "OK", t2 - t1))
 
             # Calcul distance between adresse_client and adresse_intervenant with google API
             api = DistanceMatrixAPI(log_level=self.log_level)
@@ -86,7 +85,14 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
                         mission["forfait"] = mission["total"] / mission["nbrkm_mois"]
 
                     self.signals.analysed.emit(
-                        ApiItem(mission["adresse_client"], record["adresse_intervenant"], distance, status, time_spend)
+                        Items(
+                            CONST.TYPE.API,
+                            mission["adresse_client"],
+                            record["adresse_intervenant"],
+                            distance,
+                            status,
+                            time_spend,
+                        )
                     )
 
                 # Check agence d'origine/address are in missions:
@@ -98,21 +104,30 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
                     self.tr("Get distance from Google API/DB/cache: {} / {}").format(index, n),
                 )
             t3 = time()
-            self.signals.analysed.emit(AllItem(self.tr("Get distance from Google API/DB/Cache"), "OK", t3 - t2))
+            self.signals.analysed.emit(
+                Items(CONST.TYPE.ALL, self.tr("Get distance from Google API/DB/Cache"), "OK", t3 - t2)
+            )
 
             # Create PDF with data records and distance from the API
             date = os.path.basename(self.excel_file).split(".")[0].split("_")[1]
-            writer = PdfWriter(date, dir=self.output_directory, color=self.color, log_level=self.log_level)
+            writer = Writer(CONST.TYPE.PDF, date, dir=self.output_directory, color=self.color, log_level=self.log_level)
             n = len(records)
             for index, record in enumerate(records.values()):
+                print(record)
                 (filename, total, status), time_spend = writer.write(record)
                 self.signals.progressed.emit(60 + (index / n) * 40, self.tr("Create PDFs: {} / {}").format(index, n))
                 self.signals.analysed.emit(
-                    PdfItem(
-                        filename, record.get("montant_total", 0), total, len(record["missions"]), status, time_spend
+                    Items(
+                        CONST.TYPE.PDF,
+                        filename,
+                        record.get("montant_total", 0),
+                        total,
+                        len(record["missions"]),
+                        status,
+                        time_spend,
                     )
                 )
-            self.signals.analysed.emit(AllItem(self.tr("Write PDFs"), "OK", time() - t3))
+            self.signals.analysed.emit(Items(CONST.TYPE.ALL, self.tr("Write PDFs"), "OK", time() - t3))
 
         except Exception as error:
             self.log.exception(error)

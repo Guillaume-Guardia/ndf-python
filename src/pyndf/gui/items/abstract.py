@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from pyndf.qtlib import QtWidgets, QtGui, QtCore
-from pyndf.constants import COLORS
+from pyndf.constants import CONST
 
 
 class AbstractItem(QtCore.QObject):
@@ -19,10 +19,6 @@ class AbstractItem(QtCore.QObject):
         for index, arg in enumerate(args):
             setattr(self, self.headers[index], arg)
 
-    @classmethod
-    def column_count(cls):
-        return len(cls.headers)
-
     def __setattr__(self, name: str, value) -> None:
         if name == "time":
             value = round(value, 4)
@@ -36,7 +32,7 @@ class AbstractItem(QtCore.QObject):
 
         if name == "status":
             widget.setFont(QtGui.QFont(self.font, self.font_size, self.font_weight))
-            widget.setForeground(QtGui.QColor(COLORS.get(value, COLORS["others"])))
+            widget.setForeground(QtGui.QColor(getattr(CONST.STATUS, value).COLOR))
         super().__setattr__(name, widget)
 
     def __iter__(self):
