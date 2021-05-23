@@ -32,7 +32,7 @@ class ProcessTab(AbstractTab):
         grid_widget.setLayout(grid_layout)
 
         # Generate button
-        self.buttons[CONST.TYPE.PDF] = QtWidgets.QPushButton()
+        self.buttons[CONST.TYPE.PDF] = QtWidgets.QPushButton(self.tr("Generate PDFs"))
         self.buttons[CONST.TYPE.PDF].pressed.connect(self.window.generate)
         self.buttons[CONST.TYPE.PDF].setMinimumWidth(120)
         self.buttons[CONST.TYPE.PDF].setMinimumHeight(40)
@@ -53,7 +53,7 @@ class ProcessTab(AbstractTab):
             return
 
         self.window.tabs[name].table.init(clear=True)
-        result, _ = Reader(
+        result = Reader(
             filename,
             analyse_callback=self.window.tabs[name].table.add,
             log_level=self.window.log_level,

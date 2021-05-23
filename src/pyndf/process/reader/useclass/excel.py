@@ -15,7 +15,6 @@ class ExcelReader(AbstractReader):
     type = CONST.TYPE.EXC
     regex = re.compile(".*[.][xX][lL]*")
 
-    @log_time
     def read(self, filename=None, sheet_name=0, progress_callback=None, p=100, analyse_callback=None):
         if self.check_path(filename) is False:
             return
@@ -25,6 +24,7 @@ class ExcelReader(AbstractReader):
 
         # Initialisation variables
         records = defaultdict(dict)
+        client_agence_origin = ""
 
         # Get the data on excel file in dataframe format.
         dataframe = pd.read_excel(filename, sheet_name=sheet_name, na_filter=False, dtype={"matricule": str})

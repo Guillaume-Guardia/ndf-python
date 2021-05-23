@@ -17,7 +17,6 @@ from pyndf.process.writer.abstract import AbstractWriter
 from pyndf.logbook import log_time
 from pyndf.constants import CONST
 
-UNKNOWN = "Inconnu"
 stylesheet = getSampleStyleSheet()
 stylesheet.add(ParagraphStyle(name="Justify", parent=stylesheet["Normal"], alignment=TA_JUSTIFY))
 stylesheet.add(ParagraphStyle(name="Center", parent=stylesheet["Normal"], alignment=TA_CENTER))
@@ -97,21 +96,20 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         self.addPageTemplates(PageTemplate(frames=frame, onPage=self.all_page_setup, pagesize=self.pagesize))
         super().build(*args, **kwargs)
 
-    def create_table_collaborator(self, data):
-        """Create the collaborator table from data.
+    def create_table_collaborator(self, record):
+        """Create the collaborator table from record.
 
         Args:
-            data (dict): dict info.
+            record (dict): dict info.
 
         Returns:
             Table: returned the table with style.
         """
-        data = [
-            ["Nom Prénom:", data.get("nom", UNKNOWN)],
-            ["Matricule:", data.get("matricule", UNKNOWN)],
-            ["Adresse:", data.get("adresse_intervenant", UNKNOWN)],
-        ]
-        table = Table(data, spaceBefore=cm, spaceAfter=cm)
+        result = []
+        for col in CONST.WRITER.PDF.COL_PERSO:
+            result.append([CONST.FILE.YAML[CONST.TYPE.PDF][col], record.get(col, CONST.WRITER.PDF.UNKNOWN)])
+
+        table = Table(result, spaceBefore=cm, spaceAfter=cm)
         style = TableStyle([("GRID", (0, 0), (-1, -1), 0.25, black)])
         table.setStyle(style)
         return table
@@ -127,28 +125,20 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         """
         memory_mission = []
         data = [[]]
-        for name in (
-            "Nom du client",
-            "Période",
-            "Adresse de réalisation",
-            "Nb de Km par mois",
-            "Taux",
-            "Plafond APSIDE",
-            "Montant total",
-        ):
-            data[0].append(Paragraph(name, stylesheet["Center"]))
         nbrkm_mois = 0
         quantite_payee = 0
         total = 0
         prix_unitaire = 0
-
         error = False
 
+        # Add header
+        for name in CONST.WRITER.PDF.COL_MISSION:
+            data[0].append(Paragraph(CONST.FILE.YAML[CONST.TYPE.PDF][name], stylesheet["Center"]))
+
         for mission in record.get("missions", {}):
-            print(mission, getattr(CONST.STATUS, mission["status"]))
-            if not getattr(CONST.STATUS, mission["status"]).STATE:
+            if not getattr(CONST.STATUS, mission["status"]):
                 error = True
-                break
+                continue
 
             nbrkm_mois += mission.get("nbrkm_mois", 0)
             quantite_payee += mission.get("quantite_payee", 0)
@@ -164,31 +154,24 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
             nbrkm_mois = f"> {100 * quantite_payee}"
 
         for mission in record.get("missions", {}):
-            client = mission.get("client", UNKNOWN)
-            address = mission.get("adresse_client", UNKNOWN)
-            if not error:
-                if (client, address) not in memory_mission:
-                    data.append(
-                        [
-                            Paragraph(client, stylesheet["Justify"]),
-                            mission.get("periode_production", UNKNOWN),
-                            Paragraph(address, stylesheet["Justify"]),
-                            nbrkm_mois,
-                            quantite_payee,
-                            prix_unitaire,
-                            total,
-                        ]
-                    )
-                    memory_mission.append((client, address))
-            else:
+            client = mission.get("client", CONST.WRITER.PDF.UNKNOWN)
+            address = mission.get("adresse_client", CONST.WRITER.PDF.UNKNOWN)
+
+            if (client, address) not in memory_mission:
                 data.append(
                     [
                         Paragraph(client, stylesheet["Justify"]),
+                        mission.get("periode_production", CONST.WRITER.PDF.UNKNOWN),
                         Paragraph(address, stylesheet["Justify"]),
-                        mission.get("status"),
+                        nbrkm_mois,
+                        quantite_payee,
+                        prix_unitaire,
+                        total,
                     ]
                 )
+                memory_mission.append((client, address))
 
+        # Create table with data
         table = Table(
             data,
             spaceBefore=cm,
@@ -207,8 +190,8 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
             ]
         )
 
+        # Merge
         if not error:
-            # Merge
             for i in (1, 3, 4, 5, 6):
                 style.add("SPAN", (i, 1), (i, -1))
 
@@ -222,16 +205,18 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         Args:
             data (dict): record data with personnal info of collaborator and his missions info.
         """
-        matricule = data.get("matricule", UNKNOWN)
+        matricule = data.get("matricule", CONST.WRITER.PDF.UNKNOWN)
         self.log.debug(f"Create pdf for matricule {matricule} with {len(data['missions'])} missions.")
-        filename = f"{data.get('agence', UNKNOWN)}_{matricule}_{self.date.strftime('%Y%m')}"
+        filename = f"{data.get('agence', CONST.WRITER.PDF.UNKNOWN)}_{matricule}_{self.date.strftime('%Y%m')}"
         path = self.create_path(filename)
 
         paragraphs = []
         # add some flowables
         paragraphs.append(Paragraph("NOTE DE FRAIS", stylesheet["title"]))
-        paragraphs.append(Paragraph(f"AGENCE: {data.get('agence', UNKNOWN)}", stylesheet["title"]))
-        paragraphs.append(Paragraph(f"AGENCE D'ORIGINE: {data.get('agence_o', UNKNOWN)}", stylesheet["title"]))
+        paragraphs.append(Paragraph(f"AGENCE: {data.get('agence', CONST.WRITER.PDF.UNKNOWN)}", stylesheet["title"]))
+        paragraphs.append(
+            Paragraph(f"AGENCE D'ORIGINE: {data.get('agence_o', CONST.WRITER.PDF.UNKNOWN)}", stylesheet["title"])
+        )
 
         paragraphs.append(self.create_table_collaborator(data))
         table, total = self.create_table_missions(data)
@@ -243,5 +228,5 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
             self.build(paragraphs, path)
         except Exception as e:
             self.log.exception(e)
-            return filename, None, "error"
+            return filename, None, CONST.STATUS.ERROR.NAME
         return filename, total, CONST.STATUS.OK.NAME

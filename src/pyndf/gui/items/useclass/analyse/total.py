@@ -14,6 +14,6 @@ class TotalItem(AbstractItem):
     def __init__(self, status, time):
         """Initialisation"""
         super().__init__()
-        self.status = "OK" if status else "NO"
+        self.status = status
         self.time = time
         self.vheaders_pretty = self.tr("Total")

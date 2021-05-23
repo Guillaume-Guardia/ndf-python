@@ -75,7 +75,8 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         for index, (key, title) in enumerate(info_dict.items()):
             self.tabs[key] = AnalyseTab(self, title, Items(key))
-            widget.insertTab(index + 1, self.tabs[key], title)
+            index = widget.insertTab(index + 1, self.tabs[key], title)
+            widget.setTabVisible(index, False)
 
         # Process tab
         title = self.tr("Process")
@@ -148,7 +149,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         if state is not None:
             self.restoreState(state)
 
-        for name in (CONST.TYPE.EXC, CONST.TYPE.CSV, CONST.TYPE.OUT, CONST.TYPE.COL):
+        for name in CONST.MEMORY:
             attr = settings.value(name)
             if attr is not None and getattr(self, name) is None:
                 setattr(self, name, attr)
@@ -162,6 +163,8 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         shutil.rmtree(self.app.temp_dir, ignore_errors=True)
 
         # Memory
-        for name in (CONST.TYPE.EXC, CONST.TYPE.CSV, CONST.TYPE.OUT, CONST.TYPE.COL):
+        for name in CONST.MEMORY:
             settings.setValue(name, getattr(self, name))
+
+        self.app.set_language_mem()
         super().closeEvent(event)

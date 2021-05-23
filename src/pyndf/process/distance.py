@@ -48,7 +48,7 @@ class DistanceMatrixAPI(Logger):
         return ""
 
     @log_time
-    def run(self, client_address, employee_address):
+    def run(self, client, employee):
         """Start the process google matrix api.
 
         Args:
@@ -58,6 +58,8 @@ class DistanceMatrixAPI(Logger):
         Returns:
             (tuple): Returned the result of API: distance between the client_address and employee_address with duration.
         """
+        client_name, client_address = client
+        employee_matricule, employee_address = employee
         self.log.debug(f"Get the distance between {client_address} and {employee_address}.")
         client_address = self.format_address(client_address)
         employee_address = self.format_address(employee_address)
@@ -97,7 +99,7 @@ class DistanceMatrixAPI(Logger):
         # Check status result
         top_status = result["status"]
 
-        if not getattr(CONST.STATUS, top_status).STATE:
+        if not getattr(CONST.STATUS, top_status):
             self.log.warning(f"Status: {top_status} || Result: None")
             return top_status, None
 
@@ -106,7 +108,7 @@ class DistanceMatrixAPI(Logger):
         element = result["rows"][0]["elements"][0]
         element_status = element["status"]
 
-        if not getattr(CONST.STATUS, element_status).STATE:
+        if not getattr(CONST.STATUS, element_status):
             self.log.warning(f"Status: {element_status} || Result: None")
             return element_status, None
 
@@ -120,12 +122,12 @@ class DistanceMatrixAPI(Logger):
         # Add in DB
         with db.session_scope() as session:
             # Check if client or employee exists
-            new_client = Client(address=client_address)
+            new_client = Client(name=client_name, address=client_address)
             if session.query(Client).filter(Client.address == client_address).first() is None:
                 self.log.debug(f"Add new client {new_client}")
                 session.add(new_client)
 
-            new_employee = Employee(address=employee_address)
+            new_employee = Employee(matricule=employee_matricule, address=employee_address)
             if session.query(Employee).filter(Employee.address == employee_address).first() is None:
                 self.log.debug(f"Add new employee {new_employee}")
                 session.add(new_employee)

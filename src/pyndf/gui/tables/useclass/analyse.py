@@ -24,13 +24,13 @@ class AnalyseTable(AbstractTable):
         row = self.add_row()
 
         # Check all status
-        status = all(
-            [
-                getattr(CONST.STATUS, self.item(r, self.custom_item.headers.index("status")).text()).STATE
-                for r in range(self.rowCount() - 1)
-            ]
-        )
-        total_item = Items(CONST.TYPE.TOT, status, self.time)
+        total_status = set()
+        for r in range(self.rowCount() - 1):
+            item = self.item(r, self.custom_item.headers.index("status"))
+            status = getattr(CONST.STATUS, item.text())
+            total_status.add(status.NAME)
+        total_status = "/".join(list(total_status))
+        total_item = Items(CONST.TYPE.TOT, total_status, self.time)
 
         # Set total at the end
         self.setVerticalHeaderItem(row, total_item.vheaders_pretty)

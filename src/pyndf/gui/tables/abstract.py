@@ -11,9 +11,7 @@ class AbstractTable(QtWidgets.QTableWidget):
     def __init__(self, tab, item):
         super().__init__(tab)
         self.tab = tab
-
         self.custom_item = item
-
         headers = self.custom_item.headers_pretty()
         self.setColumnCount(len(headers))
         self.setHorizontalHeaderLabels(headers)
@@ -35,6 +33,7 @@ class AbstractTable(QtWidgets.QTableWidget):
 
     def finished(self):
         self.cellClicked.connect(self.on_header_clicked)
+        self.tab.window.toggled_tab(self.tab, True)
 
     def on_header_clicked(self, row, col):
         if col in self._cache:

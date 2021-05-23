@@ -8,6 +8,8 @@ from pyndf.db.base import Base
 class Client(Base):
     """Db class"""
 
+    name = Column(String)
+
     # Employee relation many to many -> backref
 
     # Measure relation many to one

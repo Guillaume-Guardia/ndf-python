@@ -15,6 +15,10 @@ class Utils:
         except ValueError:
             return value
 
+    @staticmethod
+    def insert(l: list, index: int, value: str):
+        return l[:index] + str(value) + l[index:]
+
 
 class Factory:
     def __new__(cls, type, *args, **kwargs):

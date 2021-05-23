@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-from pyndf.qtlib import QtCore
+from pyndf.qtlib import QtCore, QtWidgets
 from pyndf.logbook import Logger
 
 

@@ -79,7 +79,8 @@ class MainMenu(QtWidgets.QMenuBar):
     def create_action(self, menu, tab):
         action = QtGui.QAction(tab.title, menu)
         action.setCheckable(True)
-        action.setChecked(True)
+        widget = self.window.centralWidget()
+        action.setChecked(widget.isTabVisible(widget.indexOf(tab)))
         action.toggled.connect(lambda boolean, tab_=tab: self.window.toggled_tab(tab_, boolean))
         menu.addAction(action)
 

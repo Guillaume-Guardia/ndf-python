@@ -4,6 +4,8 @@ import os
 import yaml
 from dataclasses import dataclass
 
+DIR = os.path.dirname(__file__)
+
 
 class CONST:
     TITLE_APP = "PYNDF"
@@ -11,7 +13,6 @@ class CONST:
     VERSION = "1.0"
 
     class FILE:
-        DIR = os.path.dirname(__file__)
         DB = os.path.join(DIR, "db", "pydb.db")
         TRANSLATION_DIR = os.path.join(DIR, "data", "translations")
         README = os.path.join(DIR, "..", "..", "README.md")
@@ -24,6 +25,8 @@ class CONST:
         CSV = ".csv"
         EXC = ".xlsx"
         PDF = ".pdf"
+        QM = ".qm"
+        TS = ".ts"
 
     class TYPE:
         # Analyse
@@ -42,20 +45,23 @@ class CONST:
         # Others
         OUT = "output"
         COL = "color"
+        LAN = "language"
+
+    MEMORY = TYPE.EXC, TYPE.CSV, TYPE.OUT, TYPE.COL
 
     class UI:
         class ICONS:
-            excel = "src\pyndf\data\icons\excel.png"
-            csv = "src\pyndf\data\icons\csv.png"
-            CLO = "src\pyndf\data\icons\close.png"
-            fr = r"src\pyndf\data\icons\fr.png"
-            HEL = "src\pyndf\data\icons\help.png"
-            LAN = "src\pyndf\data\icons\language.png"
-            output = "src\pyndf\data\icons\output.png"
-            PDF = "src\pyndf\data\icons\pdf.png"
-            en = "src\pyndf\data\icons\en.png"
-            COL = "src\pyndf\data\icons\color.png"
-            MAN = "src\pyndf\data\icons\manual.png"
+            excel = os.path.join(DIR, "data\icons\excel.png")
+            csv = os.path.join(DIR, "data\icons\csv.png")
+            CLO = os.path.join(DIR, "data\icons\close.png")
+            fr = os.path.join(DIR, "data\icons\fr.png")
+            HEL = os.path.join(DIR, "data\icons\help.png")
+            LAN = os.path.join(DIR, "data\icons\language.png")
+            output = os.path.join(DIR, "data\icons\output.png")
+            PDF = os.path.join(DIR, "data\icons\pdf.png")
+            en = os.path.join(DIR, "data\icons\en.png")
+            COL = os.path.join(DIR, "data\icons\color.png")
+            MAN = os.path.join(DIR, "data\icons\manual.png")
 
         BUTTONSTYLE = """  QPushButton {
                 background-color: #79bbff;
@@ -92,16 +98,33 @@ class CONST:
 
     class MetaClass(type):
         def __getattr__(cls, key):
-            attr = CONST.STATUS.Status(key)
-            setattr(cls, key, attr)
+            # check key
+            total_status = []
+            kwargs = {}
+            splits = key.split("/")
+            if len(splits) > 1:
+                for s in splits:
+                    status = getattr(CONST.STATUS, s)
+                    total_status.append(bool(status))
+
+                if all(total_status):
+                    kwargs["COLOR"] = CONST.STATUS.OK.COLOR
+                    kwargs["STATE"] = True
+
+            attr = CONST.STATUS.Status(key, **kwargs)
+            if len(splits) == 1:
+                setattr(cls, key, attr)
             return attr
 
     class STATUS(metaclass=MetaClass):
         @dataclass
         class Status:
             NAME: str
-            COLOR: str = "#FFFF00"
+            COLOR: str = "#A12312"
             STATE: bool = False
+
+            def __bool__(self):
+                return self.STATE
 
         OK = Status("OK", "#008000", True)
         CACHE = Status("CACHE", "#32CD32", True)
@@ -133,8 +156,7 @@ class CONST:
             FONT = ["Helvetica", 10]
             COLOR = "#99ccff"  # Blue
 
+            COL_PERSO = ["nom", "matricule", "adresse_intervenant"]
+            COL_MISSION = ["client", "periode", "addresse_client", "nbrkm_mois", "taux", "plafond", "total"]
 
-if __name__ == "__main__":
-    print(vars(CONST.STATUS))
-    print(CONST.STATUS.N)
-    print(vars(CONST.STATUS))
+            UNKNOWN = "Inconnu"

@@ -13,9 +13,3 @@ class Writer(Factory):
         CONST.TYPE.CSV: CsvWriter,
         CONST.TYPE.PDF: PdfWriter,
     }
-
-
-if __name__ == "__main__":
-    a = Writer(CONST.TYPE.PDF, "dhdh")
-
-    print(a)

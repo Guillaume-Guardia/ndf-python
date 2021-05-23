@@ -8,6 +8,8 @@ from pyndf.db.base import Base, association_table
 class Employee(Base):
     """Db class"""
 
+    matricule = Column(String)
+
     # Client relation many to many
     clients = relationship("Client", secondary=association_table, backref="employees")
 

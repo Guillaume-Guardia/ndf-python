@@ -16,8 +16,3 @@ class Reader(Factory):
                 instance.__init__()
                 return instance.read(filename, *args, **kwargs)
         return instance
-
-
-if __name__ == "__main__":
-    a = Reader("fhfh.csv")
-    print(a)

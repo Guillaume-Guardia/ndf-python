@@ -56,3 +56,16 @@ csv:
   quantite3: 'Nombre Ind. Déplac. 83000'
   montant3: 'Montant salarial Ind. Déplac. 83000'
   date_depart: 'Date départ'
+
+# PDF libellé
+pdf:
+  nom: "Nom Prénom:"
+  matricule: "Matricule:"
+  adresse_intervenant: "Adresse:"
+  client: "Nom du client"
+  periode: "Période"
+  addresse_client: "Adresse de réalisation"
+  nbrkm_mois: "Nb de Km par mois"
+  taux: "Taux"
+  plafond: "Plafond APSIDE"
+  total: "Montant total"

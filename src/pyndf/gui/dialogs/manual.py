@@ -31,7 +31,7 @@ class ManualDialog(QtWidgets.QDialog):
 
         # Image
         image = QtWidgets.QLabel()
-        pixmap = QtGui.QPixmap(CONST.LOGO)
+        pixmap = QtGui.QPixmap(CONST.FILE.LOGO)
         pixmap.scaledToWidth(50)
         image.setPixmap(pixmap)
         image.setScaledContents(False)

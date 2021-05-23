@@ -17,14 +17,14 @@ class App(QtWidgets.QApplication):
         self.__window = None
         self.__language = None
 
-        self.language = language
+        self.language = language or self.get_language_mem()
         self.translator = None
         self.language_available = self.get_available_language()
         self.resolution = self.primaryScreen().availableSize()
 
     def get_available_language(self):
         language_available = []
-        ts_files = glob(os.path.join(CONST.FILE.TRANSLATION_DIR, "*.ts"))
+        ts_files = glob(os.path.join(CONST.FILE.TRANSLATION_DIR, "*" + CONST.EXT.TS))
         for ts_file in ts_files:
             language_available.append(os.path.basename(ts_file).split(".")[0].split("_")[1])
 
@@ -57,10 +57,18 @@ class App(QtWidgets.QApplication):
         translator = QtCore.QTranslator()
 
         # Load translator
-        if translator.load(self.language, "pyndf", "_", CONST.FILE.TRANSLATION_DIR, ".qm"):
+        if translator.load(self.language, "pyndf", "_", CONST.FILE.TRANSLATION_DIR, CONST.EXT.QM):
             # Install translator
             self.installTranslator(translator)
             self.translator = translator
 
     def load_window(self, *args, **kwargs):
         self.window = MainWindow(self, *args, **kwargs)
+
+    def get_language_mem(self):
+        settings = QtCore.QSettings(CONST.COMPANY, CONST.TITLE_APP)
+        return settings.value(CONST.TYPE.LAN)
+
+    def set_language_mem(self):
+        settings = QtCore.QSettings(CONST.COMPANY, CONST.TITLE_APP)
+        settings.setValue(CONST.TYPE.LAN, self.language.language())

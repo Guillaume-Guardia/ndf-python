@@ -15,7 +15,6 @@ class CSVReader(AbstractReader):
     type = CONST.TYPE.CSV
     regex = re.compile(".*[.][cC][sS][vV]")
 
-    @log_time
     def read(self, filename=None, progress_callback=None, p=100, analyse_callback=None):
         if self.check_path(filename) is False:
             return
