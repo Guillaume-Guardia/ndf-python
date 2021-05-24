@@ -186,7 +186,7 @@
     <message>
         <location filename="../../gui/windows/main.py" line="140"/>
         <source>The PDF files have been generated!</source>
-        <translation>Les fichiers PDF ont été généré!</translation>
+        <translation>Les fichiers PDF ont été générés!</translation>
     </message>
     <message>
         <source>PDF Analyse</source>

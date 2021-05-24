@@ -26,21 +26,23 @@
 ::ZQ0/vhVqMQ3MEVWAtB9wSA==
 ::Zg8zqx1/OA3MEVWAtB9wSA==
 ::dhA7pRFwIByZRRnk
-::Zh4grVQjdCyDJGyX8VAjFBxBRQiOAE+1BaAR7ebv/Na3sEIXUfYsRKH//IueOfQb5UvYe5Irm2pDjMMDAidWehTlaxcxyQ==
+::Zh4grVQjdCyDJGyX8VAjFBxBRQiOAE60EKYg/O3o+9aJpktQRPsrcIDV5rqKJq4W8kCE
 ::YB416Ek+ZG8=
 ::
 ::
 ::978f952a14a936cc963da21a135fa983
 @echo off
 
-CALL workon package 
+CALL workon %NDF_ENV%
 
 :: Find python path
 FOR /f %%p in ('where python') do (
     SET PYTHONPATH=%%p
-    goto :start
+    echo "For" %PYTHONPATH%
+    GOTO :stop
 )
-:start
-
+:stop
 CALL cdvirtualenv
-%PYTHONPATH% %PWD%src\pyndf\main.py
+echo "PWD:" %PWD%
+echo "PYTHONPATH:" %PYTHONPATH%
+%PYTHONPATH% %PWD%ndf-python\src\pyndf\main.py
