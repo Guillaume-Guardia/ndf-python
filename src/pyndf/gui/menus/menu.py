@@ -35,7 +35,7 @@ class MainMenu(QtWidgets.QMenuBar):
                 self.window.tabs[CONST.TYPE.PRO].buttons[name_env].pressed.emit,
             )
         menu.addSeparator()
-        menu.addAction(QtGui.QIcon(CONST.UI.ICONS.PDF), self.tr("Generate PDFs"), self.window.generate)
+        menu.addAction(QtGui.QIcon(CONST.UI.ICONS.PDF), self.tr("Generate PDF files"), self.window.generate)
 
         menu.addSeparator()
         menu.addAction(QtGui.QIcon(CONST.UI.ICONS.CLO), self.tr("Exit"), self.window.close, "Ctrl+Q")
@@ -54,7 +54,7 @@ class MainMenu(QtWidgets.QMenuBar):
             )
 
         # Color PDF
-        menu.addAction(QtGui.QIcon(CONST.UI.ICONS.COL), self.tr("Select Color PDF"), self.change_color_pdf)
+        menu.addAction(QtGui.QIcon(CONST.UI.ICONS.COL), self.tr("Select PDF file color"), self.change_color_pdf)
 
         return menu
 
@@ -96,7 +96,7 @@ class MainMenu(QtWidgets.QMenuBar):
 
     # Methods interaction
     def change_color_pdf(self):
-        title = self.tr("Select color for PDF")
+        title = self.tr("Select PDF file color")
         try:
             initial = QtGui.QColor(self.window.color)
         except TypeError:

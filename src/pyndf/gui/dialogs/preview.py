@@ -17,7 +17,7 @@ class PreviewDialog(QtWidgets.QDialog):
         self.pdf_widget = None
 
         self.setWindowFlag(QtCore.Qt.WindowType.WindowMinMaxButtonsHint, True)
-        self.setWindowTitle(self.tr("PDF viewer"))
+        self.setWindowTitle(self.tr("PDF file viewer"))
         self.setSizeGripEnabled(True)
 
         self.render(row)

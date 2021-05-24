@@ -2,47 +2,19 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
-    <name>ApiItem</name>
-    <message>
-        <location filename="../../gui/items/api_item.py" line="25"/>
-        <source>Client address</source>
-        <translation>Adresse du client</translation>
-    </message>
-    <message>
-        <location filename="../../gui/items/api_item.py" line="26"/>
-        <source>Employee address</source>
-        <translation>Adresse du salarié</translation>
-    </message>
-    <message>
-        <location filename="../../gui/items/api_item.py" line="27"/>
-        <source>Distance</source>
-        <translation>Distance</translation>
-    </message>
-    <message>
-        <location filename="../../gui/items/api_item.py" line="28"/>
-        <source>Status</source>
-        <translation>Status</translation>
-    </message>
-    <message>
-        <location filename="../../gui/items/api_item.py" line="29"/>
-        <source>Time (s)</source>
-        <translation>Durée (s)</translation>
-    </message>
-</context>
-<context>
     <name>AllItem</name>
     <message>
-        <location filename="../../gui/items/all_item.py" line="21"/>
+        <location filename="../../gui/items/useclass/analyse/all.py" line="16"/>
         <source>Process name</source>
         <translation>Nom du processus</translation>
     </message>
     <message>
-        <location filename="../../gui/items/all_item.py" line="21"/>
+        <location filename="../../gui/items/useclass/analyse/all.py" line="16"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../../gui/items/all_item.py" line="21"/>
+        <location filename="../../gui/items/useclass/analyse/all.py" line="16"/>
         <source>Time (s)</source>
         <translation>Durée (s)</translation>
     </message>
@@ -55,11 +27,51 @@
     </message>
 </context>
 <context>
+    <name>ApiItem</name>
+    <message>
+        <location filename="../../gui/items/useclass/analyse/api.py" line="18"/>
+        <source>Client address</source>
+        <translation>Adresse du client</translation>
+    </message>
+    <message>
+        <location filename="../../gui/items/useclass/analyse/api.py" line="19"/>
+        <source>Employee address</source>
+        <translation>Adresse du salarié</translation>
+    </message>
+    <message>
+        <location filename="../../gui/items/useclass/analyse/api.py" line="20"/>
+        <source>Distance</source>
+        <translation>Distance</translation>
+    </message>
+    <message>
+        <location filename="../../gui/items/useclass/analyse/api.py" line="21"/>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <location filename="../../gui/items/useclass/analyse/api.py" line="22"/>
+        <source>Time (s)</source>
+        <translation>Durée (s)</translation>
+    </message>
+</context>
+<context>
+    <name>CSVReader</name>
+    <message>
+        <location filename="../../process/reader/useclass/csv.py" line="47"/>
+        <source>Load CSV file</source>
+        <translation>Chargement du fichier CSV</translation>
+    </message>
+</context>
+<context>
     <name>ExcelReader</name>
     <message>
-        <location filename="../../process/reader/excel.py" line="41"/>
+        <location filename="../../process/reader/useclass/excel.py" line="58"/>
+        <source>Load EXCEL file</source>
+        <translation>Chargement du fichier EXCEL</translation>
+    </message>
+    <message>
         <source>Load Excel file with pandas...</source>
-        <translation>Chargement du fichier Excel avec pandas...</translation>
+        <translation type="vanished">Chargement du fichier Excel avec pandas...</translation>
     </message>
     <message>
         <source>Load excel file with pandas...</source>
@@ -67,71 +79,150 @@
     </message>
 </context>
 <context>
-    <name>MainWindow</name>
+    <name>MainMenu</name>
     <message>
-        <location filename="../../gui/windows/main_window.py" line="54"/>
+        <location filename="../../gui/menus/menu.py" line="28"/>
         <source>File</source>
         <translation>Fichier</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main_window.py" line="57"/>
-        <source>Select language</source>
-        <translation>Sélectionner la langue</translation>
+        <location filename="../../gui/menus/menu.py" line="30"/>
+        <source>Select</source>
+        <translation>Sélectionner</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main_window.py" line="63"/>
+        <location filename="../../gui/menus/menu.py" line="38"/>
+        <source>Generate PDF files</source>
+        <translation>Génération des fichiers PDF</translation>
+    </message>
+    <message>
+        <location filename="../../gui/menus/menu.py" line="41"/>
         <source>Exit</source>
         <translation>Quitter</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main_window.py" line="69"/>
+        <location filename="../../gui/menus/menu.py" line="46"/>
+        <source>Options</source>
+        <translation>Options</translation>
+    </message>
+    <message>
+        <location filename="../../gui/menus/menu.py" line="49"/>
+        <source>Select language</source>
+        <translation>Sélectionner la langue</translation>
+    </message>
+    <message>
+        <location filename="../../gui/menus/menu.py" line="99"/>
+        <location filename="../../gui/menus/menu.py" line="57"/>
+        <source>Select PDF file color</source>
+        <translation>Sélectionner la couleur du fichier PDF</translation>
+    </message>
+    <message>
+        <location filename="../../gui/menus/menu.py" line="62"/>
         <source>Views</source>
         <translation>Vues</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main_window.py" line="72"/>
+        <location filename="../../gui/menus/menu.py" line="88"/>
         <source>Help</source>
         <translation>Aide</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main_window.py" line="95"/>
-        <source>Process</source>
-        <translation>Processus</translation>
+        <location filename="../../gui/menus/menu.py" line="90"/>
+        <source>Manual</source>
+        <translation>Manuel</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main_window.py" line="100"/>
+        <source>Generate PDFs</source>
+        <translation type="vanished">Générer les PDFs</translation>
+    </message>
+</context>
+<context>
+    <name>MainWindow</name>
+    <message>
+        <location filename="../../gui/windows/main.py" line="69"/>
+        <source>EXCEL</source>
+        <translation>EXCEL</translation>
+    </message>
+    <message>
+        <location filename="../../gui/windows/main.py" line="70"/>
+        <source>CSV</source>
+        <translation>CSV</translation>
+    </message>
+    <message>
+        <location filename="../../gui/windows/main.py" line="71"/>
         <source>Global Analyse</source>
         <translation>Analyse Globale</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main_window.py" line="101"/>
-        <source>Distance Google API Analyse</source>
-        <translation>Analyse de l&apos;API Google de distance</translation>
+        <location filename="../../gui/windows/main.py" line="72"/>
+        <source>Google API Analyse</source>
+        <translation>Analyse de l&apos;API Google</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main_window.py" line="102"/>
-        <source>PDF Writer Analyse</source>
-        <translation>Analyse du créateur de PDF</translation>
+        <location filename="../../gui/windows/main.py" line="73"/>
+        <source>PDF files Analyse</source>
+        <translation>Analyse des fichiers PDF</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main_window.py" line="161"/>
+        <location filename="../../gui/windows/main.py" line="82"/>
+        <source>Process</source>
+        <translation>Processus</translation>
+    </message>
+    <message>
+        <location filename="../../gui/windows/main.py" line="134"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main_window.py" line="161"/>
+        <location filename="../../gui/windows/main.py" line="134"/>
         <source>Error: {}</source>
         <translation>Erreur: {}</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main_window.py" line="167"/>
+        <location filename="../../gui/windows/main.py" line="140"/>
         <source>Finished</source>
         <translation>Terminé</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main_window.py" line="167"/>
+        <location filename="../../gui/windows/main.py" line="140"/>
+        <source>The PDF files have been generated!</source>
+        <translation>Les fichiers PDF ont été généré!</translation>
+    </message>
+    <message>
+        <source>PDF Analyse</source>
+        <translation type="vanished">Analyse </translation>
+    </message>
+    <message>
+        <source>Distance Google API Analyse</source>
+        <translation type="vanished">Analyse de l&apos;API Google de distance</translation>
+    </message>
+    <message>
+        <source>PDF Writer Analyse</source>
+        <translation type="vanished">Analyse du créateur de PDF</translation>
+    </message>
+    <message>
         <source>PDFs have been generated !</source>
-        <translation>Les PDFs ont été généré !</translation>
+        <translation type="vanished">Les PDFs ont été généré !</translation>
+    </message>
+    <message>
+        <source>File</source>
+        <translation type="vanished">Fichier</translation>
+    </message>
+    <message>
+        <source>Select language</source>
+        <translation type="vanished">Sélectionner la langue</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="vanished">Quitter</translation>
+    </message>
+    <message>
+        <source>Views</source>
+        <translation type="vanished">Vues</translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation type="vanished">Aide</translation>
     </message>
     <message>
         <source>Distance google API Analyse</source>
@@ -175,69 +266,103 @@
     </message>
 </context>
 <context>
+    <name>ManualDialog</name>
+    <message>
+        <location filename="../../gui/dialogs/manual.py" line="12"/>
+        <source>Manual</source>
+        <translation>Manuel</translation>
+    </message>
+</context>
+<context>
     <name>PdfItem</name>
     <message>
-        <location filename="../../gui/items/pdf_item.py" line="26"/>
+        <location filename="../../gui/items/useclass/analyse/pdf.py" line="18"/>
         <source>Filename</source>
         <translation>Nom du fichier</translation>
     </message>
     <message>
-        <location filename="../../gui/items/pdf_item.py" line="27"/>
-        <source>DB Total</source>
-        <translation>DB Total</translation>
-    </message>
-    <message>
-        <location filename="../../gui/items/pdf_item.py" line="28"/>
-        <source>Total</source>
-        <translation>Total</translation>
-    </message>
-    <message>
-        <location filename="../../gui/items/pdf_item.py" line="29"/>
+        <location filename="../../gui/items/useclass/analyse/pdf.py" line="19"/>
         <source>Number of missions</source>
         <translation>Nombre de missions</translation>
     </message>
     <message>
-        <location filename="../../gui/items/pdf_item.py" line="30"/>
+        <location filename="../../gui/items/useclass/analyse/pdf.py" line="20"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../../gui/items/pdf_item.py" line="31"/>
+        <location filename="../../gui/items/useclass/analyse/pdf.py" line="21"/>
         <source>Time (s)</source>
         <translation>Durée (s)</translation>
+    </message>
+    <message>
+        <source>DB Total</source>
+        <translation type="vanished">DB Total</translation>
+    </message>
+    <message>
+        <source>Total</source>
+        <translation type="vanished">Total</translation>
+    </message>
+</context>
+<context>
+    <name>PreviewDialog</name>
+    <message>
+        <location filename="../../gui/dialogs/preview.py" line="20"/>
+        <source>PDF file viewer</source>
+        <translation>Visionneuse du fichier PDF</translation>
+    </message>
+    <message>
+        <source>PDF viewer</source>
+        <translation type="vanished">Visionneur de PDF</translation>
     </message>
 </context>
 <context>
     <name>ProcessTab</name>
     <message>
-        <location filename="../../gui/tabs/process.py" line="20"/>
+        <location filename="../../gui/tabs/useclass/process.py" line="20"/>
         <source>EXCEL file</source>
         <translation>fichier EXCEL</translation>
     </message>
     <message>
-        <location filename="../../gui/tabs/process.py" line="21"/>
+        <location filename="../../gui/tabs/useclass/process.py" line="21"/>
         <source>CSV file</source>
         <translation>fichier CSV</translation>
     </message>
     <message>
-        <location filename="../../gui/tabs/process.py" line="22"/>
+        <location filename="../../gui/tabs/useclass/process.py" line="22"/>
+        <source>save directory</source>
+        <translation>répertoire de sauvegarde</translation>
+    </message>
+    <message>
+        <location filename="../../gui/tabs/useclass/process.py" line="35"/>
+        <source>Generate PDF files</source>
+        <translation>Générer les fichiers PDF</translation>
+    </message>
+    <message>
+        <location filename="../../gui/tabs/useclass/process.py" line="118"/>
+        <source>Select folder</source>
+        <translation>Sélectionner répertoire</translation>
+    </message>
+    <message>
+        <location filename="../../gui/tabs/useclass/process.py" line="121"/>
+        <source>Select file</source>
+        <translation>Sélectionner fichier</translation>
+    </message>
+    <message>
         <source>output directory</source>
-        <translation>Répertoire de sauvegarde</translation>
+        <translation type="vanished">Répertoire de sauvegarde</translation>
     </message>
     <message>
-        <location filename="../../gui/tabs/process.py" line="33"/>
         <source>Generate PDFs</source>
-        <translation>Générer les PDFs</translation>
+        <translation type="vanished">Générer les PDFs</translation>
     </message>
     <message>
-        <location filename="../../gui/tabs/process.py" line="96"/>
         <source>Select a folder</source>
-        <translation>Sélectionner un dossier</translation>
+        <translation type="vanished">Sélectionner un dossier</translation>
     </message>
     <message>
-        <location filename="../../gui/tabs/process.py" line="99"/>
         <source>Select a file</source>
-        <translation>Sélectionner un fichier</translation>
+        <translation type="vanished">Sélectionner un fichier</translation>
     </message>
     <message>
         <source>excel file</source>
@@ -251,39 +376,58 @@
 <context>
     <name>Thread</name>
     <message>
-        <location filename="../../process/thread.py" line="54"/>
+        <location filename="../../process/thread.py" line="118"/>
+        <source>Get distance from Google API/DB/cache</source>
+        <translation>Obtention de la distance depuis l&apos;API Google/DB/cache</translation>
+    </message>
+    <message>
+        <location filename="../../process/thread.py" line="172"/>
+        <location filename="../../process/thread.py" line="139"/>
+        <source>Generate PDF files</source>
+        <translation>Générer les fichiers PDF</translation>
+    </message>
+    <message>
+        <location filename="../../process/thread.py" line="160"/>
+        <source>Load EXCEL file</source>
+        <translation>Chargement du fichier EXCEL</translation>
+    </message>
+    <message>
+        <location filename="../../process/thread.py" line="164"/>
+        <source>Load CSV file</source>
+        <translation>Chargement du fichier CSV</translation>
+    </message>
+    <message>
+        <location filename="../../process/thread.py" line="168"/>
+        <source>Get distance from Google API/DB/Cache</source>
+        <translation>Obtention de la distance depuis l&apos;API Google/DB/Cache</translation>
+    </message>
+    <message>
         <source>Read EXCEL file</source>
-        <translation>Lecture du fichier EXCEL</translation>
+        <translation type="vanished">Lecture du fichier EXCEL</translation>
     </message>
     <message>
-        <location filename="../../process/thread.py" line="63"/>
         <source>Read CSV file</source>
-        <translation>Lecture du fichier CSV</translation>
+        <translation type="vanished">Lecture du fichier CSV</translation>
     </message>
     <message>
-        <location filename="../../process/thread.py" line="84"/>
-        <source>Get distance from Google API / DB / cache: {} / {}</source>
-        <translation>Obtention de la distance depuis l&apos;API Google / DB / Cache: {} / {}</translation>
-    </message>
-    <message>
-        <location filename="../../process/thread.py" line="87"/>
-        <source>Get distance from Google API / DB / Cache</source>
-        <translation>Obtention de la distance depuis l&apos;API Google / DB / Cache</translation>
-    </message>
-    <message>
-        <location filename="../../process/thread.py" line="95"/>
-        <source>Create PDFs: {} / {}</source>
-        <translation>Création des PDF: {} / {}</translation>
-    </message>
-    <message>
-        <location filename="../../process/thread.py" line="101"/>
         <source>Write PDFs</source>
-        <translation>Création des PDFs</translation>
+        <translation type="vanished">Création des PDFs</translation>
     </message>
     <message>
-        <location filename="../../process/thread.py" line="107"/>
+        <source>Get distance from Google API / DB / cache: {} / {}</source>
+        <translation type="vanished">Obtention de la distance depuis l&apos;API Google / DB / Cache: {} / {}</translation>
+    </message>
+    <message>
+        <source>Get distance from Google API / DB / Cache</source>
+        <translation type="vanished">Obtention de la distance depuis l&apos;API Google / DB / Cache</translation>
+    </message>
+    <message>
+        <source>Create PDFs: {} / {}</source>
+        <translation type="vanished">Création des PDF: {} / {}</translation>
+    </message>
+    <message>
         <source>Done!</source>
-        <translation>Fini !</translation>
+        <translation type="vanished">Fini !</translation>
     </message>
     <message>
         <source>Read excel file</source>
@@ -297,7 +441,7 @@
 <context>
     <name>TotalItem</name>
     <message>
-        <location filename="../../gui/items/total_item.py" line="17"/>
+        <location filename="../../gui/items/useclass/analyse/total.py" line="19"/>
         <source>Total</source>
         <translation>Total</translation>
     </message>

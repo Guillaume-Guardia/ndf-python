@@ -39,7 +39,7 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         self.color = color or CONST.WRITER.PDF.COLOR
         self.date = datetime(year=int(date[:4]), month=int(date[4:6]), day=1) + relativedelta(months=+1)
 
-        self.log.info("Create PDFs")
+        self.log.info("Generate PDF files")
 
     def all_page_setup(self, canvas, doc, add_header=True, add_footer=True, add_watermark=False):
         """Set up page.
@@ -166,7 +166,7 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
                         nbrkm_mois,
                         quantite_payee,
                         prix_unitaire,
-                        total,
+                        total,  # TODO
                     ]
                 )
                 memory_mission.append((client, address))
@@ -196,7 +196,7 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
                 style.add("SPAN", (i, 1), (i, -1))
 
         table.setStyle(style)
-        return table, total
+        return table
 
     @log_time
     def write(self, data):
@@ -219,7 +219,7 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         )
 
         paragraphs.append(self.create_table_collaborator(data))
-        table, total = self.create_table_missions(data)
+        table = self.create_table_missions(data)
         paragraphs.append(table)
 
         paragraphs.append(Paragraph("<b>NB: Carte grise à disposition de la direction.</b>", stylesheet["Normal"]))
@@ -228,5 +228,5 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
             self.build(paragraphs, path)
         except Exception as e:
             self.log.exception(e)
-            return filename, None, CONST.STATUS.ERROR.NAME
-        return filename, total, CONST.STATUS.OK.NAME
+            return filename, CONST.STATUS.ERROR.NAME
+        return filename, CONST.STATUS.OK.NAME

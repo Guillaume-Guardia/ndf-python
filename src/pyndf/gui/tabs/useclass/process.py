@@ -19,7 +19,7 @@ class ProcessTab(AbstractTab):
         # Explorer buttons
         self.add_button(CONST.TYPE.EXC, self.tr("EXCEL file"), "(*.xl* *.XLS)", default=excel)
         self.add_button(CONST.TYPE.CSV, self.tr("CSV file"), "(*.csv)", default=csv)
-        self.add_button(CONST.TYPE.OUT, self.tr("output directory"), default=output)
+        self.add_button(CONST.TYPE.OUT, self.tr("save directory"), default=output)
 
         # Add grid layout
         grid_layout = QtWidgets.QGridLayout()
@@ -32,7 +32,7 @@ class ProcessTab(AbstractTab):
         grid_widget.setLayout(grid_layout)
 
         # Generate button
-        self.buttons[CONST.TYPE.PDF] = QtWidgets.QPushButton(self.tr("Generate PDFs"))
+        self.buttons[CONST.TYPE.PDF] = QtWidgets.QPushButton(self.tr("Generate PDF files"))
         self.buttons[CONST.TYPE.PDF].pressed.connect(self.window.generate)
         self.buttons[CONST.TYPE.PDF].setMinimumWidth(120)
         self.buttons[CONST.TYPE.PDF].setMinimumHeight(40)
@@ -115,10 +115,10 @@ class ProcessTab(AbstractTab):
     def choose(self, name_env, name, _format):
         """Method which call the native file dialog to choose file."""
         if _format is None:
-            path = QtWidgets.QFileDialog.getExistingDirectory(self, self.tr("Select a folder"))
+            path = QtWidgets.QFileDialog.getExistingDirectory(self, self.tr("Select folder"))
         else:
             path, _ = QtWidgets.QFileDialog.getOpenFileName(
-                self, self.tr("Select a file"), filter=f"{name.capitalize()} {_format}"
+                self, self.tr("Select file"), filter=f"{name.capitalize()} {_format}"
             )
         if path:
             self.texts[name_env].setText(path)

@@ -9,7 +9,7 @@ class ManualDialog(QtWidgets.QDialog):
     def __init__(self, parent):
         super().__init__(parent)
         self.setWindowFlag(QtCore.Qt.WindowType.WindowMinMaxButtonsHint, True)
-        self.setWindowTitle(self.tr("Manuel"))
+        self.setWindowTitle(self.tr("Manual"))
         self.setSizeGripEnabled(True)
         self.setMinimumHeight(400)
         self.setMinimumWidth(400)

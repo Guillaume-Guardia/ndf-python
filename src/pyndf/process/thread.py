@@ -132,17 +132,15 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
         total_status = set()
 
         for record in records.values():
-            (filename, total, status), time_spend = writer.write(record)
+            (filename, status), time_spend = writer.write(record)
 
             total_status.add(status)
 
-            self.progress.send(msg=self.tr("Create PDFs"))
+            self.progress.send(msg=self.tr("Generate PDF files"))
             self.signals.analysed.emit(
                 Items(
                     CONST.TYPE.PDF,
                     filename,
-                    record.get("montant_total", 0),
-                    total,
                     len(record["missions"]),
                     status,
                     time_spend,
@@ -159,11 +157,11 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
             sender = self.signals.analysed.emit
             # Read Excel file
             (records, status), time_spend = self.excel_read()
-            sender(Items(CONST.TYPE.ALL, self.tr("Read EXCEL file"), status, time_spend))
+            sender(Items(CONST.TYPE.ALL, self.tr("Load EXCEL file"), status, time_spend))
 
             # Read CSV file
             (records, status), time_spend = self.read_csv(records)
-            sender(Items(CONST.TYPE.ALL, self.tr("Read CSV file"), status, time_spend))
+            sender(Items(CONST.TYPE.ALL, self.tr("Load CSV file"), status, time_spend))
 
             # Calcul distance between adresse_client and adresse_intervenant with google API
             (records, status), time_spend = self.run_api(records)
@@ -171,7 +169,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
 
             # Create PDF with data records and distance from the API
             (status), time_spend = self.create_pdf(records)
-            sender(Items(CONST.TYPE.ALL, self.tr("Write PDFs"), status, time_spend))
+            sender(Items(CONST.TYPE.ALL, self.tr("Generate PDF files"), status, time_spend))
 
         except Exception as error:
             self.log.exception(error)

@@ -55,5 +55,5 @@ class ExcelReader(AbstractReader):
             records[matricule]["missions"].append(mission_record)
 
             if progress:
-                progress.send(msg=self.tr("Load Excel file"))
+                progress.send(msg=self.tr("Load EXCEL file"))
         return records

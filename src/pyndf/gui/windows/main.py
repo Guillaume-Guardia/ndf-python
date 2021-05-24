@@ -66,11 +66,11 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         # Analyse tabs
         self.tabs = {}
         info_dict = {
-            CONST.TYPE.EXC: self.tr("Excel Reader"),
-            CONST.TYPE.CSV: self.tr("CSV Reader"),
+            CONST.TYPE.EXC: self.tr("EXCEL"),
+            CONST.TYPE.CSV: self.tr("CSV"),
             CONST.TYPE.ALL: self.tr("Global Analyse"),
-            CONST.TYPE.API: self.tr("Distance Google API Analyse"),
-            CONST.TYPE.PDF: self.tr("PDF Writer Analyse"),
+            CONST.TYPE.API: self.tr("Google API Analyse"),
+            CONST.TYPE.PDF: self.tr("PDF files Analyse"),
         }
 
         for index, (key, title) in enumerate(info_dict.items()):
@@ -137,7 +137,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
     def generated(self):
         """Success methdod"""
         self.tear_down()
-        QtWidgets.QMessageBox.information(self, self.tr("Finished"), self.tr("PDFs have been generated !"))
+        QtWidgets.QMessageBox.information(self, self.tr("Finished"), self.tr("The PDF files have been generated!"))
 
     def read_settings(self):
         settings = QtCore.QSettings(CONST.COMPANY, CONST.TITLE_APP)
