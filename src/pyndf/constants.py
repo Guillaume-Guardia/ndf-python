@@ -56,7 +56,7 @@ class CONST:
             excel = os.path.join(DIR, "data\icons\excel.png")
             csv = os.path.join(DIR, "data\icons\csv.png")
             CLO = os.path.join(DIR, "data\icons\close.png")
-            fr = os.path.join(DIR, "data\icons\fr.png")
+            fr = os.path.join(DIR, r"data\icons\fr.png")
             HEL = os.path.join(DIR, "data\icons\help.png")
             LAN = os.path.join(DIR, "data\icons\language.png")
             output = os.path.join(DIR, "data\icons\output.png")
@@ -64,6 +64,8 @@ class CONST:
             en = os.path.join(DIR, "data\icons\en.png")
             COL = os.path.join(DIR, "data\icons\color.png")
             MAN = os.path.join(DIR, "data\icons\manual.png")
+            RIGHT = os.path.join(DIR, r"data\icons\right.png")
+            LEFT = os.path.join(DIR, "data\icons\left.png")
 
         BUTTONSTYLE = """  QPushButton {
                 background-color: #79bbff;

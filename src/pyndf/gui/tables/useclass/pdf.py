@@ -14,7 +14,5 @@ class PdfTable(AnalyseTable):
         if col != 0:
             return
 
-        filename = self.item(row, col).text()
-
-        dialog = PreviewDialog(self.tab.window, filename)
+        dialog = PreviewDialog(self, row)
         dialog.exec()

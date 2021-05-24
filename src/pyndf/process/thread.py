@@ -3,6 +3,7 @@
 import os
 from pyndf.constants import CONST
 from pyndf.db.client import Client
+from pyndf.process.progress import Progress
 from pyndf.process.reader.factory import Reader
 from pyndf.gui.items.factory import Items
 from pyndf.process.writer.factory import Writer
@@ -41,24 +42,24 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
         self.output_directory = output_directory
         self.color = color
         self.signals = WorkerSignals()
+        self.progress = Progress(self.signals.progressed.emit)
 
     @log_time
     def excel_read(self):
+        self.progress.add_duration(10)
         records = Reader(
             self.excel_file,
-            progress_callback=self.signals.progressed.emit,
-            p=10,
+            progress=self.progress,
             log_level=self.log_level,
         )
-
         return records, CONST.STATUS.OK.NAME
 
     @log_time
     def read_csv(self, records):
+        self.progress.add_duration(10)
         records_csv = Reader(
             self.csv_file,
-            progress_callback=self.signals.progressed.emit,
-            p=10,
+            progress=self.progress,
             log_level=self.log_level,
         )
         for matricule, record in records.items():
@@ -68,10 +69,13 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
 
     @log_time
     def run_api(self, records):
+        self.progress.add_duration(40)
+        self.progress.set_maximum(len(records))
+
         api = DistanceMatrixAPI(log_level=self.log_level)
-        n = len(records)
         total_status = set()
-        for index, record in enumerate(records.values()):
+
+        for record in records.values():
             for mission in record["missions"]:
                 distance = None
                 client = mission["client"], mission["adresse_client"]
@@ -111,25 +115,28 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
                     if mission_record["client"] not in [mission["client"] for mission in record["missions"]]:
                         record["missions"].append(mission_record)
 
-            self.signals.progressed.emit(
-                20 + (index / n) * 40,
-                self.tr("Get distance from Google API/DB/cache: {} / {}").format(index, n),
-            )
+            self.progress.send(msg=self.tr("Get distance from Google API/DB/cache"))
+
         total_status = "/".join(list(total_status))
         return records, total_status
 
     @log_time
     def create_pdf(self, records):
+        self.progress.add_duration(40)
+        self.progress.set_maximum(len(records))
+
+        # Get writer
         date = os.path.basename(self.excel_file).split(".")[0].split("_")[1]
         writer = Writer(CONST.TYPE.PDF, date, dir=self.output_directory, color=self.color, log_level=self.log_level)
-        n = len(records)
+
         total_status = set()
-        for index, record in enumerate(records.values()):
+
+        for record in records.values():
             (filename, total, status), time_spend = writer.write(record)
 
             total_status.add(status)
 
-            self.signals.progressed.emit(60 + (index / n) * 40, self.tr("Create PDFs: {} / {}").format(index, n))
+            self.progress.send(msg=self.tr("Create PDFs"))
             self.signals.analysed.emit(
                 Items(
                     CONST.TYPE.PDF,
@@ -170,6 +177,5 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
             self.log.exception(error)
             self.signals.error.emit(error)
         else:
-            self.signals.progressed.emit(100, self.tr("Done!"))
             self.signals.finished.emit()
         self.log.info("End process")

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import time
 import re
 from collections import defaultdict
 import pandas as pd
@@ -14,12 +15,9 @@ class ExcelReader(AbstractReader):
     type = CONST.TYPE.EXC
     regex = re.compile(".*[.][xX][lL]*")
 
-    def read(self, filename=None, sheet_name=0, progress_callback=None, p=100, analyse_callback=None):
+    def read(self, filename=None, sheet_name=0, progress=None, analyse_callback=None):
         if self.check_path(filename) is False:
             return
-
-        if progress_callback:
-            progress_callback(0.1 * p, self.tr("Load Excel file with pandas..."))
 
         # Initialisation variables
         records = defaultdict(dict)
@@ -27,10 +25,12 @@ class ExcelReader(AbstractReader):
         # Get the data on excel file in dataframe format.
         dataframe = pd.read_excel(filename, sheet_name=sheet_name, na_filter=False, dtype={"matricule": str})
 
-        n = len(dataframe.to_dict("records"))
+        if progress:
+            progress.set_maximum(len(dataframe.to_dict("records")))
+
         reg = re.compile("INDEMNITE.*")
 
-        for index, record in enumerate(dataframe.to_dict("records")):
+        for record in dataframe.to_dict("records"):
             if analyse_callback:
                 analyse_callback(Items(self.type, *list(record.values())))
                 continue
@@ -54,6 +54,6 @@ class ExcelReader(AbstractReader):
                 self.log.debug(f"{matricule} | missions | {key} = {mission_record[key]}")
             records[matricule]["missions"].append(mission_record)
 
-            if progress_callback:
-                progress_callback((0.1 + (index / n) * 0.9) * p, self.tr("Select info {} / {}".format(index, n)))
+            if progress:
+                progress.send(msg=self.tr("Load Excel file"))
         return records

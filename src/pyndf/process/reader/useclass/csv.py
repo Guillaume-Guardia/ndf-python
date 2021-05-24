@@ -15,12 +15,9 @@ class CSVReader(AbstractReader):
     type = CONST.TYPE.CSV
     regex = re.compile(".*[.][cC][sS][vV]")
 
-    def read(self, filename=None, progress_callback=None, p=100, analyse_callback=None):
+    def read(self, filename=None, progress=None, analyse_callback=None):
         if self.check_path(filename) is False:
             return
-
-        if progress_callback:
-            progress_callback(0.1 * p, self.tr("Load CSV file with pandas..."))
 
         # Initialisation variables
         records = {}
@@ -28,8 +25,10 @@ class CSVReader(AbstractReader):
         # Get the data on csv file in dataframe format.
         dataframe = pd.read_csv(filename, sep=";", decimal=",", na_filter=False, encoding="latin1")
 
-        n = len(dataframe.to_dict("records"))
-        for index, record in enumerate(dataframe.to_dict("records")):
+        if progress:
+            progress.set_maximum(len(dataframe.to_dict("records")))
+
+        for record in dataframe.to_dict("records"):
             if analyse_callback:
                 analyse_callback(Items(self.type, *list(record.values())))
                 continue
@@ -44,7 +43,7 @@ class CSVReader(AbstractReader):
                     total += montant
             records[matricule] = round(total, 2)
 
-            if progress_callback:
-                progress_callback((0.1 + (index / n) * 0.9) * p, self.tr("Select info {} / {}".format(index, n)))
+            if progress:
+                progress.send(msg=self.tr("Load CSV file"))
 
         return records
