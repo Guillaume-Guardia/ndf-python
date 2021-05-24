@@ -14,8 +14,6 @@ class PreviewDialog(QtWidgets.QDialog):
         self.window = table.tab.window
         self.buttons = {}
 
-        self.pdf_widget = None
-
         self.setWindowFlag(QtCore.Qt.WindowType.WindowMinMaxButtonsHint, True)
         self.setWindowTitle(self.tr("PDF file viewer"))
         self.setSizeGripEnabled(True)
@@ -26,10 +24,6 @@ class PreviewDialog(QtWidgets.QDialog):
         if not (0 <= row < self.table.rowCount() - 1):
             return None
 
-        # Layout view
-        area = self.create_area(self.get_paths(row))
-        control = self.create_control()
-
         if self.layout():
             layout = self.layout()
             # Remove all child item
@@ -39,7 +33,14 @@ class PreviewDialog(QtWidgets.QDialog):
                 del child
         else:
             layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(area)
+
+        # Layout view
+        png_paths = self.get_paths(row)
+        if png_paths:
+            area = self.create_area(png_paths)
+            layout.addWidget(area)
+
+        control = self.create_control()
         layout.addLayout(control)
         self.setLayout(layout)
 

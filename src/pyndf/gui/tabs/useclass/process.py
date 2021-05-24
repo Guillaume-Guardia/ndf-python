@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 from pyndf.gui.tabs.abstract import AbstractTab
 from pyndf.process.reader.factory import Reader
 from pyndf.qtlib import QtWidgets, QtGui
@@ -49,18 +50,15 @@ class ProcessTab(AbstractTab):
         self.setLayout(layout)
 
     def add_data(self, filename, name):
-        if filename == "" or name not in CONST.TAB.READER:
+        if not os.path.exists(filename):
+            setattr(self.window, name, "")
+            self.texts[name].setText("")
+
+        if name not in CONST.TAB.READER:
             return
 
         self.window.tabs[name].table.init(clear=True)
-        result = Reader(
-            filename,
-            analyse_callback=self.window.tabs[name].table.add,
-            log_level=self.window.log_level,
-        )
-        if result is None:
-            setattr(self.window, name, "")
-            self.texts[name].setText("")
+        Reader(filename, analyse_callback=self.window.tabs[name].table.add, log_level=self.window.log_level)
         self.window.tabs[name].table.finished()
 
     def add_button(self, name_env, name, _format=None, default=""):
