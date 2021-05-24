@@ -3,11 +3,11 @@
 01. Télécharger python version 3.9.1 [Download Python](https://www.python.org/downloads/release/python-391/) 
 02. Vérification que pip est bien installé -> pip --version
 03. pip install virtualenvwrapper-win
-04. mkvirtualenv <nom>
+04. mkvirtualenv name_env
 05. cdvirtualenv
-06. git clone https://github.com/Guillaume-Guardia/ndf-python [package](https://www.python.org/downloads/release/python-391/)
+06. git clone https://github.com/Guillaume-Guardia/ndf-python
 07. pip install -e .
-08. set NDF_ENV=<nom>
+08. set NDF_ENV=name_env
 09. Créer un raccourci du fichier ndf.exe
 10. exécuter le raccourci
 # Manuel de l'application NDF python
