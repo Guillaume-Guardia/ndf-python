@@ -1,7 +1,7 @@
 ::[Bat To Exe Converter]
 ::
-::YAwzoRdxOk+EWAnk
-::fBw5plQjdG8=
+::YAwzoRdxOk+EWAjk
+::fBw5plQjdCyDJGyX8VAjFBxBRQiOAE60EKYg/O3o+9aJpktQRPsrcIDV5rCPNOEv40bre4URxmNUnM1CBRhXHg==
 ::YAwzuBVtJxjWCl3EqQJgSA==
 ::ZR4luwNxJguZRRnk
 ::Yhs/ulQjdF+5
@@ -9,9 +9,9 @@
 ::cBs/ulQjdF+5
 ::ZR41oxFsdFKZSDk=
 ::eBoioBt6dFKZSDk=
-::cRo6pxp7LAbNWATEpCI=
+::cRo6pxp7LAbNWATEpSI=
 ::egkzugNsPRvcWATEpCI=
-::dAsiuh18IRvcCxnZtBJQ
+::dAsiuh18IRvcCxnZtBNQ
 ::cRYluBh/LU+EWAnk
 ::YxY4rhs+aU+JeA==
 ::cxY6rQJ7JhzQF1fEqQJQ
@@ -38,11 +38,9 @@ CALL workon %NDF_ENV%
 :: Find python path
 FOR /f %%p in ('where python') do (
     SET PYTHONPATH=%%p
-    echo "For" %PYTHONPATH%
     GOTO :stop
 )
 :stop
 CALL cdvirtualenv
-echo "PWD:" %PWD%
-echo "PYTHONPATH:" %PYTHONPATH%
+
 %PYTHONPATH% %PWD%ndf-python\src\pyndf\main.py
