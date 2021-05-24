@@ -74,7 +74,8 @@ class ProcessTab(AbstractTab):
         """
         self.icons[name_env] = QtWidgets.QLabel()
         pix = QtGui.QPixmap(getattr(CONST.UI.ICONS, name_env))
-        self.icons[name_env].setPixmap(pix.scaledToHeight(15))
+        if pix:
+            self.icons[name_env].setPixmap(pix.scaledToHeight(15))
         self.labels[name_env] = QtWidgets.QLabel(name.capitalize())
         self.texts[name_env] = QtWidgets.QLineEdit()
         self.texts[name_env].textChanged.connect(lambda filename: self.add_data(filename, name_env))
