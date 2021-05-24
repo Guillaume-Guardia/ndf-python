@@ -27,6 +27,7 @@ class CONST:
         PDF = ".pdf"
         QM = ".qm"
         TS = ".ts"
+        PNG = ".png"
 
     class TYPE:
         # Analyse
@@ -38,6 +39,7 @@ class CONST:
         # RW
         CSV = "csv"
         EXC = "excel"
+        PNG = "png"
 
         # Process
         PRO = "process"

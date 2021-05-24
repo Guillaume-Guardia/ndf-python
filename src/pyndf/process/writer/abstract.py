@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import os
-from pyndf.qtlib import QtCore, QtWidgets
+from pyndf.qtlib import QtCore
 from pyndf.logbook import Logger
+from pyndf.utils import Utils
 
 
 class AbstractWriter(Logger, QtCore.QObject):
@@ -15,7 +16,7 @@ class AbstractWriter(Logger, QtCore.QObject):
         super().__init__(*args, **kwargs)
         self.dir = dir
 
-    def create_path(self, filename, dir=None, ext=None, force=True):
+    def create_path(self, filename, dir=None, page: int = None, ext=None, force=True):
         """Check path method.
 
         Args:
@@ -42,6 +43,9 @@ class AbstractWriter(Logger, QtCore.QObject):
         if dir is not None and os.path.exists(dir):
             # Modify or Add dir to filename
             path = os.path.join(dir, os.path.basename(filename))
+
+        if page is not None:
+            path = Utils.insert(path, path.index("."), f"_page-{page}")
 
         if ext is not None and ext.startswith("."):
             # Add extension of filename

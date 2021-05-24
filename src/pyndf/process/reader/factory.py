@@ -2,11 +2,12 @@
 
 from pyndf.process.reader.useclass.csv import CSVReader
 from pyndf.process.reader.useclass.excel import ExcelReader
+from pyndf.process.reader.useclass.pdf import PdfReader
 from pyndf.utils import Factory
 
 
 class Reader(Factory):
-    class_list = [ExcelReader, CSVReader]
+    class_list = [ExcelReader, CSVReader, PdfReader]
 
     def __new__(cls, filename, *args, log_level=None, **kwargs):
         instance = None, None

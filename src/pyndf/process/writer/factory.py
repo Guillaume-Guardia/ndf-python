@@ -4,6 +4,7 @@ from pyndf.constants import CONST
 from pyndf.process.writer.useclass.csv import CsvWriter
 from pyndf.process.writer.useclass.excel import ExcelWriter
 from pyndf.process.writer.useclass.pdf import PdfWriter
+from pyndf.process.writer.useclass.png import PngWriter
 from pyndf.utils import Factory
 
 
@@ -12,4 +13,5 @@ class Writer(Factory):
         CONST.TYPE.EXC: ExcelWriter,
         CONST.TYPE.CSV: CsvWriter,
         CONST.TYPE.PDF: PdfWriter,
+        CONST.TYPE.PNG: PngWriter,
     }

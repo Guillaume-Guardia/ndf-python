@@ -15,6 +15,14 @@ class AbstractTable(QtWidgets.QTableWidget):
         headers = self.custom_item.headers_pretty()
         self.setColumnCount(len(headers))
         self.setHorizontalHeaderLabels(headers)
+        header = self.horizontalHeader()
+        for col in range(self.columnCount()):
+            header.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+
+        header.setSortIndicatorShown(True)
+        header.setSectionsClickable(True)
+        header.setSectionsMovable(True)
+        header.sectionClicked.connect(self.on_header_clicked)
 
     def init(self):
         self.clearContents()
@@ -32,13 +40,12 @@ class AbstractTable(QtWidgets.QTableWidget):
             self.setItem(row, index, widget)
 
     def finished(self):
-        self.cellClicked.connect(self.on_header_clicked)
         self.tab.window.toggled_tab(self.tab, True)
 
-    def on_header_clicked(self, row, col):
+    def on_header_clicked(self, col):
         if col in self._cache:
             self._cache[col] = not self._cache[col]
         else:
-            self._cache[col] = True
+            self._cache[col] = False
         sort = self.sort_order[self._cache[col]]
         self.sortItems(col, sort)

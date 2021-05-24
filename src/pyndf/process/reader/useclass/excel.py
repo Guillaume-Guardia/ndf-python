@@ -4,7 +4,6 @@ import re
 from collections import defaultdict
 import pandas as pd
 from pyndf.gui.items.factory import Items
-from pyndf.logbook import log_time
 from pyndf.constants import CONST
 from pyndf.process.reader.abstract import AbstractReader
 
@@ -24,7 +23,6 @@ class ExcelReader(AbstractReader):
 
         # Initialisation variables
         records = defaultdict(dict)
-        client_agence_origin = ""
 
         # Get the data on excel file in dataframe format.
         dataframe = pd.read_excel(filename, sheet_name=sheet_name, na_filter=False, dtype={"matricule": str})
