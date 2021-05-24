@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 
+import sys
 from setuptools import setup
+
+with open("requirements.txt") as f:
+    required = f.read().splitlines()
+
+sys.path.append(__file__)
 
 setup(
     name="pyndf",
@@ -10,9 +16,8 @@ setup(
     packages=["pyndf"],
     package_dir={"": "src"},
     package_data={"pyndf": ["data/test.xlsx"]},
-    # url="http://pypi.python.org/pypi/ndf-python/",
     license="LICENSE.txt",
     description="Do NDF for Apside",
     long_description=open("README.md").read(),
-    install_requires=[],
+    install_requires=required,
 )
