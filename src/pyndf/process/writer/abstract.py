@@ -32,9 +32,9 @@ class AbstractWriter(Logger, QtCore.QObject):
             string: Path of the new file
         """
 
-        filename = filename or self.filename
+        path = filename or self.filename
 
-        if filename is None:
+        if path is None:
             raise Exception("No filename provided !")
 
         dir = dir or self.dir
@@ -42,7 +42,7 @@ class AbstractWriter(Logger, QtCore.QObject):
 
         if dir is not None and os.path.exists(dir):
             # Modify or Add dir to filename
-            path = os.path.join(dir, os.path.basename(filename))
+            path = os.path.join(dir, os.path.basename(path))
 
         if page is not None:
             path = Utils.insert(path, path.index("."), f"_page-{page}")
