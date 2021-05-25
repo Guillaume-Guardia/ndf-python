@@ -2,11 +2,11 @@
 
 
 class Progress:
-    def __init__(self, callback, min=0, max=0, local_max=100):
+    def __init__(self, callback, global_min=0, global_max=0, local_max=100):
         self.callback = callback
-        self.global_min = min
-        self.global_max = max
-        self.global_value = min
+        self.global_min = global_min
+        self.global_max = global_max
+        self.global_value = global_min
 
         self.local_min = 0
         self.local_max = local_max
@@ -28,8 +28,8 @@ class Progress:
     def local_duration(self):
         return self.local_max - self.local_min
 
-    def set_maximum(self, max):
-        self.local_max = max
+    def set_maximum(self, local_max):
+        self.local_max = local_max
         self.local_value = self.local_min
         self.global_min = self.global_value
 
@@ -42,4 +42,4 @@ class Progress:
 
         self.global_value = self.global_min + (self.local_value / self.local_duration) * self.global_duration
 
-        self.callback(round(self.global_value), msg)
+        return self.callback(round(self.global_value), msg)

@@ -16,11 +16,7 @@ class PngWriter(AbstractWriter):
         zomm_y = 2.0  # vertical zoom
         self.mat = fitz.Matrix(zoom_x, zomm_y)
 
-    def write(self, page, filename=None):
-        path = self.create_path(filename, page=page.number)
-
+    def _write(self, page, filename=None):
         # pix = page.get_pixmap(matrix=self.mat, alpha=False)  # render page to an image
         pix = page.get_pixmap(alpha=False)
-        pix.save(path)  # store image as a PNG
-
-        return path
+        pix.save(filename)  # store image as a PNG

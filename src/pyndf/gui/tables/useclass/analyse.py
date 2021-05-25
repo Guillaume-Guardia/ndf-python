@@ -28,7 +28,7 @@ class AnalyseTable(AbstractTable):
         for r in range(self.rowCount() - 1):
             item = self.item(r, self.custom_item.headers.index("status"))
             status = getattr(CONST.STATUS, item.text())
-            total_status.add(status.NAME)
+            total_status.add(status.name)
         total_status = "/".join(list(total_status))
         total_item = Items(CONST.TYPE.TOT, total_status, self.time)
 

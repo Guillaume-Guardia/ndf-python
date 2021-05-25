@@ -52,9 +52,15 @@ class MainMenu(QtWidgets.QMenuBar):
             sub_menu.addAction(
                 QtGui.QIcon(getattr(CONST.UI.ICONS, lang)), lang, lambda l=lang: self.window.change_language(l)
             )
+        menu.addSeparator()
 
         # Color PDF
         menu.addAction(QtGui.QIcon(CONST.UI.ICONS.COL), self.tr("Select PDF file color"), self.change_color_pdf)
+        menu.addSeparator()
+
+        # API
+        self.create_action_options(menu, self.tr("Use DB"), CONST.TYPE.DB)
+        self.create_action_options(menu, self.tr("Use CACHE"), CONST.TYPE.CACHE)
 
         return menu
 
@@ -62,26 +68,34 @@ class MainMenu(QtWidgets.QMenuBar):
         menu = QtWidgets.QMenu(self.tr("Views"), self)
 
         # Process
-        self.create_action(menu, self.window.tabs[CONST.TYPE.PRO])
+        self.create_action_views(menu, self.window.tabs[CONST.TYPE.PRO])
         menu.addSeparator()
 
         # Reader/Writer TAB_RW
         for reader in CONST.TAB.READER:
-            self.create_action(menu, self.window.tabs[reader])
+            self.create_action_views(menu, self.window.tabs[reader])
         menu.addSeparator()
 
         # Analyse
         for analyse in CONST.TAB.ANALYSE:
-            self.create_action(menu, self.window.tabs[analyse])
+            self.create_action_views(menu, self.window.tabs[analyse])
 
         return menu
 
-    def create_action(self, menu, tab):
+    def create_action_options(self, menu, title, name):
+        action = QtGui.QAction(title, menu)
+        action.setCheckable(True)
+        action.toggled.connect(lambda boolean: setattr(self.window, name, boolean))
+        attr = getattr(self.window, name)
+        action.setChecked(attr if attr is not None else CONST.FILE.YAML[CONST.TYPE.API][name])
+        menu.addAction(action)
+
+    def create_action_views(self, menu, tab):
         action = QtGui.QAction(tab.title, menu)
         action.setCheckable(True)
         widget = self.window.centralWidget()
-        action.setChecked(widget.isTabVisible(widget.indexOf(tab)))
         action.toggled.connect(lambda boolean, tab_=tab: self.window.toggled_tab(tab_, boolean))
+        action.setChecked(widget.isTabVisible(widget.indexOf(tab)))
         menu.addAction(action)
 
     def create_help_menu(self):

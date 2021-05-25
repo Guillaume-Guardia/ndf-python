@@ -9,32 +9,45 @@ class TestProgress(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        pass
+        cls.msg = "test"
 
     def setUp(self):
         pass
 
-    def test_progress_sub(self):
-        a = Progress(print, 0, 10)
-        a.set_maximum(1000)
+    @staticmethod
+    def custom_print(value, msg):
+        return msg, value
 
-        for b in range(1000):
-            a.send()
+    def test_progress_sub(self, maxi=1000):
 
-    def test_progress_sub_max(self):
-        a = Progress(print, 10, 20, 500)
+        a = Progress(TestProgress.custom_print, 0, 10)
+        a.set_maximum(maxi)
+        for b in range(1, maxi):
+            msg, value = a.send(msg=self.msg)
 
-        for b in range(500):
-            a.send()
+            self.assertEqual(msg, self.msg + f": {b} / {maxi}")
+            self.assertEqual(value, round(b / maxi * 10))
 
-    def test_progress_sub_redefine_max(self):
-        a = Progress(print, 10, 20)
+    def test_progress_sub_max(self, maxi=500):
+        a = Progress(TestProgress.custom_print, 10, 20, maxi)
+
+        for b in range(1, maxi):
+            msg, value = a.send(msg=self.msg)
+
+            self.assertEqual(msg, self.msg + f": {b} / {maxi}")
+            self.assertEqual(value, round(10 + b / maxi * 10))
+
+    def test_progress_sub_redefine_max(self, maxi=30):
+        a = Progress(TestProgress.custom_print, 10, 20)
         a.send(50)
 
-        a.set_maximum(30)
+        a.set_maximum(maxi)
 
-        for b in range(30):
-            a.send()
+        for b in range(1, maxi):
+            msg, value = a.send(msg=self.msg)
+
+            self.assertEqual(msg, self.msg + f": {b} / {maxi}")
+            self.assertEqual(value, round(15 + b / maxi * 5))
 
     def tearDown(self):
         pass

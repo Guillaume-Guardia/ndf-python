@@ -32,7 +32,7 @@ class AbstractItem(QtCore.QObject):
 
         if name == "status":
             widget.setFont(QtGui.QFont(self.font, self.font_size, self.font_weight))
-            widget.setForeground(QtGui.QColor(getattr(CONST.STATUS, value).COLOR))
+            widget.setForeground(QtGui.QColor(getattr(CONST.STATUS, value).color))
         super().__setattr__(name, widget)
 
     def __iter__(self):

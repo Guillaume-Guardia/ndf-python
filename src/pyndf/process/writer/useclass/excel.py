@@ -11,12 +11,7 @@ class ExcelWriter(AbstractWriter):
     ext = CONST.EXT.EXC
     engine = "xlsxwriter"
 
-    def write(self, data, filename=None):
-        path = self.create_path(filename)
-
+    def _write(self, data, filename=None):
         df = pd.DataFrame(data)
-
-        with pd.ExcelWriter(path, engine=self.engine) as writer:
+        with pd.ExcelWriter(filename, engine=self.engine) as writer:
             df.to_excel(writer, index=False)
-
-        return path

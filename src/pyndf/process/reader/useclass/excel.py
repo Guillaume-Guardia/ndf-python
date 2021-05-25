@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import time
 import re
 from collections import defaultdict
 import pandas as pd

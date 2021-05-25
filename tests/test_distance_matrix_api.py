@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from pyndf.constants import CONFIG
+from pyndf.constants import CONST
 from pyndf.process.distance import DistanceMatrixAPI
 
 
@@ -16,14 +16,14 @@ class TestDistanceMatrixAPI(unittest.TestCase):
         pass
 
     def test_api(self):
-        origin = "7 Rue George Sand, 29200 Brest"
-        destination = "90 Rue Ernest Hemingway, 29200 Brest"
+        origin = "Moi", "7 Rue George Sand, 29200 Brest"
+        destination = "Apside", "90 Rue Ernest Hemingway, 29200 Brest"
 
-        status, (distance, duration) = self.api.run(origin, destination)
+        ((distance, duration), status), time_spend = self.api.run(origin, destination, use_db=False)
 
         # Check status
-        self.assertIn(status, CONFIG["good_status"])
-        self.assertEqual(round(distance, 1), 2.0)
+        self.assertEqual(status, CONST.STATUS.API.name)
+        self.assertEqual(round(distance, 1), 2.1)
         self.assertEqual(round(duration / 60), 4)
 
     def test_extract_address(self):

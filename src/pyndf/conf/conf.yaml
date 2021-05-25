@@ -4,6 +4,8 @@ api:
   language: fr
   mode: driving # driving, walking, bicycling, transit
   unit: metric # metric, imperial
+  use_cache: True
+  use_db: True
 
 # Excel colonnes
 excel:

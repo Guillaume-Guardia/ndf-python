@@ -28,7 +28,8 @@ class DistanceMatrixAPI(Logger):
 
         self.log.info("Get distance with API or DB or cache from Excel file")
 
-    def format_address(self, addr):
+    @staticmethod
+    def format_address(addr):
         """Formatter of addresses. Each address is returned like:
         - ROAD, ZIPCODE, CITY
 
@@ -48,7 +49,7 @@ class DistanceMatrixAPI(Logger):
         return ""
 
     @log_time
-    def run(self, client, employee):
+    def run(self, client, employee, use_db=True, use_cache=True):
         """Start the process google matrix api.
 
         Args:
@@ -61,31 +62,32 @@ class DistanceMatrixAPI(Logger):
         client_name, client_address = client
         employee_matricule, employee_address = employee
         self.log.debug(f"Get the distance between {client_address} and {employee_address}.")
-        client_address = self.format_address(client_address)
-        employee_address = self.format_address(employee_address)
+        client_address = DistanceMatrixAPI.format_address(client_address)
+        employee_address = DistanceMatrixAPI.format_address(employee_address)
 
         # Check cache
-        if (client_address, employee_address) in self._cache:
+        if use_cache and (client_address, employee_address) in self._cache:
             self.log.debug(
-                f"Status: {CONST.STATUS.CACHE.NAME} || Result: {self._cache[(client_address, employee_address)]}"
+                f"Status: {CONST.STATUS.CACHE.name} || Result: {self._cache[(client_address, employee_address)]}"
             )
-            return CONST.STATUS.CACHE.NAME, self._cache[(client_address, employee_address)]
+            return self._cache[(client_address, employee_address)], CONST.STATUS.CACHE.name
 
         # Check DB
-        with db.session_scope() as session:
-            measure = (
-                session.query(Measure)
-                .filter(Measure.client_address == client_address)
-                .filter(Measure.employee_address == employee_address)
-                .first()
-            )
+        if use_db:
+            with db.session_scope() as session:
+                measure = (
+                    session.query(Measure)
+                    .filter(Measure.client_address == client_address)
+                    .filter(Measure.employee_address == employee_address)
+                    .first()
+                )
 
-            if measure:
-                # Add in cache
-                self._cache[(client_address, employee_address)] = (measure.distance, measure.duration)
+                if measure:
+                    # Add in cache
+                    self._cache[(client_address, employee_address)] = (measure.distance, measure.duration)
 
-                self.log.debug(f"Status: {CONST.STATUS.DB.NAME} || Result: {(measure.distance, measure.duration)}")
-                return CONST.STATUS.DB.NAME, (measure.distance, measure.duration)
+                    self.log.debug(f"Status: {CONST.STATUS.DB.name} || Result: {(measure.distance, measure.duration)}")
+                    return (measure.distance, measure.duration), CONST.STATUS.DB.name
 
         dict_params = dict(
             origins=client_address,
@@ -96,30 +98,32 @@ class DistanceMatrixAPI(Logger):
         )
         result = self.client.distance_matrix(**dict_params)
 
-        # Check status result
+        # Check status
         top_status = result["status"]
-
-        if not getattr(CONST.STATUS, top_status):
-            self.log.warning(f"Status: {top_status} || Result: None")
-            return top_status, None
-
-        # Informations sur le trajet : duree et distance "elements"
-        # Check status element
         element = result["rows"][0]["elements"][0]
         element_status = element["status"]
 
-        if not getattr(CONST.STATUS, element_status):
-            self.log.warning(f"Status: {element_status} || Result: None")
-            return element_status, None
+        for status in (top_status, element_status):
+            if not getattr(CONST.STATUS, top_status):
+                self.log.warning(f"Status: {top_status} || Result: None")
+                return status, None
 
         # conversion de m en km
         distance = element["distance"]["value"] / 1000
         duration = element["duration"]["value"]
 
         # Add in cache
-        self._cache[(client_address, employee_address)] = distance, duration
+        if use_cache:
+            self._cache[(client_address, employee_address)] = distance, duration
 
         # Add in DB
+        if use_db:
+            self.add_result_in_db(client_name, client_address, employee_matricule, employee_address, distance, duration)
+
+        self.log.debug(f"Status: {CONST.STATUS.API.name} || Result: {(distance, duration)}")
+        return (distance, duration), CONST.STATUS.API.name
+
+    def add_result_in_db(self, client_name, client_address, employee_matricule, employee_address, distance, duration):
         with db.session_scope() as session:
             # Check if client or employee exists
             new_client = Client(name=client_name, address=client_address)
@@ -149,6 +153,3 @@ class DistanceMatrixAPI(Logger):
             )
             self.log.debug(f"Add new measure {new_measure}")
             session.add(new_measure)
-
-        self.log.debug(f"Status: {element_status} || Result: {(distance, duration)}")
-        return element_status, (distance, duration)

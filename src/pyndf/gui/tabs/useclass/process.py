@@ -38,7 +38,7 @@ class ProcessTab(AbstractTab):
         self.buttons[CONST.TYPE.PDF].setMinimumWidth(120)
         self.buttons[CONST.TYPE.PDF].setMinimumHeight(40)
         self.buttons[CONST.TYPE.PDF].setStyleSheet(CONST.UI.BUTTONSTYLE)
-        generate_widget = self.add_widget([self.buttons[CONST.TYPE.PDF]])
+        generate_widget = ProcessTab.add_widget([self.buttons[CONST.TYPE.PDF]])
 
         # Create vertical layout
         layout = QtWidgets.QVBoxLayout()
@@ -85,7 +85,8 @@ class ProcessTab(AbstractTab):
         self.buttons[name_env].setFixedHeight(30)
         self.buttons[name_env].pressed.connect(lambda: self.choose(name_env, name, _format))
 
-    def add_widget(self, widgets):
+    @staticmethod
+    def add_widget(widgets):
         """add widget in center of Horizontal layout
 
         Args:

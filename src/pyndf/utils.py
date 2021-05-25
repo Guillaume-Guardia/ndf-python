@@ -6,6 +6,12 @@ class Utils:
     def type(value: str, decimal: str = "."):
         value = value.replace(decimal, ".")
         try:
+            if value.lower() == "true":
+                return True
+
+            if value.lower() == "false":
+                return False
+
             float_value = float(value)
             int_value = int(float_value)
 
@@ -21,8 +27,8 @@ class Utils:
 
 
 class Factory:
-    def __new__(cls, type, *args, **kwargs):
-        _class = cls.class_dico[type]
+    def __new__(cls, type_, *args, **kwargs):
+        _class = cls.class_dico[type_]
         if len(args) + len(kwargs) <= 0:
             return _class
         instance = _class.__new__(_class, *args, **kwargs)

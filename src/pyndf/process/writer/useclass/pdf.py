@@ -2,7 +2,6 @@
 
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-
 from reportlab.lib.units import cm
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.pagesizes import A4, landscape
@@ -12,9 +11,7 @@ from reportlab.platypus.frames import Frame
 from reportlab.platypus.doctemplate import BaseDocTemplate, PageTemplate
 from reportlab.platypus.tables import Table, TableStyle
 from reportlab.platypus.paragraph import Paragraph
-
 from pyndf.process.writer.abstract import AbstractWriter
-from pyndf.logbook import log_time
 from pyndf.constants import CONST
 
 stylesheet = getSampleStyleSheet()
@@ -198,17 +195,21 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         table.setStyle(style)
         return table
 
-    @log_time
-    def write(self, data):
+    def create_path(self, data=None):
+        filename = self.create_filename(data)
+        return super().create_path(filename)
+
+    def create_filename(self, data):
+        matricule = data.get("matricule", CONST.WRITER.PDF.UNKNOWN)
+        self.log.debug(f"Create pdf for matricule {matricule} with {len(data['missions'])} missions.")
+        return f"{data.get('agence', CONST.WRITER.PDF.UNKNOWN)}_{matricule}_{self.date.strftime('%Y%m')}"
+
+    def _write(self, data, path):
         """Create method, add each element of pdf.
 
         Args:
             data (dict): record data with personnal info of collaborator and his missions info.
         """
-        matricule = data.get("matricule", CONST.WRITER.PDF.UNKNOWN)
-        self.log.debug(f"Create pdf for matricule {matricule} with {len(data['missions'])} missions.")
-        filename = f"{data.get('agence', CONST.WRITER.PDF.UNKNOWN)}_{matricule}_{self.date.strftime('%Y%m')}"
-        path = self.create_path(filename)
 
         paragraphs = []
         # add some flowables
@@ -224,9 +225,4 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
 
         paragraphs.append(Paragraph("<b>NB: Carte grise à disposition de la direction.</b>", stylesheet["Normal"]))
 
-        try:
-            self.build(paragraphs, path)
-        except Exception as e:
-            self.log.exception(e)
-            return filename, CONST.STATUS.ERROR.NAME
-        return filename, CONST.STATUS.OK.NAME
+        self.build(paragraphs, path)

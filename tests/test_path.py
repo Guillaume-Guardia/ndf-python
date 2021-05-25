@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 import unittest
 import tempfile
 import shutil
@@ -20,7 +19,7 @@ class TestPath(unittest.TestCase):
     def test_insert_on_path(self):
         """test function."""
         path = "un/deux.pdf"
-        result = Utils.insert(path, path.index("."), f"_page-5")
+        result = Utils.insert(path, path.index("."), "_page-5")
         self.assertEqual(result, "un/deux_page-5.pdf")
 
     def tearDown(self):

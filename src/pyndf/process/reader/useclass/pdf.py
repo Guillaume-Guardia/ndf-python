@@ -17,7 +17,7 @@ class PdfReader(AbstractReader):
         if self.check_path(filename) is False:
             return
 
-        writer = Writer(CONST.TYPE.PNG, dir=window.app.temp_dir)
+        writer = Writer(CONST.TYPE.PNG, directory=window.app.temp_dir)
 
         # read pdf
         with fitz.Document(filename) as doc:

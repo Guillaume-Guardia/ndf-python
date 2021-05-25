@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import os
+from pyndf.constants import CONST
 from pyndf.qtlib import QtCore
-from pyndf.logbook import Logger
+from pyndf.logbook import Logger, log_time
 from pyndf.utils import Utils
 
 
@@ -11,17 +12,17 @@ class AbstractWriter(Logger, QtCore.QObject):
 
     ext = None
 
-    def __init__(self, *args, dir=None, **kwargs):
+    def __init__(self, *args, directory=None, **kwargs):
         """Initialisation"""
         super().__init__(*args, **kwargs)
-        self.dir = dir
+        self.directory = directory
 
-    def create_path(self, filename, dir=None, page: int = None, ext=None, force=True):
+    def create_path(self, filename, directory=None, page: int = None, ext=None, force=True):
         """Check path method.
 
         Args:
             filename (string): just the basename of the wanted file
-            dir (str): directory to the futur new file.
+            directory (str): directory to the futur new file.
             ext (str): extension of the file added to filename
             force (bool, optional): Force the creation of file. Defaults to True.
 
@@ -37,12 +38,12 @@ class AbstractWriter(Logger, QtCore.QObject):
         if path is None:
             raise Exception("No filename provided !")
 
-        dir = dir or self.dir
+        directory = directory or self.directory
         ext = ext or self.ext
 
-        if dir is not None and os.path.exists(dir):
-            # Modify or Add dir to filename
-            path = os.path.join(dir, os.path.basename(path))
+        if directory is not None and os.path.exists(directory):
+            # Modify or Add directory to filename
+            path = os.path.join(directory, os.path.basename(path))
 
         if page is not None:
             path = Utils.insert(path, path.index("."), f"_page-{page}")
@@ -57,3 +58,20 @@ class AbstractWriter(Logger, QtCore.QObject):
 
         self.log.info(f"Write data in file {os.path.basename(path)}")
         return path
+
+    @log_time
+    def write(self, data, filename=None):
+        """Create method, add each element of pdf.
+
+        Args:
+            data (dict): record data with personnal info of collaborator and his missions info.
+        """
+        try:
+            filename = self.create_path(filename)
+            self._write(data, filename)
+            status = CONST.STATUS.OK.name
+        except Exception as e:
+            self.log.exception(e)
+            status = CONST.STATUS.ERROR.name
+
+        return filename, status

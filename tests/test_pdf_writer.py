@@ -4,8 +4,8 @@ import os
 import unittest
 import tempfile
 import shutil
-from pyndf.writer.pdf import PdfWriter
-from pyndf.constants import CONFIG
+from pyndf.process.writer.factory import Writer
+from pyndf.constants import CONST
 
 
 class TestPdfWriter(unittest.TestCase):
@@ -14,7 +14,8 @@ class TestPdfWriter(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.directory = tempfile.mkdtemp()
-        cls.writer = PdfWriter(dir=cls.directory)
+        cls.date = "300012"
+        cls.writer = Writer(CONST.TYPE.PDF, cls.date, CONST.WRITER.PDF.COLOR, directory=cls.directory)
 
         cls.data = {
             "nom": "Moise",
@@ -33,7 +34,7 @@ class TestPdfWriter(unittest.TestCase):
                     "total": 64.8,
                     "nbrkm_mois": 92.85600000000001,
                     "forfait": 0.697854742827604,
-                    "status": CONFIG["good_status"][0],
+                    "status": CONST.STATUS.OK.name,
                 },
                 {
                     "client": "BREST 2",
@@ -44,7 +45,7 @@ class TestPdfWriter(unittest.TestCase):
                     "total": 80,
                     "nbrkm_mois": 85,
                     "forfait": 0.35,
-                    "status": CONFIG["good_status"][0],
+                    "status": CONST.STATUS.OK.name,
                 },
             ],
         }
@@ -75,8 +76,8 @@ class TestPdfWriter(unittest.TestCase):
     def test_check_path(self):
         """test function."""
         # Check if transform path
-        path = "un_path"
-        test_path = self.writer.check_path(path)
+        test_path = self.writer.create_path(self.data)
+        path = f"{self.data['agence']}_{self.data['matricule']}_{self.writer.date.strftime('%Y%m')}"
         self.assertEqual(os.path.join(self.directory, path + ".pdf"), test_path)
 
     def tearDown(self):

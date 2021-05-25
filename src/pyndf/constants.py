@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
 
 import os
-import yaml
 from dataclasses import dataclass
+import yaml
 
 DIR = os.path.dirname(__file__)
 
 
 class CONST:
+    """Constantes ojbect. Shorcut to add constante in other file."""
+
     TITLE_APP = "PYNDF"
     COMPANY = "APSIDE"
     VERSION = "1.0"
 
     class FILE:
+        """All important file"""
+
         DB = os.path.join(DIR, "db", "pydb.db")
         TRANSLATION_DIR = os.path.join(DIR, "data", "translations")
         README = os.path.join(DIR, "..", "..", "README.md")
@@ -22,6 +26,8 @@ class CONST:
             YAML = yaml.safe_load(opened_file)
 
     class EXT:
+        """All extension in app."""
+
         CSV = ".csv"
         EXC = ".xlsx"
         PDF = ".pdf"
@@ -30,6 +36,8 @@ class CONST:
         PNG = ".png"
 
     class TYPE:
+        """String use in app to represent one type."""
+
         # Analyse
         ALL = "all"
         API = "api"
@@ -48,24 +56,28 @@ class CONST:
         OUT = "output"
         COL = "color"
         LAN = "language"
+        DB = "use_db"
+        CACHE = "use_cache"
 
-    MEMORY = TYPE.EXC, TYPE.CSV, TYPE.OUT, TYPE.COL
+    MEMORY = TYPE.EXC, TYPE.CSV, TYPE.OUT, TYPE.COL, TYPE.DB, TYPE.CACHE
 
     class UI:
+        """All visual parameters"""
+
         class ICONS:
-            excel = os.path.join(DIR, "data\icons\excel.png")
-            csv = os.path.join(DIR, "data\icons\csv.png")
-            CLO = os.path.join(DIR, "data\icons\close.png")
+            excel = os.path.join(DIR, r"data\icons\excel.png")
+            csv = os.path.join(DIR, r"data\icons\csv.png")
+            CLO = os.path.join(DIR, r"data\icons\close.png")
             fr = os.path.join(DIR, r"data\icons\fr.png")
-            HEL = os.path.join(DIR, "data\icons\help.png")
-            LAN = os.path.join(DIR, "data\icons\language.png")
-            output = os.path.join(DIR, "data\icons\output.png")
-            PDF = os.path.join(DIR, "data\icons\pdf.png")
-            en = os.path.join(DIR, "data\icons\en.png")
-            COL = os.path.join(DIR, "data\icons\color.png")
-            MAN = os.path.join(DIR, "data\icons\manual.png")
+            HEL = os.path.join(DIR, r"data\icons\help.png")
+            LAN = os.path.join(DIR, r"data\icons\language.png")
+            output = os.path.join(DIR, r"data\icons\output.png")
+            PDF = os.path.join(DIR, r"data\icons\pdf.png")
+            en = os.path.join(DIR, r"data\icons\en.png")
+            COL = os.path.join(DIR, r"data\icons\color.png")
+            MAN = os.path.join(DIR, r"data\icons\manual.png")
             RIGHT = os.path.join(DIR, r"data\icons\right.png")
-            LEFT = os.path.join(DIR, "data\icons\left.png")
+            LEFT = os.path.join(DIR, r"data\icons\left.png")
 
         BUTTONSTYLE = """  QPushButton {
                 background-color: #79bbff;
@@ -85,10 +97,14 @@ class CONST:
             """
 
     class TAB:
+        """All tabs name"""
+
         READER = ["csv", "excel"]
         ANALYSE = ["all", "api", "pdf"]
 
     class READER:
+        """All constants links to reader."""
+
         class EXC:
             COL_PERSO = ["nom", "matricule", "societe", "agence", "agence_o", "adresse_intervenant"]
             COL_MISSION = [
@@ -101,7 +117,17 @@ class CONST:
             ]
 
     class MetaClass(type):
+        """metaclass for status class"""
+
         def __getattr__(cls, key):
+            """Get status from STATUS class. If don't exists, create a new one with a red color.
+
+            Args:
+                key (string): name of the status
+
+            Returns:
+                Status: New or Old status
+            """
             # check key
             total_status = []
             kwargs = {}
@@ -112,8 +138,8 @@ class CONST:
                     total_status.append(bool(status))
 
                 if all(total_status):
-                    kwargs["COLOR"] = CONST.STATUS.OK.COLOR
-                    kwargs["STATE"] = True
+                    kwargs["color"] = CONST.STATUS.OK.color
+                    kwargs["state"] = True
 
             attr = CONST.STATUS.Status(key, **kwargs)
             if len(splits) == 1:
@@ -121,16 +147,19 @@ class CONST:
             return attr
 
     class STATUS(metaclass=MetaClass):
+        """Status function in app."""
+
         @dataclass
         class Status:
-            NAME: str
-            COLOR: str = "#A12312"
-            STATE: bool = False
+            name: str
+            color: str = "#A12312"
+            state: bool = False
 
             def __bool__(self):
-                return self.STATE
+                return self.state
 
         OK = Status("OK", "#008000", True)
+        API = Status("API", "#008000", True)
         CACHE = Status("CACHE", "#32CD32", True)
         DB = Status("DB", "#ADFF2F", True)
 
@@ -156,6 +185,8 @@ class CONST:
         ]
 
     class WRITER:
+        """All constants related to writer."""
+
         class PDF:
             FONT = ["Helvetica", 10]
             COLOR = "#99ccff"  # Blue

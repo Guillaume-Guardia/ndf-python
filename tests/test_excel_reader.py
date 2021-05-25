@@ -5,8 +5,12 @@ import unittest
 import tempfile
 import shutil
 import pandas as pd
-from pyndf.reader.excel import ExcelReader
-from pyndf.constants import CONFIG, COL
+from collections import defaultdict
+from pyndf.process.reader.factory import Reader
+from pyndf.process.writer.factory import Writer
+from pyndf.constants import CONST
+
+counter = 0
 
 
 class TestExcelReader(unittest.TestCase):
@@ -16,49 +20,56 @@ class TestExcelReader(unittest.TestCase):
     def setUpClass(cls):
         """Before all tests"""
         cls.directory = tempfile.mkdtemp()
-        cls.reader = ExcelReader()
-
-    def create_xl(self, filename, n_rows=10, change_matricule=False):
-        n_col = len(CONFIG[COL])
-        list_df = list([[0 for i in range(n_col)] for j in range(n_rows)])
-        for index, row in enumerate(list_df):
-            if change_matricule:
-                row[2] = index
-            row[18] = "INDEMNITE"
-        df = pd.DataFrame(list_df, columns=list(CONFIG[COL].values()))
-
-        with pd.ExcelWriter(filename, engine="xlsxwriter") as writer:
-            df.to_excel(writer, sheet_name="A")
+        cls.dico = CONST.FILE.YAML[CONST.TYPE.EXC]
 
     def setUp(self):
         """Before each test"""
-        pass
+        global counter
+
+        counter += 1
+        self.filename = os.path.join(self.directory, f"test_read_{counter}.xlsx")
+
+    def create_xl(self, filename, oneperson=None, n_rows=10):
+        headers = list(self.dico.values())
+
+        data = defaultdict(list)
+        for row in range(n_rows):
+            for header in headers:
+                if oneperson is not None and header == self.dico["matricule"]:
+                    value = oneperson
+                elif header == self.dico["libelle"]:
+                    value = "INDEMNITE"
+                else:
+                    value = f"{row} {header}"
+
+                data[header].append(value)
+
+        writer = Writer(CONST.TYPE.EXC, directory=self.directory)
+        (filename, status), time_spend = writer.write(data, filename)
+        return filename
 
     def test_read(self):
-        filename = os.path.join(self.directory, "test_read.xlsx")
-        self.create_xl(filename)
-        records = self.reader.read(filename)
+        oneperson = "ALBERT"
+        self.filename = self.create_xl(self.filename, oneperson=oneperson)
+        records = Reader(self.filename)
 
         # Check the dict info
-        # 1 person with matricule 0 and 10 missions
+        # 1 person with matricule ALBERT and 10 missions
         self.assertEqual(len(records), 1)
-        self.assertEqual(len(records[0]["missions"]), 10)
+        self.assertEqual(len(records[oneperson]["missions"]), 10)
 
     def test_read_big(self):
-        filename = os.path.join(self.directory, "test_read_big.xlsx")
-        self.create_xl(filename, n_rows=1000)
-
-        records = self.reader.read(filename)
+        oneperson = "ALBERT"
+        self.filename = self.create_xl(self.filename, oneperson=oneperson, n_rows=1000)
+        records = Reader(self.filename)
 
         # Check the dict info
         self.assertEqual(len(records), 1)
-        self.assertEqual(len(records[0]["missions"]), 1000)
+        self.assertEqual(len(records[oneperson]["missions"]), 1000)
 
     def test_read_change_matricule(self):
-        filename = os.path.join(self.directory, "test_read_change_matricule.xlsx")
-        self.create_xl(filename, change_matricule=True)
-
-        records = self.reader.read(filename)
+        self.filename = self.create_xl(self.filename)
+        records = Reader(self.filename)
 
         # Check the dict info
         self.assertEqual(len(records), 10)
@@ -66,13 +77,10 @@ class TestExcelReader(unittest.TestCase):
             self.assertEqual(len(record["missions"]), 1)
 
     def tearDown(self):
-        pass
+        os.remove(self.filename)
 
     @classmethod
     def tearDownClass(cls):
-        cls.reader = None
-        cls.filename = None
-
         # destroy tempdir
         shutil.rmtree(cls.directory, ignore_errors=True)
         cls.directory = None

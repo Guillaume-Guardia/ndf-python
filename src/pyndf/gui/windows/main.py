@@ -9,18 +9,21 @@ from pyndf.gui.tabs.useclass.analyse import AnalyseTab
 from pyndf.gui.tabs.useclass.process import ProcessTab
 from pyndf.gui.items.factory import Items
 from pyndf.gui.menus.menu import MainMenu
+from pyndf.utils import Utils
 
 
 class MainWindow(Logger, QtWidgets.QMainWindow):
     """Main window of the app"""
 
-    def __init__(self, app, excel=None, csv=None, output=None, color=None, **kwargs):
+    def __init__(self, app, excel=None, csv=None, output=None, color=None, use_db=None, use_cache=None, **kwargs):
         super().__init__(**kwargs)
         self.app = app
         self.excel = excel
         self.csv = csv
         self.output = output
         self.color = color
+        self.use_db = use_db
+        self.use_cache = use_cache
 
         # Window parameters
         self.setWindowTitle(CONST.TITLE_APP)
@@ -101,7 +104,11 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         for name in CONST.TAB.ANALYSE + CONST.TAB.READER:
             self.tabs[name].table.init()
         process = Thread(
-            *[t.text() for t in self.tabs[CONST.TYPE.PRO].texts.values()], color=self.color, log_level=self.log_level
+            *[t.text() for t in self.tabs[CONST.TYPE.PRO].texts.values()],
+            color=self.color,
+            log_level=self.log_level,
+            use_db=self.use_db,
+            use_cache=self.use_cache,
         )
         process.signals.error.connect(self.error)
         process.signals.finished.connect(self.generated)
@@ -152,7 +159,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         for name in CONST.MEMORY:
             attr = settings.value(name)
             if attr is not None and getattr(self, name) is None:
-                setattr(self, name, attr)
+                setattr(self, name, Utils.type(attr))
 
     def closeEvent(self, event):
         settings = QtCore.QSettings(CONST.COMPANY, CONST.TITLE_APP)

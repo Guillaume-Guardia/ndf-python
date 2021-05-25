@@ -35,12 +35,14 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
     :param data: The data to add to the PDF for generating.
     """
 
-    def __init__(self, excel_file, csv_file, output_directory, color, **kwargs):
+    def __init__(self, excel_file, csv_file, output_directory, color, use_db, use_cache, **kwargs):
         super().__init__(**kwargs)
         self.excel_file = excel_file
         self.csv_file = csv_file
         self.output_directory = output_directory
         self.color = color
+        self.use_db = use_db
+        self.use_cache = use_cache
         self.signals = WorkerSignals()
         self.progress = Progress(self.signals.progressed.emit)
 
@@ -52,7 +54,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
             progress=self.progress,
             log_level=self.log_level,
         )
-        return records, CONST.STATUS.OK.NAME
+        return records, CONST.STATUS.OK.name
 
     @log_time
     def read_csv(self, records):
@@ -65,7 +67,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
         for matricule, record in records.items():
             if int(matricule) in records_csv:
                 record["montant_total"] = records_csv[int(matricule)]
-        return records, CONST.STATUS.OK.NAME
+        return records, CONST.STATUS.OK.name
 
     @log_time
     def run_api(self, records):
@@ -80,7 +82,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
                 distance = None
                 client = mission["client"], mission["adresse_client"]
                 employee = record["matricule"], record["adresse_intervenant"]
-                (status, result), time_spend = api.run(client, employee)
+                (result, status), time_spend = api.run(client, employee, use_db=self.use_db, use_cache=self.use_cache)
                 mission["status"] = status
 
                 total_status.add(status)
@@ -110,7 +112,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
                 if client:
                     mission_record["client"] = client.name
                     mission_record["adresse_client"] = client.address.replace(",", " ")
-                    mission_record["status"] = CONST.STATUS.DB.NAME
+                    mission_record["status"] = CONST.STATUS.DB.name
 
                     if mission_record["client"] not in [mission["client"] for mission in record["missions"]]:
                         record["missions"].append(mission_record)
@@ -127,12 +129,14 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
 
         # Get writer
         date = os.path.basename(self.excel_file).split(".")[0].split("_")[1]
-        writer = Writer(CONST.TYPE.PDF, date, dir=self.output_directory, color=self.color, log_level=self.log_level)
+        writer = Writer(
+            CONST.TYPE.PDF, date, directory=self.output_directory, color=self.color, log_level=self.log_level
+        )
 
         total_status = set()
 
         for record in records.values():
-            (filename, status), time_spend = writer.write(record)
+            (filename, status), time_spend = writer.write(record, filename=record)
 
             total_status.add(status)
 

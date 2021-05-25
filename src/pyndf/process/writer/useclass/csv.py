@@ -10,10 +10,6 @@ class CsvWriter(AbstractWriter):
 
     ext = CONST.EXT.CSV
 
-    def write(self, data, filename=None):
-        path = self.create_path(filename)
-
+    def _write(self, data, filename=None):
         df = pd.DataFrame(data)
-        df.to_csv(path, sep=";", decimal=",", index=False)
-
-        return path
+        df.to_csv(filename, sep=";", decimal=",", index=False)

@@ -2,7 +2,6 @@
 
 import re
 import pandas as pd
-from pyndf.logbook import log_time
 from pyndf.constants import CONST
 from pyndf.gui.items.factory import Items
 from pyndf.process.reader.abstract import AbstractReader
