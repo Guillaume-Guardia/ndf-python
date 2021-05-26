@@ -65,7 +65,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
             log_level=self.log_level,
         )
         for matricule, record in records.items():
-            if int(matricule) in records_csv:
+            if matricule and int(matricule) in records_csv:
                 record["montant_total"] = records_csv[int(matricule)]
         return records, CONST.STATUS.OK.name
 
