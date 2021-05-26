@@ -13,3 +13,5 @@ class CsvWriter(AbstractWriter):
     def _write(self, data, filename=None):
         df = pd.DataFrame(data)
         df.to_csv(filename, sep=";", decimal=",", index=False)
+
+        return CONST.STATUS.OK

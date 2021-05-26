@@ -17,6 +17,8 @@ class AbstractItem(QtCore.QObject):
         super().__init__()
         if columns is not None:
             self.headers = list(columns)
+        else:
+            self.headers = getattr(CONST.TABLE, self.type[:3].upper())
 
         for index, arg in enumerate(args):
             setattr(self, self.headers[index], arg)
@@ -39,7 +41,7 @@ class AbstractItem(QtCore.QObject):
 
         if name == "status":
             widget.setFont(QtGui.QFont(self.font, self.font_size, self.font_weight))
-            widget.setForeground(QtGui.QColor(getattr(CONST.STATUS, value).color))
+            widget.setForeground(QtGui.QColor(value.color))
         super().__setattr__(name, widget)
 
     def __iter__(self):

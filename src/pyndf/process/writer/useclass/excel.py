@@ -15,3 +15,5 @@ class ExcelWriter(AbstractWriter):
         df = pd.DataFrame(data)
         with pd.ExcelWriter(filename, engine=self.engine) as writer:
             df.to_excel(writer, index=False)
+
+        return CONST.STATUS.OK

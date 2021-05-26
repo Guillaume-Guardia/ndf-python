@@ -8,7 +8,6 @@ class CsvItem(AbstractItem):
     """Class for storing data for analyse."""
 
     type = CONST.TYPE.CSV
-    headers = list(CONST.FILE.YAML[CONST.TYPE.CSV].values())
 
     @classmethod
     def headers_pretty(cls):

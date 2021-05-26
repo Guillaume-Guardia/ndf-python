@@ -13,6 +13,7 @@ from reportlab.platypus.tables import Table, TableStyle
 from reportlab.platypus.paragraph import Paragraph
 from pyndf.process.writer.abstract import AbstractWriter
 from pyndf.constants import CONST
+from pyndf.utils import Utils
 
 stylesheet = getSampleStyleSheet()
 stylesheet.add(ParagraphStyle(name="Justify", parent=stylesheet["Normal"], alignment=TA_JUSTIFY))
@@ -74,7 +75,7 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
             # footer
             canvas.drawString(left, bottom, "Apside Groupe")
             canvas.drawCentredString(x_center, bottom - cm, f"- {doc.page} -")
-            canvas.drawRightString(right, bottom, f"{CONST.VERSION}")
+            canvas.drawRightString(right, bottom, f"version: {CONST.VERSION}")
 
         if add_watermark:
             # Move the origin to middle, and after rotate the image
@@ -126,16 +127,14 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         quantite_payee = 0
         total = 0
         prix_unitaire = 0
-        error = False
+        total_status = set()
 
         # Add header
         for name in CONST.WRITER.PDF.COL_MISSION:
             data[0].append(Paragraph(CONST.FILE.YAML[CONST.TYPE.PDF][name], stylesheet["Center"]))
 
         for mission in record.get("missions", {}):
-            if not getattr(CONST.STATUS, mission["status"]):
-                error = True
-                continue
+            total_status.add(str(mission["status"]))
 
             nbrkm_mois += mission.get("nbrkm_mois", 0)
             quantite_payee += mission.get("quantite_payee", 0)
@@ -188,12 +187,13 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         )
 
         # Merge
-        if not error:
+        total_status = Utils.getattr(CONST.STATUS, total_status)
+        if total_status:
             for i in (1, 3, 4, 5, 6):
                 style.add("SPAN", (i, 1), (i, -1))
 
         table.setStyle(style)
-        return table
+        return table, total_status
 
     def create_path(self, data=None):
         filename = self.create_filename(data)
@@ -218,11 +218,11 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         paragraphs.append(
             Paragraph(f"AGENCE D'ORIGINE: {data.get('agence_o', CONST.WRITER.PDF.UNKNOWN)}", stylesheet["title"])
         )
-
         paragraphs.append(self.create_table_collaborator(data))
-        table = self.create_table_missions(data)
+        table, status = self.create_table_missions(data)
         paragraphs.append(table)
-
         paragraphs.append(Paragraph("<b>NB: Carte grise à disposition de la direction.</b>", stylesheet["Normal"]))
 
         self.build(paragraphs, path)
+
+        return status

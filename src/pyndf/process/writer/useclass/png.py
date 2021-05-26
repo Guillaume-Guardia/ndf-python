@@ -20,3 +20,5 @@ class PngWriter(AbstractWriter):
         # pix = page.get_pixmap(matrix=self.mat, alpha=False)  # render page to an image
         pix = page.get_pixmap(alpha=False)
         pix.save(filename)  # store image as a PNG
+
+        return CONST.STATUS.OK

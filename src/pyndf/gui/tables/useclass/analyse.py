@@ -3,6 +3,7 @@
 from pyndf.gui.tables.abstract import AbstractTable
 from pyndf.constants import CONST
 from pyndf.gui.items.factory import Items
+from pyndf.utils import Utils
 
 
 class AnalyseTable(AbstractTable):
@@ -24,13 +25,11 @@ class AnalyseTable(AbstractTable):
         row = self.add_row()
 
         # Check all status
-        total_status = set()
+        total_status = []
         for r in range(self.rowCount() - 1):
-            item = self.item(r, self.custom_item.headers.index("status"))
-            status = getattr(CONST.STATUS, item.text())
-            total_status.add(status.name)
-        total_status = "/".join(list(total_status))
-        total_item = Items(CONST.TYPE.TOT, total_status, self.time)
+            status = self.item(r, self.custom_item.headers.index("status"))
+            total_status.append(status.text())
+        total_item = Items(CONST.TYPE.TOT, Utils.getattr(CONST.STATUS, total_status), self.time)
 
         # Set total at the end
         self.setVerticalHeaderItem(row, total_item.vheaders_pretty)

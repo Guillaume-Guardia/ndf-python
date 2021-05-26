@@ -130,18 +130,18 @@ class CONST:
             """
             # check key
             total_status = []
-            kwargs = {}
-            splits = key.split("/")
+            state = False
+
+            splits = list(set(key.split("/")))
+
             if len(splits) > 1:
                 for s in splits:
                     status = getattr(CONST.STATUS, s)
                     total_status.append(bool(status))
+                state = all(total_status)
+                key = "/".join(splits)
 
-                if all(total_status):
-                    kwargs["color"] = CONST.STATUS.OK.color
-                    kwargs["state"] = True
-
-            attr = CONST.STATUS.Status(key, **kwargs)
+            attr = CONST.STATUS.Status(key, state)
             if len(splits) == 1:
                 setattr(cls, key, attr)
             return attr
@@ -152,16 +152,24 @@ class CONST:
         @dataclass
         class Status:
             name: str
-            color: str = "#A12312"
             state: bool = False
 
             def __bool__(self):
                 return self.state
 
-        OK = Status("OK", "#008000", True)
-        API = Status("API", "#008000", True)
-        CACHE = Status("CACHE", "#32CD32", True)
-        DB = Status("DB", "#ADFF2F", True)
+            def __str__(self):
+                return self.name
+
+            @property
+            def color(self):
+                if self:
+                    return "#008000"
+                return "#A12312"
+
+        OK = Status("OK", True)
+        API = Status("API", True)
+        CACHE = Status("CACHE", True)
+        DB = Status("DB", True)
 
         # NOK class
         BAD = [
@@ -195,3 +203,9 @@ class CONST:
             COL_MISSION = ["client", "periode", "addresse_client", "nbrkm_mois", "taux", "plafond", "total"]
 
             UNKNOWN = "Inconnu"
+
+    class TABLE:
+        API = ["matricule", "addr_client", "addr_employee", "distance", "status", "time"]
+        ALL = ["name", "status", "time"]
+        PDF = ["matricule", "filename", "nbr_missions", "status", "time"]
+        TOT = ["status", "time"]

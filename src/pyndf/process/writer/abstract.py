@@ -68,10 +68,9 @@ class AbstractWriter(Logger, QtCore.QObject):
         """
         try:
             filename = self.create_path(filename)
-            self._write(data, filename)
-            status = CONST.STATUS.OK.name
+            status = self._write(data, filename)
         except Exception as e:
             self.log.exception(e)
-            status = CONST.STATUS.ERROR.name
+            status = CONST.STATUS.ERROR
 
         return filename, status

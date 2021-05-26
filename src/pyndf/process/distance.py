@@ -67,10 +67,8 @@ class DistanceMatrixAPI(Logger):
 
         # Check cache
         if use_cache and (client_address, employee_address) in self._cache:
-            self.log.debug(
-                f"Status: {CONST.STATUS.CACHE.name} || Result: {self._cache[(client_address, employee_address)]}"
-            )
-            return self._cache[(client_address, employee_address)], CONST.STATUS.CACHE.name
+            self.log.debug(f"Status: {CONST.STATUS.CACHE} || Result: {self._cache[(client_address, employee_address)]}")
+            return self._cache[(client_address, employee_address)], CONST.STATUS.CACHE
 
         # Check DB
         if use_db:
@@ -86,8 +84,8 @@ class DistanceMatrixAPI(Logger):
                     # Add in cache
                     self._cache[(client_address, employee_address)] = (measure.distance, measure.duration)
 
-                    self.log.debug(f"Status: {CONST.STATUS.DB.name} || Result: {(measure.distance, measure.duration)}")
-                    return (measure.distance, measure.duration), CONST.STATUS.DB.name
+                    self.log.debug(f"Status: {CONST.STATUS.DB} || Result: {(measure.distance, measure.duration)}")
+                    return (measure.distance, measure.duration), CONST.STATUS.DB
 
         dict_params = dict(
             origins=client_address,
@@ -96,7 +94,11 @@ class DistanceMatrixAPI(Logger):
             mode=self.mode,
             units=self.unit,
         )
-        result = self.client.distance_matrix(**dict_params)
+        try:
+            result = self.client.distance_matrix(**dict_params)
+        except googlemaps.exceptions.ApiError as error:
+            self.log.warning(f"Status: {error.status} || Result: None")
+            return None, getattr(CONST.STATUS, error.status)
 
         # Check status
         top_status = result["status"]
@@ -104,9 +106,10 @@ class DistanceMatrixAPI(Logger):
         element_status = element["status"]
 
         for status in (top_status, element_status):
-            if not getattr(CONST.STATUS, top_status):
-                self.log.warning(f"Status: {top_status} || Result: None")
-                return status, None
+            status = getattr(CONST.STATUS, status)
+            if not status:
+                self.log.warning(f"Status: {status} || Result: None")
+                return None, status
 
         # conversion de m en km
         distance = element["distance"]["value"] / 1000
@@ -120,8 +123,8 @@ class DistanceMatrixAPI(Logger):
         if use_db:
             self.add_result_in_db(client_name, client_address, employee_matricule, employee_address, distance, duration)
 
-        self.log.debug(f"Status: {CONST.STATUS.API.name} || Result: {(distance, duration)}")
-        return (distance, duration), CONST.STATUS.API.name
+        self.log.debug(f"Status: {CONST.STATUS.API} || Result: {(distance, duration)}")
+        return (distance, duration), CONST.STATUS.API
 
     def add_result_in_db(self, client_name, client_address, employee_matricule, employee_address, distance, duration):
         with db.session_scope() as session:

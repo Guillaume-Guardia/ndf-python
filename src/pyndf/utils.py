@@ -24,6 +24,16 @@ class Utils:
             return value
 
     @staticmethod
+    def getattr(obj, name):
+        if isinstance(name, set):
+            name = list(name)
+
+        if isinstance(name, list):
+            name = "/".join(name)
+
+        return getattr(obj, name)
+
+    @staticmethod
     def insert(l: list, index: int, value: str):
         return l[:index] + str(value) + l[index:]
 

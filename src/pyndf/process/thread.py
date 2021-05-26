@@ -54,7 +54,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
             progress=self.progress,
             log_level=self.log_level,
         )
-        return records, CONST.STATUS.OK.name
+        return records, CONST.STATUS.OK
 
     @log_time
     def read_csv(self, records):
@@ -67,7 +67,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
         for matricule, record in records.items():
             if matricule and int(matricule) in records_csv:
                 record["montant_total"] = records_csv[int(matricule)]
-        return records, CONST.STATUS.OK.name
+        return records, CONST.STATUS.OK
 
     @log_time
     def run_api(self, records):
@@ -85,7 +85,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
                 (result, status), time_spend = api.run(client, employee, use_db=self.use_db, use_cache=self.use_cache)
                 mission["status"] = status
 
-                total_status.add(status)
+                total_status.add(str(status))
 
                 if result is not None:
                     distance, _ = result
@@ -96,6 +96,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
                 self.signals.analysed.emit(
                     Items(
                         CONST.TYPE.API,
+                        record["matricule"],
                         mission["adresse_client"],
                         record["adresse_intervenant"],
                         distance,
@@ -112,14 +113,14 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
                 if client:
                     mission_record["client"] = client.name
                     mission_record["adresse_client"] = client.address.replace(",", " ")
-                    mission_record["status"] = CONST.STATUS.DB.name
+                    mission_record["status"] = CONST.STATUS.DB
 
                     if mission_record["client"] not in [mission["client"] for mission in record["missions"]]:
                         record["missions"].append(mission_record)
 
             self.progress.send(msg=self.tr("Get distance from Google API/DB/cache"))
 
-        total_status = "/".join(list(total_status))
+        total_status = Utils.getattr(CONST.STATUS, total_status)
         return records, total_status
 
     @log_time
@@ -138,19 +139,20 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
         for record in records.values():
             (filename, status), time_spend = writer.write(record, filename=record)
 
-            total_status.add(status)
+            total_status.add(str(status))
 
             self.progress.send(msg=self.tr("Generate PDF files"))
             self.signals.analysed.emit(
                 Items(
                     CONST.TYPE.PDF,
+                    record["matricule"],
                     filename,
                     len(record["missions"]),
                     status,
                     time_spend,
                 )
             )
-        total_status = "/".join(list(total_status))
+        total_status = Utils.getattr(CONST.STATUS, total_status)
         return total_status
 
     @QtCore.pyqtSlot()

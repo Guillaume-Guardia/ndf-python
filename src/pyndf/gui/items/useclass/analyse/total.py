@@ -8,7 +8,6 @@ class TotalItem(AbstractItem):
     """Class for storing data for analyse."""
 
     type = CONST.TYPE.TOT
-    headers = ["status", "time"]
     vheaders = ["total"]
 
     def __init__(self, status, time):

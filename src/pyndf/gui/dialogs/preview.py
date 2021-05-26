@@ -7,12 +7,13 @@ from pyndf.constants import CONST
 
 
 class PreviewDialog(QtWidgets.QDialog):
-    def __init__(self, table, row):
+    def __init__(self, table, col, row):
         super().__init__(table.tab.window)
         self.table = table
         self.row = row
         self.window = table.tab.window
         self.buttons = {}
+        self.col = col
 
         self.setWindowFlag(QtCore.Qt.WindowType.WindowMinMaxButtonsHint, True)
         self.setWindowTitle(self.tr("PDF file viewer"))
@@ -46,9 +47,8 @@ class PreviewDialog(QtWidgets.QDialog):
 
     def get_paths(self, row):
         self.row = row
-        filename = self.table.item(row, 0).text()
-        path = os.path.join(self.window.output, filename + CONST.EXT.PDF)
-        png_paths = Reader(path, self.window, log_level=self.window.log_level)
+        filename = self.table.item(row, self.col).text()
+        png_paths = Reader(filename, self.window, log_level=self.window.log_level)
 
         return png_paths
 

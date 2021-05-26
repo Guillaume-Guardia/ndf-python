@@ -22,7 +22,7 @@ class TestDistanceMatrixAPI(unittest.TestCase):
         ((distance, duration), status), time_spend = self.api.run(origin, destination, use_db=False)
 
         # Check status
-        self.assertEqual(status, CONST.STATUS.API.name)
+        self.assertEqual(status, CONST.STATUS.API)
         self.assertEqual(round(distance, 1), 2.1)
         self.assertEqual(round(duration / 60), 4)
 

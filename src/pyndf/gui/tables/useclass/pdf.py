@@ -10,8 +10,6 @@ class PdfTable(AnalyseTable):
         super().finished()
 
     def on_filename_clicked(self, row, col):
-        if col != 0:
-            return
-
-        dialog = PreviewDialog(self, row)
-        dialog.exec()
+        if self.custom_item.headers[col] == "filename":
+            dialog = PreviewDialog(self, col, row)
+            dialog.exec()

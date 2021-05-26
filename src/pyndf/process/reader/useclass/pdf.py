@@ -23,6 +23,7 @@ class PdfReader(AbstractReader):
         with fitz.Document(filename) as doc:
             paths = []
             for page in doc:  # iterate through the pages
-                paths.append(writer.write(page, filename))
+                (filename, status), time_spend = writer.write(page, filename)
+                paths.append(filename)
 
         return paths

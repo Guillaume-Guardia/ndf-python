@@ -34,7 +34,7 @@ class TestPdfWriter(unittest.TestCase):
                     "total": 64.8,
                     "nbrkm_mois": 92.85600000000001,
                     "forfait": 0.697854742827604,
-                    "status": CONST.STATUS.OK.name,
+                    "status": CONST.STATUS.OK,
                 },
                 {
                     "client": "BREST 2",
@@ -45,7 +45,7 @@ class TestPdfWriter(unittest.TestCase):
                     "total": 80,
                     "nbrkm_mois": 85,
                     "forfait": 0.35,
-                    "status": CONST.STATUS.OK.name,
+                    "status": CONST.STATUS.OK,
                 },
             ],
         }
