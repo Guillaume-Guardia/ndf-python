@@ -27,19 +27,22 @@ class CSVReader(AbstractReader):
         if progress:
             progress.set_maximum(len(dataframe.to_dict("records")))
 
+        regex = re.compile(CONST.FILE.YAML[CONST.TYPE.CSV]["montant"] + ".*")
+
         for record in dataframe.to_dict("records"):
             if analyse_callback:
-                analyse_callback(Items(self.type, *list(record.values())))
+                analyse_callback(Items(self.type, *list(record.values()), columns=dataframe.columns))
                 continue
 
             matricule = record[CONST.FILE.YAML[CONST.TYPE.CSV]["matricule"]]
             total = 0
 
-            for i in range(1, 4):
-                montant = Utils.type(record[CONST.FILE.YAML[CONST.TYPE.CSV][f"montant{i}"]], decimal=",")
+            for column in list(dataframe.columns):
+                if regex.match(column):
+                    montant = Utils.type(record[column], decimal=",")
 
-                if isinstance(montant, (int, float)):
-                    total += montant
+                    if isinstance(montant, (int, float)):
+                        total += montant
             records[matricule] = round(total, 2)
 
             if progress:

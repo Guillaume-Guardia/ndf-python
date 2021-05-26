@@ -31,7 +31,7 @@ class ExcelReader(AbstractReader):
 
         for record in dataframe.to_dict("records"):
             if analyse_callback:
-                analyse_callback(Items(self.type, *list(record.values())))
+                analyse_callback(Items(self.type, *list(record.values()), columns=dataframe.columns))
                 continue
 
             if reg.match(str(record[CONST.FILE.YAML[CONST.TYPE.EXC]["libelle"]])) is None:

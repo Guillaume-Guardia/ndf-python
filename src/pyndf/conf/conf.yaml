@@ -51,6 +51,7 @@ csv:
   matricule: Matricule
   nom: Nom
   prenom: 'Prénom'
+  montant: "Montant salarial Ind. Déplac."
   quantite1: 'Nombre Ind. Déplac. 82000'
   montant1: 'Montant salarial Ind. Déplac. 82000'
   quantite2: 'Nombre Ind. Déplac. 83250'

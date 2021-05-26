@@ -12,17 +12,21 @@ class AbstractItem(QtCore.QObject):
     font_weight = QtGui.QFont.Weight.Bold
     headers = []
 
-    def __init__(self, *args):
+    def __init__(self, *args, columns=None):
         """Initialisation"""
         super().__init__()
+        if columns is not None:
+            self.headers = list(columns)
 
         for index, arg in enumerate(args):
-            try:
-                setattr(self, self.headers[index], arg)
-            except Exception:
-                pass
+            setattr(self, self.headers[index], arg)
+
+        self.counter = len(args)
 
     def __setattr__(self, name: str, value) -> None:
+        if isinstance(value, list) or name == "counter":
+            return super().__setattr__(name, value)
+
         if name == "time":
             value = round(value, 4)
         elif isinstance(value, float):
