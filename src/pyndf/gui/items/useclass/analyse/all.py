@@ -8,6 +8,7 @@ class AllItem(AbstractItem):
     """Class for storing data for analyse."""
 
     type = CONST.TYPE.ALL
+    headers = ["name", "status", "time"]
 
     @classmethod
     def headers_pretty(cls):

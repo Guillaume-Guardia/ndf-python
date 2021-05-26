@@ -17,8 +17,6 @@ class AbstractItem(QtCore.QObject):
         super().__init__()
         if columns is not None:
             self.headers = list(columns)
-        else:
-            self.headers = getattr(CONST.TABLE, self.type[:3].upper())
 
         for index, arg in enumerate(args):
             setattr(self, self.headers[index], arg)

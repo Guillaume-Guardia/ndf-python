@@ -38,6 +38,8 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.threadpool = QtCore.QThreadPool()
 
         # Tabs
+        self.controller_tab = QtWidgets.QTabWidget()
+        self.setCentralWidget(self.controller_tab)
         self.tabs = {}
         self._create_tabs()
 
@@ -52,8 +54,8 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.tabs[CONST.TYPE.PRO].texts[name].setText(path)
 
     def toggled_tab(self, tab, boolean):
-        widget = self.centralWidget()
-        widget.setTabVisible(widget.indexOf(tab), boolean)
+        index = self.controller_tab.indexOf(tab)
+        self.controller_tab.setTabVisible(index, boolean)
 
     def change_language(self, language):
         self.app.language = language
@@ -63,11 +65,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.deleteLater()
 
     def _create_tabs(self):
-        widget = QtWidgets.QTabWidget()
-        self.setCentralWidget(widget)
-
         # Analyse tabs
-        self.tabs = {}
         info_dict = {
             CONST.TYPE.EXC: self.tr("EXCEL"),
             CONST.TYPE.CSV: self.tr("CSV"),
@@ -78,15 +76,14 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         for index, (key, title) in enumerate(info_dict.items()):
             self.tabs[key] = AnalyseTab(self, title, Items(key))
-            index = widget.insertTab(index + 1, self.tabs[key], title)
-            widget.setTabVisible(index, False)
+            index = self.controller_tab.insertTab(index + 1, self.tabs[key], title)
+            self.controller_tab.setTabVisible(index, False)
 
         # Process tab
         title = self.tr("Process")
         self.tabs[CONST.TYPE.PRO] = ProcessTab(self, title, excel=self.excel, csv=self.csv, output=self.output)
-        widget.insertTab(0, self.tabs[CONST.TYPE.PRO], title)
-
-        widget.setCurrentIndex(0)
+        self.controller_tab.insertTab(0, self.tabs[CONST.TYPE.PRO], title)
+        self.controller_tab.setCurrentIndex(0)
 
     def _create_status_bar(self):
         self.progress.hide()
@@ -119,13 +116,16 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(object)
     def analysed(self, obj):
+        index = self.controller_tab.indexOf(self.tabs[obj.type])
+        if self.controller_tab.currentIndex != index:
+            self.controller_tab.setCurrentIndex(index)
         self.tabs[obj.type].table.add(obj)
 
     @QtCore.pyqtSlot(float, str)
     def progressed(self, value, text):
         if value <= 100:
             self.progress.setValue(int(value))
-            self.statusBar().showMessage(text, 1000)
+            self.statusBar().showMessage(text, 3000)
 
     # End methods
     def tear_down(self):

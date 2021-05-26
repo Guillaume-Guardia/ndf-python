@@ -14,6 +14,6 @@ class Reader(Factory):
         for reader in cls.class_list:
             if reader.can_read(filename):
                 instance = reader.__new__(reader, log_level=log_level)
-                instance.__init__()
+                instance.__init__(log_level=log_level)
                 return instance.read(filename, *args, **kwargs)
         return instance

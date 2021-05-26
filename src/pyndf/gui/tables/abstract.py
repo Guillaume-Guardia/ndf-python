@@ -46,6 +46,7 @@ class AbstractTable(QtWidgets.QTableWidget):
 
         for index, (name, widget) in enumerate(obj):
             self.setItem(row, index, widget)
+        return widget
 
     def finished(self):
         self.tab.window.toggled_tab(self.tab, True)

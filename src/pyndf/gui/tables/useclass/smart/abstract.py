@@ -12,7 +12,7 @@ class AbstractSmartTable(AbstractTable):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.writer = Writer(self.type, directory=self.tab.window.app.temp_dir)
+        self.writer = Writer(self.type, directory=self.tab.window.app.temp_dir, log_level=self.tab.window.log_level)
 
         self.itemChanged.connect(self.on_item_changed)
 

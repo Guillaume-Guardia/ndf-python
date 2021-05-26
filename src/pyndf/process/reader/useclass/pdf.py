@@ -13,11 +13,11 @@ class PdfReader(AbstractReader):
     type = CONST.TYPE.PDF
     regex = re.compile(".*[.]pdf")
 
-    def read(self, filename=None, window=None):
+    def read(self, filename=None, window=None, ratio=None):
         if self.check_path(filename) is False:
             return
 
-        writer = Writer(CONST.TYPE.PNG, directory=window.app.temp_dir)
+        writer = Writer(CONST.TYPE.PNG, ratio=ratio, directory=window.app.temp_dir, log_level=window.log_level)
 
         # read pdf
         with fitz.Document(filename) as doc:

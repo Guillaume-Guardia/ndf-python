@@ -19,7 +19,10 @@ class AnalyseTable(AbstractTable):
 
     def add(self, obj):
         self.time += float(obj.time.text())
-        super().add(obj)
+
+        last_item = super().add(obj)
+        if not CONST.OPTI:
+            self.scrollToItem(last_item)
 
     def finished(self):
         row = self.add_row()

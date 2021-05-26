@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 from pyndf.process.reader.factory import Reader
 from pyndf.qtlib import QtWidgets, QtGui, QtCore
 from pyndf.constants import CONST
@@ -14,10 +13,13 @@ class PreviewDialog(QtWidgets.QDialog):
         self.window = table.tab.window
         self.buttons = {}
         self.col = col
+        self.ratio = 3
 
         self.setWindowFlag(QtCore.Qt.WindowType.WindowMinMaxButtonsHint, True)
         self.setWindowTitle(self.tr("PDF file viewer"))
         self.setSizeGripEnabled(True)
+        self.setMinimumWidth(700)
+        self.setMinimumHeight(700)
 
         self.render(row)
 
@@ -31,6 +33,7 @@ class PreviewDialog(QtWidgets.QDialog):
 
             while layout.takeAt(0):
                 child = layout.takeAt(0)
+                child.deleteLater()
                 del child
         else:
             layout = QtWidgets.QVBoxLayout()
@@ -48,7 +51,7 @@ class PreviewDialog(QtWidgets.QDialog):
     def get_paths(self, row):
         self.row = row
         filename = self.table.item(row, self.col).text()
-        png_paths = Reader(filename, self.window, log_level=self.window.log_level)
+        png_paths = Reader(filename, self.window, ratio=self.ratio, log_level=self.window.log_level)
 
         return png_paths
 
@@ -69,31 +72,31 @@ class PreviewDialog(QtWidgets.QDialog):
         return layout
 
     def create_area(self, paths):
-        widget = QtWidgets.QWidget()
-        widget.setLayout(PreviewDialog.create_layout(paths))
-        widget.adjustSize()
-        self.setMinimumWidth(widget.width())
-        self.setMinimumHeight(widget.height())
-
         scroll_area = QtWidgets.QScrollArea()
+        widget = QtWidgets.QWidget()
+        widget.setLayout(self.create_layout(paths))
         scroll_area.setWidget(widget)
+        scroll_area.setWidgetResizable(True)
         return scroll_area
 
-    @staticmethod
-    def create_layout(paths):
+    def create_layout(self, paths):
         layout = QtWidgets.QHBoxLayout()
-
         layout.addStretch()
         for path in paths:
-            widget = PreviewDialog.create_widget(path)
-            layout.addWidget(widget)
+            layout.addWidget(self.set_widget(path))
         layout.addStretch()
         return layout
 
-    @staticmethod
-    def create_widget(path):
-        widget = QtWidgets.QLabel()
-        pix = QtGui.QPixmap(path)
-        widget.setPixmap(pix)
-        widget.adjustSize()
-        return widget
+    def set_widget(self, path=None):
+        if path is not None:
+            self.widget = QtWidgets.QLabel()
+            self.pix = QtGui.QPixmap(path)
+        self.pix.setDevicePixelRatio(self.ratio)
+        self.widget.setPixmap(self.pix)
+        return self.widget
+
+    def wheelEvent(self, event):
+        self.ratio += event.angleDelta().y() / 360
+
+        if event.modifiers() & QtCore.Qt.KeyboardModifier.ControlModifier:
+            self.set_widget()

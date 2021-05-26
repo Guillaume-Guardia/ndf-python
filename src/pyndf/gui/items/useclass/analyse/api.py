@@ -9,6 +9,7 @@ class ApiItem(AbstractItem):
     """Class for storing data for analyse."""
 
     type = CONST.TYPE.API
+    headers = ["matricule", "addr_client", "addr_employee", "distance", "status", "time"]
 
     @classmethod
     def headers_pretty(cls):

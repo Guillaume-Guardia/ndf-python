@@ -93,9 +93,8 @@ class MainMenu(QtWidgets.QMenuBar):
     def create_action_views(self, menu, tab):
         action = QtGui.QAction(tab.title, menu)
         action.setCheckable(True)
-        widget = self.window.centralWidget()
         action.toggled.connect(lambda boolean, tab_=tab: self.window.toggled_tab(tab_, boolean))
-        action.setChecked(widget.isTabVisible(widget.indexOf(tab)))
+        action.setChecked(self.window.controller_tab.isTabVisible(self.window.controller_tab.indexOf(tab)))
         menu.addAction(action)
 
     def create_help_menu(self):

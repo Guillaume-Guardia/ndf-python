@@ -49,7 +49,7 @@ class DistanceMatrixAPI(Logger):
         return ""
 
     @log_time
-    def run(self, client, employee, use_db=True, use_cache=True):
+    def run(self, client, employee, use_db=True, use_cache=True, use_api=True):
         """Start the process google matrix api.
 
         Args:
@@ -86,6 +86,9 @@ class DistanceMatrixAPI(Logger):
 
                     self.log.debug(f"Status: {CONST.STATUS.DB} || Result: {(measure.distance, measure.duration)}")
                     return (measure.distance, measure.duration), CONST.STATUS.DB
+
+        if not use_api:
+            return None, CONST.STATUS.NO_USE_API
 
         dict_params = dict(
             origins=client_address,

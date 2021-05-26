@@ -13,6 +13,7 @@ class CONST:
     TITLE_APP = "PYNDF"
     COMPANY = "APSIDE"
     VERSION = "1.0"
+    OPTI = True
 
     class FILE:
         """All important file"""
@@ -203,9 +204,3 @@ class CONST:
             COL_MISSION = ["client", "periode", "addresse_client", "nbrkm_mois", "taux", "plafond", "total"]
 
             UNKNOWN = "Inconnu"
-
-    class TABLE:
-        API = ["matricule", "addr_client", "addr_employee", "distance", "status", "time"]
-        ALL = ["name", "status", "time"]
-        PDF = ["matricule", "filename", "nbr_missions", "status", "time"]
-        TOT = ["status", "time"]
