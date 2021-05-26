@@ -17,7 +17,10 @@ class AbstractItem(QtCore.QObject):
         super().__init__()
 
         for index, arg in enumerate(args):
-            setattr(self, self.headers[index], arg)
+            try:
+                setattr(self, self.headers[index], arg)
+            except Exception:
+                pass
 
     def __setattr__(self, name: str, value) -> None:
         if name == "time":
