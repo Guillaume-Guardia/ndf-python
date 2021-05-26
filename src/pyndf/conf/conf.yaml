@@ -38,11 +38,6 @@ excel:
   adresse_client: "Adresse\nClient"
   adresse_intervenant: "Adresse\nIntervenant"
   responsable: Responsable
-  analytique_1: Analytique 1
-  analytique_2: Analytique 2
-  analytique_3: Analytique 3
-  analytique_4: Analytique 4
-  analytique_5: Analytique 5
 
 # CSV colonnes
 csv:
@@ -52,12 +47,6 @@ csv:
   nom: Nom
   prenom: 'Prénom'
   montant: "Montant salarial Ind. Déplac."
-  quantite1: 'Nombre Ind. Déplac. 82000'
-  montant1: 'Montant salarial Ind. Déplac. 82000'
-  quantite2: 'Nombre Ind. Déplac. 83250'
-  montant2: 'Montant salarial Ind. Déplac. 83250'
-  quantite3: 'Nombre Ind. Déplac. 83000'
-  montant3: 'Montant salarial Ind. Déplac. 83000'
   date_depart: 'Date départ'
 
 # PDF libellé

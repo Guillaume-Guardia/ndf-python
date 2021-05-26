@@ -4,8 +4,8 @@
 class Utils:
     @staticmethod
     def type(value: str, decimal: str = "."):
-        value = value.replace(decimal, ".")
         try:
+            value = value.replace(decimal, ".")
             if value.lower() == "true":
                 return True
 
