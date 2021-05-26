@@ -20,6 +20,8 @@ class Utils:
             return float_value
         except ValueError:
             return value
+        except AttributeError:
+            return value
 
     @staticmethod
     def insert(l: list, index: int, value: str):
