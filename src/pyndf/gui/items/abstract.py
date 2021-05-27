@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from pyndf.qtlib import QtWidgets, QtGui, QtCore
+from pyndf.constants import CONST
 
 
 class AbstractItem(QtCore.QObject):
@@ -11,9 +12,11 @@ class AbstractItem(QtCore.QObject):
     font_weight = QtGui.QFont.Weight.Bold
     headers = []
 
-    def __init__(self, *args, columns=None):
+    def __init__(self, *args, columns=None, colored=False):
         """Initialisation"""
         super().__init__()
+        self.colored = colored
+
         if columns is not None:
             self.headers = list(columns)
 
@@ -23,7 +26,7 @@ class AbstractItem(QtCore.QObject):
         self.counter = len(args)
 
     def __setattr__(self, name: str, value) -> None:
-        if isinstance(value, list) or name == "counter":
+        if isinstance(value, list) or name in ("counter", "colored"):
             return super().__setattr__(name, value)
 
         if name == "time":
@@ -44,6 +47,9 @@ class AbstractItem(QtCore.QObject):
         if name == "status":
             widget.setFont(QtGui.QFont(self.font, self.font_size, self.font_weight))
             widget.setForeground(QtGui.QColor(value.color))
+
+        if self.colored:
+            widget.setBackground(QtGui.QColor(CONST.WRITER.PDF.COLOR))
         super().__setattr__(name, widget)
 
     def __iter__(self):

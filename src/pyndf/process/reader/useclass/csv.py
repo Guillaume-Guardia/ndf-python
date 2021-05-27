@@ -13,8 +13,9 @@ class CsvReader(AbstractReader):
 
     type = CONST.TYPE.CSV
     regex = re.compile(".*[.][cC][sS][vV]")
+    record_regex = re.compile("Montant salarial.*")
 
-    def read(self, filename=None, progress=None, analyse_callback=None):
+    def read(self, filename=None, progress=None, analyse=None):
         if self.check_path(filename) is False:
             return
 
@@ -27,25 +28,28 @@ class CsvReader(AbstractReader):
         if progress:
             progress.set_maximum(len(dataframe.to_dict("records")))
 
-        regex = re.compile(CONST.FILE.YAML[CONST.TYPE.CSV]["montant"] + ".*")
-
         for record in dataframe.to_dict("records"):
-            if analyse_callback:
-                analyse_callback(
-                    Items(self.type, *list([Utils.type(r) for r in record.values()]), columns=dataframe.columns)
-                )
-                continue
-
             matricule = record[CONST.FILE.YAML[CONST.TYPE.CSV]["matricule"]]
             total = 0
 
             for column in list(dataframe.columns):
-                if regex.match(column):
+                if self.record_regex.match(column):
                     montant = Utils.type(record[column], decimal=",")
 
                     if isinstance(montant, (int, float)):
                         total += montant
             records[matricule] = round(total, 2)
+
+            if analyse:
+                analyse(
+                    Items(
+                        self.type,
+                        *list([Utils.type(r) for r in record.values()]),
+                        columns=dataframe.columns,
+                        colored=records[matricule] > 0,
+                    )
+                )
+                continue
 
             if progress:
                 progress.send(msg=self.tr("Load CSV file"))

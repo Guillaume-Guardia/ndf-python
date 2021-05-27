@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import re
 import unittest
 import tempfile
 import shutil
@@ -22,10 +21,12 @@ class TestCsvReader(unittest.TestCase):
         """Before all tests"""
         cls.directory = tempfile.mkdtemp()
         cls.headers = CONST.FILE.YAML[CONST.TYPE.CSV]
+
+        for i in range(10):
+            cls.headers[f"montant{i}"] = CONST.FILE.YAML[CONST.TYPE.CSV]["montant"] + str(i)
+
         cls.writer = Writer(CONST.TYPE.CSV, directory=cls.directory)
         cls.reader = CsvReader()
-
-        cls.regex = re.compile(CONST.FILE.YAML[CONST.TYPE.CSV]["montant"] + ".*")
 
     def setUp(self):
         """Before each test"""
@@ -37,17 +38,14 @@ class TestCsvReader(unittest.TestCase):
         self.filename = self.create_csv(filename)
 
     def create_csv(self, filename):
-        headers = list(self.headers.values())
-        for i in range(10):
-            headers.append(CONST.FILE.YAML[CONST.TYPE.CSV]["montant"] + str(i))
 
         data = defaultdict(list)
         for row in range(self.n_rows):
-            for header in headers:
-                if self.regex.match(header):
+            for header in self.headers.values():
+                if self.reader.record_regex.match(header):
                     value = row * 10
                 elif header == self.headers["matricule"]:
-                    value = row + 1
+                    value = row
                 else:
                     value = row, header
                 data[header].append(value)
@@ -76,10 +74,10 @@ class TestCsvReader(unittest.TestCase):
 
         for row in range(self.n_rows):
             value = 0
-            for header in self.headers:
-                if self.regex.match(header):
+            for header in self.headers.values():
+                if self.reader.record_regex.match(header):
                     value += row * 10
-            self.assertEqual(records[row + 1], value)
+            self.assertEqual(records[row], value)
 
     def tearDown(self):
         os.remove(self.filename)

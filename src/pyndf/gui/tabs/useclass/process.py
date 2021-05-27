@@ -58,7 +58,7 @@ class ProcessTab(AbstractTab):
             return
 
         self.window.tabs[name].table.init(clear=True)
-        Reader(filename, analyse_callback=self.window.tabs[name].table.add, log_level=self.window.log_level)
+        Reader(filename, analyse=self.window.tabs[name].table.add, log_level=self.window.log_level)
         self.window.tabs[name].table.finished()
 
     def add_button(self, name_env, name, _format=None, default=""):
