@@ -201,7 +201,7 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
 
     def create_filename(self, data):
         matricule = data.get("matricule", CONST.WRITER.PDF.UNKNOWN)
-        self.log.debug(f"Create pdf for matricule {matricule} with {len(data['missions'])} missions.")
+        self.log.debug(f"Create pdf for matricule {matricule} with {len(data.get('missions', []))} missions.")
         return f"{data.get('agence', CONST.WRITER.PDF.UNKNOWN)}_{matricule}_{self.date.strftime('%Y%m')}"
 
     def _write(self, data, path):

@@ -4,7 +4,6 @@ import os
 import unittest
 import tempfile
 import shutil
-import pandas as pd
 from collections import defaultdict
 from pyndf.process.reader.factory import Reader
 from pyndf.process.writer.factory import Writer

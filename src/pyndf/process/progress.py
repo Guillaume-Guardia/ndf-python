@@ -12,12 +12,12 @@ class Progress:
         self.local_max = local_max
         self.local_value = 0
 
-    def add_duration(self, duration):
+    def add_duration(self, duration, local_max=100):
         self.global_min = self.global_max
         self.global_max += duration
 
         self.local_min = 0
-        self.local_max = 100
+        self.local_max = local_max
         self.local_value = 0
 
     @property

@@ -16,15 +16,9 @@ class TestProgress(unittest.TestCase):
         pass
 
     def test_status_getattr(self):
-        Utils.getattr(CONST.STATUS, ["hh"])
+        status = Utils.getattr(CONST.STATUS, ["hh"])
 
-    def test_property_for_class(self):
-        class test:
-            @property
-            def test_(self):
-                return "test"
-
-        print(test.test_)
+        self.assertEqual(status, CONST.STATUS.hh)
 
     def tearDown(self):
         pass

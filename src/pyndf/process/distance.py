@@ -8,6 +8,7 @@ from pyndf.db.session import db
 from pyndf.db.client import Client
 from pyndf.db.employee import Employee
 from pyndf.db.measure import Measure
+from pyndf.utils import Utils
 
 
 class DistanceMatrixAPI(Logger):
@@ -29,9 +30,11 @@ class DistanceMatrixAPI(Logger):
         self.log.info("Get distance with API or DB or cache from Excel file")
 
     @staticmethod
-    def format_address(addr):
+    def format_address(addr: str) -> str:
         """Formatter of addresses. Each address is returned like:
-        - ROAD, ZIPCODE, CITY
+        - ROAD,ZIPCODE,CITY if match
+        else:
+            return the raw address
 
         Args:
             addr (string): addresse to format
@@ -39,14 +42,15 @@ class DistanceMatrixAPI(Logger):
         Returns:
             string: formatted addresse or "" if no match with the regex.
         """
-        reg = re.compile(r"(?P<road>^.*)(?P<zipcode> \d{5})(?P<city>.*$)")
+        addr = Utils.pretty_join(addr)
+        reg = re.compile(r"(?P<road>^.*)(?P<zipcode> \d{5} )(?P<city>.*$)")
         match = reg.match(addr)
         if match is not None:
-            road = match.groupdict()["road"].strip()
+            road = match.groupdict()["road"]
             code = match.groupdict()["zipcode"].strip()
-            city = match.groupdict()["city"].strip().upper()
+            city = match.groupdict()["city"].upper()
             return ",".join([road, code, city])
-        return ""
+        return addr
 
     @log_time
     def run(self, client, employee, use_db=True, use_cache=True, use_api=True):
@@ -124,22 +128,29 @@ class DistanceMatrixAPI(Logger):
 
         # Add in DB
         if use_db:
-            self.add_result_in_db(client_name, client_address, employee_matricule, employee_address, distance, duration)
+            DistanceMatrixAPI.add_result_in_db(
+                client_name, client_address, employee_matricule, employee_address, distance, duration, log=self.log
+            )
 
         self.log.debug(f"Status: {CONST.STATUS.API} || Result: {(distance, duration)}")
         return (distance, duration), CONST.STATUS.API
 
-    def add_result_in_db(self, client_name, client_address, employee_matricule, employee_address, distance, duration):
+    @staticmethod
+    def add_result_in_db(
+        client_name, client_address, employee_matricule, employee_address, distance, duration, log=None
+    ):
         with db.session_scope() as session:
             # Check if client or employee exists
             new_client = Client(name=client_name, address=client_address)
             if session.query(Client).filter(Client.address == client_address).first() is None:
-                self.log.debug(f"Add new client {new_client}")
+                if log:
+                    log.debug(f"Add new client {new_client}")
                 session.add(new_client)
 
             new_employee = Employee(matricule=employee_matricule, address=employee_address)
             if session.query(Employee).filter(Employee.address == employee_address).first() is None:
-                self.log.debug(f"Add new employee {new_employee}")
+                if log:
+                    log.debug(f"Add new employee {new_employee}")
                 session.add(new_employee)
 
             session.flush()
@@ -157,5 +168,6 @@ class DistanceMatrixAPI(Logger):
                 distance=distance,
                 duration=duration,
             )
-            self.log.debug(f"Add new measure {new_measure}")
+            if log:
+                log.debug(f"Add new measure {new_measure}")
             session.add(new_measure)

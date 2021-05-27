@@ -48,7 +48,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
 
     @log_time
     def excel_read(self):
-        self.progress.add_duration(10)
+        self.progress.add_duration(5)
         records = Reader(
             self.excel_file,
             progress=self.progress,
@@ -58,7 +58,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
 
     @log_time
     def read_csv(self, records):
-        self.progress.add_duration(10)
+        self.progress.add_duration(5)
         records_csv = Reader(
             self.csv_file,
             progress=self.progress,
@@ -71,8 +71,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
 
     @log_time
     def run_api(self, records):
-        self.progress.add_duration(40)
-        self.progress.set_maximum(len(records))
+        self.progress.add_duration(45, len(records))
 
         api = DistanceMatrixAPI(log_level=self.log_level)
         total_status = set()
@@ -125,8 +124,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
 
     @log_time
     def create_pdf(self, records):
-        self.progress.add_duration(40)
-        self.progress.set_maximum(len(records))
+        self.progress.add_duration(40, len(records))
 
         # Get writer
         date = os.path.basename(self.excel_file).split(".")[0].split("_")[1]

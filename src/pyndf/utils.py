@@ -37,6 +37,10 @@ class Utils:
     def insert(l: list, index: int, value: str):
         return l[:index] + str(value) + l[index:]
 
+    @staticmethod
+    def pretty_join(string: str):
+        return " ".join(string.split())
+
 
 class Factory:
     def __new__(cls, type_, *args, **kwargs):

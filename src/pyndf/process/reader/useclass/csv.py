@@ -8,7 +8,7 @@ from pyndf.process.reader.abstract import AbstractReader
 from pyndf.utils import Utils
 
 
-class CSVReader(AbstractReader):
+class CsvReader(AbstractReader):
     """Class for reading csv file."""
 
     type = CONST.TYPE.CSV

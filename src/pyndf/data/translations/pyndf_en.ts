@@ -55,7 +55,7 @@
     </message>
 </context>
 <context>
-    <name>CSVReader</name>
+    <name>CsvReader</name>
     <message>
         <location filename="../../process/reader/useclass/csv.py" line="46"/>
         <source>Load CSV file</source>
