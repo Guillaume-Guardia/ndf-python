@@ -31,7 +31,9 @@ class CsvReader(AbstractReader):
 
         for record in dataframe.to_dict("records"):
             if analyse_callback:
-                analyse_callback(Items(self.type, *list(record.values()), columns=dataframe.columns))
+                analyse_callback(
+                    Items(self.type, *list([Utils.type(r) for r in record.values()]), columns=dataframe.columns)
+                )
                 continue
 
             matricule = record[CONST.FILE.YAML[CONST.TYPE.CSV]["matricule"]]

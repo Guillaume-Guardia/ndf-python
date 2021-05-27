@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from pyndf.qtlib import QtWidgets, QtGui, QtCore
-from pyndf.constants import CONST
 
 
 class AbstractItem(QtCore.QObject):
@@ -28,11 +27,16 @@ class AbstractItem(QtCore.QObject):
             return super().__setattr__(name, value)
 
         if name == "time":
-            value = round(value, 4)
+            edit_value = round(value, 4)
         elif isinstance(value, float):
-            value = round(value, 2)
+            edit_value = round(value, 2)
+        elif name == "status":
+            edit_value = str(value)
+        else:
+            edit_value = value
 
-        widget = QtWidgets.QTableWidgetItem(str(value))
+        widget = QtWidgets.QTableWidgetItem()
+        widget.setData(QtCore.Qt.ItemDataRole.EditRole, edit_value)
 
         if name == "status" or isinstance(value, (int, float)):
             widget.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)

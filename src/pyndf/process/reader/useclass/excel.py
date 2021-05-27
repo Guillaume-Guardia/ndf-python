@@ -6,6 +6,7 @@ import pandas as pd
 from pyndf.gui.items.factory import Items
 from pyndf.constants import CONST
 from pyndf.process.reader.abstract import AbstractReader
+from pyndf.utils import Utils
 
 
 class ExcelReader(AbstractReader):
@@ -23,14 +24,16 @@ class ExcelReader(AbstractReader):
         records = defaultdict(dict)
 
         # Get the data on excel file in dataframe format.
-        dataframe = pd.read_excel(filename, sheet_name=sheet_name, na_filter=False, dtype={"matricule": str})
+        dataframe = pd.read_excel(filename, sheet_name=sheet_name, na_filter=False)
 
         if progress:
             progress.set_maximum(len(dataframe.to_dict("records")))
 
         for record in dataframe.to_dict("records"):
             if analyse_callback:
-                analyse_callback(Items(self.type, *list(record.values()), columns=dataframe.columns))
+                analyse_callback(
+                    Items(self.type, *list([Utils.type(r) for r in record.values()]), columns=dataframe.columns)
+                )
                 continue
 
             if self.record_regex.match(str(record[CONST.FILE.YAML[CONST.TYPE.EXC]["libelle"]])) is None:
