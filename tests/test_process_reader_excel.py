@@ -37,7 +37,7 @@ class TestExcelReader(unittest.TestCase):
                 if oneperson is not None and header == self.dico["matricule"]:
                     value = oneperson
                 elif header == self.dico["libelle"]:
-                    value = "INDEMNITE"
+                    value = "DEPLACEMENT"
                 else:
                     value = f"{row} {header}"
 
