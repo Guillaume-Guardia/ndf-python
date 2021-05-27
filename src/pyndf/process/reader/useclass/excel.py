@@ -13,6 +13,7 @@ class ExcelReader(AbstractReader):
 
     type = CONST.TYPE.EXC
     regex = re.compile(".*[.][xX][lL]*")
+    record_regex = re.compile(".*DEPLACEMENT.*")
 
     def read(self, filename=None, sheet_name=0, progress=None, analyse_callback=None):
         if self.check_path(filename) is False:
@@ -27,14 +28,12 @@ class ExcelReader(AbstractReader):
         if progress:
             progress.set_maximum(len(dataframe.to_dict("records")))
 
-        reg = re.compile("INDEMNITE.*")
-
         for record in dataframe.to_dict("records"):
             if analyse_callback:
                 analyse_callback(Items(self.type, *list(record.values()), columns=dataframe.columns))
                 continue
 
-            if reg.match(str(record[CONST.FILE.YAML[CONST.TYPE.EXC]["libelle"]])) is None:
+            if self.record_regex.match(str(record[CONST.FILE.YAML[CONST.TYPE.EXC]["libelle"]])) is None:
                 continue
 
             matricule = record[CONST.FILE.YAML[CONST.TYPE.EXC]["matricule"]]

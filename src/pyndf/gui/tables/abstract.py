@@ -12,7 +12,6 @@ class AbstractTable(QtWidgets.QTableWidget):
         super().__init__(tab)
         self.tab = tab
         self.custom_item = item
-
         self.set_horizontal_headers()
 
     def set_horizontal_headers(self, headers=None):
@@ -43,6 +42,7 @@ class AbstractTable(QtWidgets.QTableWidget):
 
         if self.columnCount() != obj.counter:
             self.set_horizontal_headers(obj.headers)
+            self.custom_item.headers = obj.headers
 
         for index, (name, widget) in enumerate(obj):
             self.setItem(row, index, widget)
