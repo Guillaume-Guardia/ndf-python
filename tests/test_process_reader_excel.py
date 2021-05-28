@@ -50,7 +50,7 @@ class TestExcelReader(unittest.TestCase):
     def test_read(self):
         oneperson = "ALBERT"
         self.filename = self.create_xl(self.filename, oneperson=oneperson)
-        records = Reader(self.filename)
+        records, status = Reader(self.filename)
 
         # Check the dict info
         # 1 person with matricule ALBERT and 10 missions
@@ -60,7 +60,7 @@ class TestExcelReader(unittest.TestCase):
     def test_read_big(self):
         oneperson = "ALBERT"
         self.filename = self.create_xl(self.filename, oneperson=oneperson, n_rows=1000)
-        records = Reader(self.filename)
+        records, status = Reader(self.filename)
 
         # Check the dict info
         self.assertEqual(len(records), 1)
@@ -68,7 +68,7 @@ class TestExcelReader(unittest.TestCase):
 
     def test_read_change_matricule(self):
         self.filename = self.create_xl(self.filename)
-        records = Reader(self.filename)
+        records, status = Reader(self.filename)
 
         # Check the dict info
         self.assertEqual(len(records), 10)

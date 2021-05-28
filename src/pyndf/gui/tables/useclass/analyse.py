@@ -28,10 +28,11 @@ class AnalyseTable(AbstractTable):
         row = self.add_row()
 
         # Check all status
-        total_status = []
+        total_status = set()
         for r in range(self.rowCount() - 1):
-            status = self.item(r, self.custom_item.headers.index("status"))
-            total_status.append(status.text())
+            status = self.item(r, self.custom_item.headers.index("status")).text()
+            if status:
+                total_status.add(status)
         total_item = Items(CONST.TYPE.TOT, Utils.getattr(CONST.STATUS, total_status), self.time)
 
         # Set total at the end

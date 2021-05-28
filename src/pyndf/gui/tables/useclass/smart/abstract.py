@@ -37,6 +37,6 @@ class AbstractSmartTable(AbstractTable):
         if clear:
             super().init()
 
-    def finished(self):
+    def finished(self, *args):
         self.blockSignals(False)
-        super().finished()
+        super().finished(*args)

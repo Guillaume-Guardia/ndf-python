@@ -107,6 +107,8 @@ class CONST:
     class READER:
         """All constants links to reader."""
 
+        CAN_ADD_ALL_FILES = True
+
         class EXC:
             COL_PERSO = ["nom", "matricule", "societe", "agence", "agence_o", "adresse_intervenant"]
             COL_MISSION = [

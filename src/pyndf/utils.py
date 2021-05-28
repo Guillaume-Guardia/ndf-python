@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import re
+from datetime import datetime
+
 
 class Utils:
     @staticmethod
@@ -47,6 +50,16 @@ class Utils:
         if len(split) > 0:
             return split[0], split[1]
         return split
+
+    @staticmethod
+    def get_date_from_file(path: str):
+        regex = re.compile(r"^.*_(?P<date>\d{6}).*$")
+
+        match = regex.match(path)
+        if match is not None:
+            date = match.groupdict()["date"]
+            return datetime(year=int(date[:4]), month=int(date[4:6]), day=1)
+        return None
 
 
 class Factory:

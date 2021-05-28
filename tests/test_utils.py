@@ -29,6 +29,11 @@ class TestPath(unittest.TestCase):
         self.assertEqual(agence, "NORD 1")
         self.assertEqual(address, "100 rue Nationale 59000 LILLE")
 
+    def test_get_date_from_file(self):
+        path = "diuhzehzhoiezhz_150012yyezyuzgcyu"
+        result = Utils.get_date_from_file(path)
+        self.assertEqual(result.strftime("%Y%m"), "150012")
+
     def tearDown(self):
         pass
 

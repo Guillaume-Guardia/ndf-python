@@ -20,7 +20,7 @@ class ProcessTab(AbstractTab):
         # Explorer buttons
         self.add_button(CONST.TYPE.EXC, self.tr("EXCEL file"), "(*.xl* *.XLS)", default=excel)
         self.add_button(CONST.TYPE.CSV, self.tr("CSV file"), "(*.csv)", default=csv)
-        self.add_button(CONST.TYPE.OUT, self.tr("save directory"), default=output)
+        self.add_button(CONST.TYPE.OUT, self.tr("Save directory"), default=output)
 
         # Add grid layout
         grid_layout = QtWidgets.QGridLayout()
@@ -53,13 +53,20 @@ class ProcessTab(AbstractTab):
         if not os.path.exists(filename):
             setattr(self.window, name, "")
             self.texts[name].setText("")
+            return
 
         if name not in CONST.TAB.READER:
             return
 
         self.window.tabs[name].table.init(clear=True)
-        Reader(filename, analyse=self.window.tabs[name].table.add, log_level=self.window.log_level)
-        self.window.tabs[name].table.finished()
+        records, status = Reader(filename, analyse=self.window.tabs[name].table.add, log_level=self.window.log_level)
+        if not status:
+            QtWidgets.QMessageBox.information(
+                self,
+                self.tr("Cant read file"),
+                self.tr("No reader implemented to open the file {}! Choose another file!").format(filename),
+            )
+        self.window.tabs[name].table.finished(bool(status))
 
     def add_button(self, name_env, name, _format=None, default=""):
         """Add label, text + button
@@ -74,7 +81,7 @@ class ProcessTab(AbstractTab):
         pix = QtGui.QPixmap(getattr(CONST.UI.ICONS, name_env))
         if pix:
             self.icons[name_env].setPixmap(pix.scaledToHeight(15))
-        self.labels[name_env] = QtWidgets.QLabel(name.capitalize())
+        self.labels[name_env] = QtWidgets.QLabel(name)
         self.texts[name_env] = QtWidgets.QLineEdit()
         self.texts[name_env].textChanged.connect(lambda filename: self.add_data(filename, name_env))
         self.texts[name_env].setText(default)
@@ -115,10 +122,12 @@ class ProcessTab(AbstractTab):
     def choose(self, name_env, name, _format):
         """Method which call the native file dialog to choose file."""
         if _format is None:
-            path = QtWidgets.QFileDialog.getExistingDirectory(self, self.tr("Select folder"))
+            path = QtWidgets.QFileDialog.getExistingDirectory(self, self.tr("Open"))
         else:
             path, _ = QtWidgets.QFileDialog.getOpenFileName(
-                self, self.tr("Select file"), filter=f"{name.capitalize()} {_format}"
+                self,
+                self.tr("Open"),
+                filter=f"{name} {_format}" + f";;{self.tr('All files')} *" * CONST.READER.CAN_ADD_ALL_FILES,
             )
         if path:
             self.texts[name_env].setText(path)

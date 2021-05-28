@@ -48,8 +48,8 @@ class AbstractTable(QtWidgets.QTableWidget):
             self.setItem(row, index, widget)
         return widget
 
-    def finished(self):
-        self.tab.window.toggled_tab(self.tab, True)
+    def finished(self, boolean=True):
+        self.tab.window.toggled_tab(self.tab, boolean)
 
     def on_header_clicked(self, col):
         if col in self._cache:

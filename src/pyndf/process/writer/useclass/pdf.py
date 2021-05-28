@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from reportlab.lib.units import cm
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -35,7 +34,10 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
 
         super().__init__(filename="", **kwargs)
         self.color = color or CONST.WRITER.PDF.COLOR
-        self.date = datetime(year=int(date[:4]), month=int(date[4:6]), day=1) + relativedelta(months=+1)
+
+        self.date = date
+        if date is not None:
+            self.date += relativedelta(months=+1)
 
         self.log.info("Generate PDF files")
 
@@ -65,7 +67,8 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
 
         if add_header:
             # header
-            canvas.drawRightString(right, top, f"{self.date.strftime('%B %Y')}")
+            if self.date is not None:
+                canvas.drawRightString(right, top, f"{self.date.strftime('%B %Y')}")
             # Set Image
             canvas.drawImage(
                 CONST.FILE.LOGO, left, top + cm, width=2.5 * cm, height=-2.5 * cm, preserveAspectRatio=True
@@ -202,7 +205,11 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
     def create_filename(self, data):
         matricule = data.get("matricule", CONST.WRITER.PDF.UNKNOWN)
         self.log.debug(f"Create pdf for matricule {matricule} with {len(data.get('missions', []))} missions.")
-        return f"{data.get('agence', CONST.WRITER.PDF.UNKNOWN)}_{matricule}_{self.date.strftime('%Y%m')}"
+        if self.date is not None:
+            date = self.date.strftime("%Y%m")
+        else:
+            date = "NODATE"
+        return f"{data.get('agence', CONST.WRITER.PDF.UNKNOWN)}_{matricule}_{date}"
 
     def _write(self, data, path):
         """Create method, add each element of pdf.

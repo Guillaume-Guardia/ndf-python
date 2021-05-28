@@ -14,9 +14,9 @@ def main(language, **kwargs):
 
 
 def cmdline():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser("NDF")
     parser.add_argument(
-        "--log", help="level log", choices=["NOTSET", "DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"], type=str
+        "--log", help="level log", choices=["notset", "debug", "info", "warn", "error", "critical"], type=str
     )
     parser.add_argument("-e", "--excel", help="Excel file to parse", type=str)
     parser.add_argument("-c", "--csv", help="CSV file to parse", type=str)
@@ -27,7 +27,7 @@ def cmdline():
 
     level = logging.NOTSET
     if args.log:
-        level = getattr(logging, args.log)
+        level = getattr(logging, args.log.upper())
 
     return main(args.language, excel=args.excel, csv=args.csv, output=args.output, log_level=level)
 

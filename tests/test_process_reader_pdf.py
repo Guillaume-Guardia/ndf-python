@@ -52,7 +52,7 @@ class TestPdfReader(unittest.TestCase):
 
     def test_read(self):
         # The reader create a png file
-        png_paths = Reader(self.filename, temp_dir=self.directory, ratio=3)
+        png_paths, status = Reader(self.filename, temp_dir=self.directory, ratio=3)
 
         self.assertEqual(self.filename.replace(CONST.EXT.PDF, CONST.EXT.PNG), png_paths[0])
 

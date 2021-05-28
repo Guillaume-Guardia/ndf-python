@@ -51,7 +51,7 @@ class PreviewDialog(QtWidgets.QDialog):
     def get_paths(self, row):
         self.row = row
         filename = self.table.item(row, self.col).text()
-        png_paths = Reader(
+        png_paths, status = Reader(
             filename, temp_dir=self.window.app.temp_dir, ratio=self.ratio, log_level=self.window.log_level
         )
 

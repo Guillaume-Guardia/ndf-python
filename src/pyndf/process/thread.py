@@ -47,19 +47,19 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
         self.progress = Progress(self.signals.progressed.emit)
 
     @log_time
-    def excel_read(self):
+    def read_excel(self):
         self.progress.add_duration(5)
-        records = Reader(
+        records, status = Reader(
             self.excel_file,
             progress=self.progress,
             log_level=self.log_level,
         )
-        return records, CONST.STATUS.OK
+        return records, status
 
     @log_time
     def read_csv(self, records):
         self.progress.add_duration(5)
-        records_csv = Reader(
+        records_csv, status = Reader(
             self.csv_file,
             progress=self.progress,
             log_level=self.log_level,
@@ -67,7 +67,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
         for matricule, record in records.items():
             if matricule and int(matricule) in records_csv:
                 record["montant_total"] = records_csv[int(matricule)]
-        return records, CONST.STATUS.OK
+        return records, status
 
     @log_time
     def run_api(self, records):
@@ -124,15 +124,14 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
 
             self.progress.send(msg=self.tr("Get distance from Google API/DB/cache"))
 
-        total_status = Utils.getattr(CONST.STATUS, total_status)
-        return records, total_status
+        return records, Utils.getattr(CONST.STATUS, total_status)
 
     @log_time
     def create_pdf(self, records):
         self.progress.add_duration(40, len(records))
 
         # Get writer
-        date = os.path.basename(self.excel_file).split(".")[0].split("_")[1]
+        date = Utils.get_date_from_file(self.excel_file)
         writer = Writer(
             CONST.TYPE.PDF, date, directory=self.output_directory, color=self.color, log_level=self.log_level
         )
@@ -155,8 +154,8 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
                     time_spend,
                 )
             )
-        total_status = Utils.getattr(CONST.STATUS, total_status)
-        return total_status
+
+        return Utils.getattr(CONST.STATUS, total_status)
 
     @QtCore.pyqtSlot()
     def run(self):
@@ -165,7 +164,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
         try:
             sender = self.signals.analysed.emit
             # Read Excel file
-            (records, status), time_spend = self.excel_read()
+            (records, status), time_spend = self.read_excel()
             sender(Items(CONST.TYPE.ALL, self.tr("Load EXCEL file"), status, time_spend))
 
             # Read CSV file

@@ -70,7 +70,7 @@ class TestCsvReader(unittest.TestCase):
         self.assertEqual(result, CONST.TYPE.CSV)
 
     def test_read(self):
-        records = Reader(self.filename)
+        records, status = Reader(self.filename)
 
         for row in range(self.n_rows):
             value = 0
