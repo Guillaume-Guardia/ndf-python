@@ -41,6 +41,13 @@ class Utils:
     def pretty_join(string: str):
         return " ".join(string.split())
 
+    @staticmethod
+    def pretty_split(string: str):
+        split = string.split("|")
+        if len(split) > 0:
+            return split[0], split[1]
+        return split
+
 
 class Factory:
     def __new__(cls, type_, *args, **kwargs):

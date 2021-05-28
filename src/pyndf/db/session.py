@@ -10,6 +10,7 @@ from pyndf.db.base import Base
 from pyndf.db.client import Client
 from pyndf.db.employee import Employee
 from pyndf.db.measure import Measure
+from pyndf.utils import Utils
 
 
 class Database(Logger):
@@ -28,6 +29,12 @@ class Database(Logger):
         self.session = sessionmaker(bind=self.db_engine)
         with self.session_scope() as session:
             self.base.metadata.create_all(self.db_engine)
+
+            # Create Agence clients
+            for agence_o, value in CONST.FILE.YAML[CONST.TYPE.AGENCE].items():
+                name, address = Utils.pretty_split(value)
+                if session.query(Client).filter(Client.name == name).first() is None:
+                    session.add(Client(name=name, address=address))
 
     @contextmanager
     def session_scope(self):

@@ -106,11 +106,11 @@ class TestDistanceMatrixAPI(unittest.TestCase):
 
         # Check in db
         with db.session_scope() as session:
-            db_client = session.query(Client).filter(Client.address == client.address).one()
-            self.assertEqual(db_client.name, client.name)
+            db_client = session.query(Client).filter(Client.name == client.name).one()
+            self.assertEqual(db_client.address, client.address)
 
-            db_employee = session.query(Employee).filter(Employee.address == employee.address).one()
-            self.assertEqual(db_employee.matricule, employee.matricule)
+            db_employee = session.query(Employee).filter(Employee.matricule == employee.matricule).one()
+            self.assertEqual(db_employee.address, employee.address)
 
             # Check relation between employee and client
             self.assertListEqual(db_employee.clients, [db_client])
@@ -125,8 +125,8 @@ class TestDistanceMatrixAPI(unittest.TestCase):
 
         # Remove in db
         with db.session_scope() as session:
-            db_client = session.query(Client).filter(Client.address == client.address).one()
-            db_employee = session.query(Employee).filter(Employee.address == employee.address).one()
+            db_client = session.query(Client).filter(Client.name == client.name).one()
+            db_employee = session.query(Employee).filter(Employee.matricule == employee.matricule).one()
             db_measure = (
                 session.query(Measure).filter(Measure.client == db_client).filter(Measure.employee == db_employee).one()
             )

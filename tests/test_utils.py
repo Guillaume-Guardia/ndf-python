@@ -4,6 +4,7 @@ import unittest
 import tempfile
 import shutil
 from pyndf.utils import Utils
+from pyndf.constants import CONST
 
 
 class TestPath(unittest.TestCase):
@@ -21,6 +22,12 @@ class TestPath(unittest.TestCase):
         path = "un/deux.pdf"
         result = Utils.insert(path, path.index("."), "_page-5")
         self.assertEqual(result, "un/deux_page-5.pdf")
+
+    def test_get_agence_from_yaml(self):
+        self.assertEqual(CONST.FILE.YAML[CONST.TYPE.AGENCE]["NORD1"], "NORD 1|100 rue Nationale 59000 LILLE")
+        agence, address = Utils.pretty_split(CONST.FILE.YAML[CONST.TYPE.AGENCE]["NORD1"])
+        self.assertEqual(agence, "NORD 1")
+        self.assertEqual(address, "100 rue Nationale 59000 LILLE")
 
     def tearDown(self):
         pass

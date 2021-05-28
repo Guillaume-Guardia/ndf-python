@@ -61,3 +61,49 @@ pdf:
   taux: "Taux"
   plafond: "Plafond APSIDE"
   total: "Montant total"
+
+# Code, addresse
+agence:
+  AI1: APSIDE INFOGERANCE 1|6 RUE PAUL BAUDRY 75008 PARIS
+  AI2: APSIDE INFOGERANCE 2|6 RUE PAUL BAUDRY 75008 PARIS
+  NORD1: NORD 1|100 rue Nationale 59000 LILLE
+  NORD3: NORD 3|100 rue Nationale 59000 LILLE
+  APEA1: APSIDE EA 1|6 RUE PAUL BAUDRY 75008 PARIS
+  AERB: AERONAUTIQUE BORDEAUX|23 quai de Paludate Immeuble Manager St Jean 33800 BORDEAUX
+  AIX1: AIX1|Le Galice Mirabeau 7B route de Galice 13100 AIX EN PROVENCE
+  AIX2: AIX2|Le Galice Mirabeau 7B route de Galice 13100 AIX EN PROVENCE
+  BDX2: BORDEAUX 2|23 quai de Paludate Immeuble Manager St Jean 33800 BORDEAUX
+  BQ1: BANQUE1|58, Avenue du Général Leclerc 92514 BOULOGNE  CEDEX
+  BQ2: BANQUE 2|58, Avenue du Général Leclerc 92514 BOULOGNE  CEDEX
+  BQ3: BANQUE 3|58, Avenue du Génréral Leclerc 92514 BOULOGNE  CEDEX
+  BREIT: BREST IT|90 rue Ernest Hemingway 29200 BREST
+  BRES1: BREST 1|90 rue Ernest Hemingway 29200 BREST
+  CFE01: APSIDE CENTRE 1|17 rue de Sarliève 63800 Cournon d'Auvergne
+  CYBER: CYBER|58, Avenue du Génréral Leclerc 92514 BOULOGNE  CEDEX
+  IS1: INDUSTRIE & SERVICES 1|58, Avenue du Génréral Leclerc 92514 BOULOGNE  CEDEX
+  IS2: INDUSTRIE & SERVICES 2|58, Avenue du Génréral Leclerc 92514 BOULOGNE  CEDEX
+  IS3: INDUSTRIES ET SERVICES 3|58, Avenue du Génréral Leclerc 92514 BOULOGNE  CEDEX
+  LYON1: LYON1|Immeuble Le Terralta 77 boulevard Marius Vivier Merle 69003 LYON
+  LYON2: LYON2|Immeuble Le Terralta 77 boulevard Marius Vivier Merle 69003 LYON
+  NANT1: NANTES 1|1 rue Haute Casserie Cours 50 Otages 44000 NANTES
+  NANT2: NANTES 2|1 rue Haute Casserie Cours 50 Otages 44000 NANTES
+  NICE: NICE|300, route des Crêtes 06902 VALBONNE SOPHIA ANTIPOLIS CEDEX
+  P1: P1|58 avenue du Général Leclerc 92514 BOULOGNE BILLANCOURT
+  P21: P21|58 avenue du Général Leclerc 92514 BOULOGNE BILLANCOURT
+  P22: P22|58 avenue du Général Leclerc 92514 BOULOGNE BILLANCOURT
+  P5: P5|58 avenue du Général Leclerc 92514 BOULOGNE BILLANCOURT
+  RENIT: RENNES IT|Immeuble Urban Quartz - Bâtiment 2 24, rue de l'Alma 35000 RENNES
+  RENN1: RENNES|Immeuble Urban Quartz - Bâtiment 2 24, rue de l'Alma 35000 RENNES
+  STRA1: APSIDE STRASBOURG|4, rue de Sarrelouis 67000 STRASBOURG
+  TLSE1: TOULOUSE 1|9 rue Matabiau Espace Jeanne d'Arc 31000 TOULOUSE
+  TLSE2: TOULOUSE2|9 rue Matabiau Espace Jeanne d'Arc 31000 TOULOUSE
+  B1: B1|58 avenue du Général Leclerc 92514 BOULOGNE BILLANCOURT
+  B2: B2|58 avenue du Général Leclerc 92514 BOULOGNE BILLANCOURT
+  ORLE1: ORLEANS|12 rue Emile Zola 45000 ORLEANS
+  TOUR1: TOURS|12 Rue Fabienne Landy 37700 SAINT PIERRE DES CORPS
+  HTI1: HTI AUTO 1|6 rue Paul Baudry 75008 PARIS
+  HTI2: HTI AUTO 2|6 rue Paul Baudry 75008 PARIS
+  HTI3: HTI AUTO 3|6 rue Paul Baudry 75008 PARIS
+  HTILY: HTI LYON|Immeuble Le Terralta 77 boulevard Marius Vivier Merle 69003 LYON
+  HTIMO: HTI MONTBELIARD|6 rue Paul Baudry 75008 PARIS
+  HTITO: HTI TOULOUSE|9 rue Matabiau Espace Jeanne d'Arc 31000 TOULOUSE

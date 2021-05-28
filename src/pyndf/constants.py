@@ -59,6 +59,7 @@ class CONST:
         LAN = "language"
         DB = "use_db"
         CACHE = "use_cache"
+        AGENCE = "agence"
 
     MEMORY = TYPE.EXC, TYPE.CSV, TYPE.OUT, TYPE.COL, TYPE.DB, TYPE.CACHE
 

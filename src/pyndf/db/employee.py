@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
 from pyndf.db.base import Base, association_table
 
@@ -8,7 +8,7 @@ from pyndf.db.base import Base, association_table
 class Employee(Base):
     """Db class"""
 
-    matricule = Column(String)
+    matricule = Column(Integer, nullable=False, unique=True)
 
     # Client relation many to many
     clients = relationship("Client", secondary=association_table, backref="employees")
@@ -17,4 +17,4 @@ class Employee(Base):
     measures = relationship("Measure")
 
     # Real attribute
-    address = Column(String, nullable=False, unique=True)
+    address = Column(String)

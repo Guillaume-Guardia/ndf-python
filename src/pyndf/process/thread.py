@@ -108,7 +108,8 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
             mission_record = {}
             agence_o = record["agence_o"]
             with db.session_scope() as session:
-                client = session.query(Client).filter(Client.name.like(Utils.insert(agence_o, -1, "%"))).first()
+                name, address = Utils.pretty_split(CONST.FILE.YAML[CONST.TYPE.AGENCE][agence_o])
+                client = session.query(Client).filter(Client.name == name).first()
                 if client:
                     mission_record["client"] = client.name
                     mission_record["adresse_client"] = client.address.replace(",", " ")
@@ -116,6 +117,10 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
 
                     if mission_record["client"] not in [mission["client"] for mission in record["missions"]]:
                         record["missions"].append(mission_record)
+
+                    self.log.info(f"find client in DB -> {client} ")
+                else:
+                    self.log.warning(f"Doesn't find client in DB -> {name}")
 
             self.progress.send(msg=self.tr("Get distance from Google API/DB/cache"))
 

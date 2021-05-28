@@ -142,22 +142,22 @@ class DistanceMatrixAPI(Logger):
         with db.session_scope() as session:
             # Check if client or employee exists
             new_client = Client(name=client_name, address=client_address)
-            if session.query(Client).filter(Client.address == client_address).first() is None:
+            if session.query(Client).filter(Client.name == client_name).first() is None:
                 if log:
-                    log.debug(f"Add new client {new_client}")
+                    log.info(f"Add new client {new_client}")
                 session.add(new_client)
 
             new_employee = Employee(matricule=employee_matricule, address=employee_address)
-            if session.query(Employee).filter(Employee.address == employee_address).first() is None:
+            if session.query(Employee).filter(Employee.matricule == employee_matricule).first() is None:
                 if log:
-                    log.debug(f"Add new employee {new_employee}")
+                    log.info(f"Add new employee {new_employee}")
                 session.add(new_employee)
 
             session.flush()
 
             # Add relation between client and employee
-            employee = session.query(Employee).filter(Employee.address == employee_address).first()
-            client = session.query(Client).filter(Client.address == client_address).first()
+            employee = session.query(Employee).filter(Employee.matricule == employee_matricule).first()
+            client = session.query(Client).filter(Client.name == client_name).first()
 
             if client not in employee.clients:
                 employee.clients.append(client)

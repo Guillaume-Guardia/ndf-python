@@ -8,7 +8,7 @@ from pyndf.db.base import Base
 class Client(Base):
     """Db class"""
 
-    name = Column(String)
+    name = Column(String, nullable=False, unique=True)
 
     # Employee relation many to many -> backref
 
@@ -16,4 +16,4 @@ class Client(Base):
     measures = relationship("Measure")
 
     # Real attribute
-    address = Column(String, nullable=False, unique=True)
+    address = Column(String)
