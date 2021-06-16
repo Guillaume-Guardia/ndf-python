@@ -17,4 +17,4 @@ class Employee(Base):
     measures = relationship("Measure")
 
     # Real attribute
-    address = Column(String)
+    address = Column(String, nullable=False)

@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import os
 from pyndf.constants import CONST
-from pyndf.db.client import Client
 from pyndf.process.progress import Progress
 from pyndf.process.reader.factory import Reader
 from pyndf.gui.items.factory import Items
+from pyndf.process.record import RecordsManager
 from pyndf.process.writer.factory import Writer
 from pyndf.qtlib import QtCore
 from pyndf.process.distance import DistanceMatrixAPI
 from pyndf.logbook import Logger, log_time
-from pyndf.db.session import db
 from pyndf.utils import Utils
 
 
@@ -45,90 +43,70 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
         self.use_cache = use_cache
         self.signals = WorkerSignals()
         self.progress = Progress(self.signals.progressed.emit)
+        self.records_manager = RecordsManager(log_level=self.log_level)
 
     @log_time
     def read_excel(self):
         self.progress.add_duration(5)
-        records, status = Reader(
+        _, status = Reader(
             self.excel_file,
             progress=self.progress,
             log_level=self.log_level,
+            manager=self.records_manager,
         )
-        return records, status
+        return status
 
     @log_time
-    def read_csv(self, records):
+    def read_csv(self):
         self.progress.add_duration(5)
-        records_csv, status = Reader(
+        _, status = Reader(
             self.csv_file,
             progress=self.progress,
             log_level=self.log_level,
+            manager=self.records_manager,
         )
-        for matricule, record in records.items():
-            if matricule and int(matricule) in records_csv:
-                record["montant_total"] = records_csv[int(matricule)]
-        return records, status
+        return status
 
     @log_time
-    def run_api(self, records):
-        self.progress.add_duration(45, len(records))
+    def run_api(self):
+        self.progress.add_duration(45, len(self.records_manager))
 
         api = DistanceMatrixAPI(log_level=self.log_level)
         total_status = set()
 
-        for record in records.values():
-            for mission in record["missions"]:
-                distance = None
-                client = mission["client"], mission["adresse_client"]
-                employee = record["matricule"], record["adresse_intervenant"]
-                (result, status), time_spend = api.run(client, employee, use_db=self.use_db, use_cache=self.use_cache)
-                mission["status"] = status
+        for record in self.records_manager:
+            for mission in record.missions:
+                client = mission.client, mission.adresse_client
+                employee = record.matricule, record.adresse_intervenant
 
+                (result, status), time_spend = api.run(
+                    client, employee, use_db=self.use_db, use_cache=self.use_cache, analyse=self.signals.analysed.emit
+                )
+                mission.status = status
                 total_status.add(str(status))
 
-                if result is not None:
-                    distance, _ = result
-
-                    mission["nbrkm_mois"] = mission["quantite_payee"] * 2 * distance
-                    mission["forfait"] = mission["total"] / mission["nbrkm_mois"]
+                mission.set_api_result(result)
 
                 self.signals.analysed.emit(
                     Items(
                         CONST.TYPE.API,
-                        record["matricule"],
-                        mission["adresse_client"],
-                        record["adresse_intervenant"],
-                        distance,
+                        Utils.type(record.matricule),
+                        mission.adresse_client,
+                        record.adresse_intervenant,
+                        mission.distance,
                         status,
                         time_spend,
                     )
                 )
 
-            # Check agence d'origine/address are in missions:
-            mission_record = {}
-            agence_o = record["agence_o"]
-            with db.session_scope() as session:
-                name, address = Utils.pretty_split(CONST.FILE.YAML[CONST.TYPE.AGENCE][agence_o])
-                client = session.query(Client).filter(Client.name == name).first()
-                if client:
-                    mission_record["client"] = client.name
-                    mission_record["adresse_client"] = client.address.replace(",", " ")
-                    mission_record["status"] = CONST.STATUS.DB
-
-                    if mission_record["client"] not in [mission["client"] for mission in record["missions"]]:
-                        record["missions"].append(mission_record)
-
-                    self.log.info(f"find client in DB -> {client} ")
-                else:
-                    self.log.warning(f"Doesn't find client in DB -> {name}")
-
             self.progress.send(msg=self.tr("Get distance from Google API/DB/cache"))
 
-        return records, Utils.getattr(CONST.STATUS, total_status)
+        return Utils.getattr(CONST.STATUS, total_status)
 
     @log_time
-    def create_pdf(self, records):
-        self.progress.add_duration(40, len(records))
+    def create_pdf(self):
+        self.progress.add_duration(40, len(self.records_manager))
+        total_status = set()
 
         # Get writer
         date = Utils.get_date_from_file(self.excel_file)
@@ -136,9 +114,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
             CONST.TYPE.PDF, date, directory=self.output_directory, color=self.color, log_level=self.log_level
         )
 
-        total_status = set()
-
-        for record in records.values():
+        for record in self.records_manager:
             (filename, status), time_spend = writer.write(record, filename=record)
 
             total_status.add(str(status))
@@ -147,9 +123,10 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
             self.signals.analysed.emit(
                 Items(
                     CONST.TYPE.PDF,
-                    record["matricule"],
+                    Utils.type(record.matricule),
                     filename,
-                    len(record["missions"]),
+                    len(record.missions),
+                    len(record.indemnites),
                     status,
                     time_spend,
                 )
@@ -164,19 +141,19 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
         try:
             sender = self.signals.analysed.emit
             # Read Excel file
-            (records, status), time_spend = self.read_excel()
+            status, time_spend = self.read_excel()
             sender(Items(CONST.TYPE.ALL, self.tr("Load EXCEL file"), status, time_spend))
 
             # Read CSV file
-            (records, status), time_spend = self.read_csv(records)
+            status, time_spend = self.read_csv()
             sender(Items(CONST.TYPE.ALL, self.tr("Load CSV file"), status, time_spend))
 
             # Calcul distance between adresse_client and adresse_intervenant with google API
-            (records, status), time_spend = self.run_api(records)
+            status, time_spend = self.run_api()
             sender(Items(CONST.TYPE.ALL, self.tr("Get distance from Google API/DB/Cache"), status, time_spend))
 
             # Create PDF with data records and distance from the API
-            (status), time_spend = self.create_pdf(records)
+            status, time_spend = self.create_pdf()
             sender(Items(CONST.TYPE.ALL, self.tr("Generate PDF files"), status, time_spend))
 
         except Exception as error:

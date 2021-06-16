@@ -31,10 +31,10 @@ class Database(Logger):
             self.base.metadata.create_all(self.db_engine)
 
             # Create Agence clients
-            for agence_o, value in CONST.FILE.YAML[CONST.TYPE.AGENCE].items():
+            for value in CONST.FILE.YAML[CONST.TYPE.AGENCE].values():
                 name, address = Utils.pretty_split(value)
                 if session.query(Client).filter(Client.name == name).first() is None:
-                    session.add(Client(name=name, address=address))
+                    session.add(Client(name=name, address=Utils.format_address(address)))
 
     @contextmanager
     def session_scope(self):

@@ -9,7 +9,7 @@ class PdfItem(AbstractItem):
     """Class for storing data for analyse."""
 
     type = CONST.TYPE.PDF
-    headers = ["matricule", "filename", "nbr_missions", "status", "time"]
+    headers = ["matricule", "filename", "nbr_missions", "nbr_indemnites", "status", "time"]
 
     @classmethod
     def headers_pretty(cls):
@@ -18,6 +18,7 @@ class PdfItem(AbstractItem):
             cls.tr("Matricule"),
             cls.tr("Filename"),
             cls.tr("Number of missions"),
+            cls.tr("Number of indemnity"),
             cls.tr("Status"),
             cls.tr("Time (s)"),
         ]

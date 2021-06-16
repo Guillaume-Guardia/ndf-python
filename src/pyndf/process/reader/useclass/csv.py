@@ -13,32 +13,23 @@ class CsvReader(AbstractReader):
 
     type = CONST.TYPE.CSV
     regex = re.compile(".*[.][cC][sS][vV]")
-    record_regex = re.compile("Montant salarial.*")
 
-    def read(self, filename=None, progress=None, analyse=None):
+    def read(self, filename=None, progress=None, analyse=None, manager=None):
         if self.check_path(filename) is False:
             return
-
-        # Initialisation variables
-        records = {}
 
         # Get the data on csv file in dataframe format.
         dataframe = pd.read_csv(filename, sep=";", decimal=",", na_filter=False, encoding="latin1")
 
+        # Progress Bar
         if progress:
             progress.set_maximum(len(dataframe.to_dict("records")))
 
         for record in dataframe.to_dict("records"):
-            matricule = record[CONST.FILE.YAML[CONST.TYPE.CSV]["matricule"]]
-            total = 0
+            if manager is None:
+                continue
 
-            for column in list(dataframe.columns):
-                if self.record_regex.match(column):
-                    montant = Utils.type(record[column], decimal=",")
-
-                    if isinstance(montant, (int, float)):
-                        total += montant
-            records[matricule] = round(total, 2)
+            status = manager.add_csv_record(record, list(dataframe.columns))
 
             if analyse:
                 analyse(
@@ -46,12 +37,12 @@ class CsvReader(AbstractReader):
                         self.type,
                         *list([Utils.type(r) for r in record.values()]),
                         columns=dataframe.columns,
-                        colored=records[matricule] > 0,
+                        colored=status,
                     )
                 )
                 continue
 
-            if progress:
+            if progress is not None:
                 progress.send(msg=self.tr("Load CSV file"))
 
-        return records
+        return manager

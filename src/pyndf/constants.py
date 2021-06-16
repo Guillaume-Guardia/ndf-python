@@ -12,7 +12,7 @@ class CONST:
 
     TITLE_APP = "PYNDF"
     COMPANY = "APSIDE"
-    VERSION = "1.0"
+    VERSION = "1.1"
     OPTI = True
 
     class FILE:
@@ -61,6 +61,11 @@ class CONST:
         CACHE = "use_cache"
         AGENCE = "agence"
 
+        # DB
+        DB_CLIENT = "client"
+        DB_EMPLOYEE = "employee"
+        DB_MEASURE = "measure"
+
     MEMORY = TYPE.EXC, TYPE.CSV, TYPE.OUT, TYPE.COL, TYPE.DB, TYPE.CACHE
 
     class UI:
@@ -103,6 +108,7 @@ class CONST:
 
         READER = ["csv", "excel"]
         ANALYSE = ["all", "api", "pdf"]
+        DB = ["client", "employee", "measure"]
 
     class READER:
         """All constants links to reader."""
@@ -115,6 +121,15 @@ class CONST:
                 "periode_production",
                 "client",
                 "adresse_client",
+                "quantite_payee",
+                "prix_unitaire",
+                "total",
+            ]
+
+        class CSV:
+            COL_PERSO = ["nom", "matricule", "agence"]
+            COL_MISSION = [
+                "periode_production",
                 "quantite_payee",
                 "prix_unitaire",
                 "total",

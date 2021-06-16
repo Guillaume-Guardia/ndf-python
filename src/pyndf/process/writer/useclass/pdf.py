@@ -28,6 +28,7 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
     """
 
     ext = CONST.EXT.PDF
+    mapper = CONST.FILE.YAML[CONST.TYPE.PDF]
 
     def __init__(self, date, color, **kwargs):
         kwargs["pagesize"] = landscape(A4)
@@ -108,7 +109,7 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         """
         result = []
         for col in CONST.WRITER.PDF.COL_PERSO:
-            result.append([CONST.FILE.YAML[CONST.TYPE.PDF][col], record.get(col, CONST.WRITER.PDF.UNKNOWN)])
+            result.append([self.mapper[col], getattr(record, col)])
 
         table = Table(result, spaceBefore=cm, spaceAfter=cm)
         style = TableStyle([("GRID", (0, 0), (-1, -1), 0.25, black)])
@@ -124,51 +125,33 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         Returns:
             Table: returned table with style.
         """
-        memory_mission = []
         data = [[]]
-        nbrkm_mois = 0
-        quantite_payee = 0
-        total = 0
-        prix_unitaire = 0
-        total_status = set()
+        status = set()
 
-        # Add header
+        record.prepare_for_pdf()
+
+        # Add headers
         for name in CONST.WRITER.PDF.COL_MISSION:
-            data[0].append(Paragraph(CONST.FILE.YAML[CONST.TYPE.PDF][name], stylesheet["Center"]))
+            data[0].append(Paragraph(self.mapper[name], stylesheet["Center"]))
 
-        for mission in record.get("missions", {}):
-            total_status.add(str(mission["status"]))
+        for mission in record.pdf_missions:
+            status.add(str(mission.status))
+            data.append(
+                [
+                    Paragraph(mission.client, stylesheet["Justify"]),
+                    mission.periode_production,
+                    Paragraph(mission.adresse_client, stylesheet["Justify"]),
+                    record.nbr_km_mois,
+                    "",
+                    "",
+                    "",
+                ]
+            )
 
-            nbrkm_mois += mission.get("nbrkm_mois", 0)
-            quantite_payee += mission.get("quantite_payee", 0)
-            total += mission.get("total", 0)
-            prix_unitaire = max(mission.get("prix_unitaire", 0), prix_unitaire)
-
-        nbrkm_mois = round(nbrkm_mois, 2)
-        quantite_payee = round(quantite_payee, 2)
-        prix_unitaire = round(prix_unitaire, 2)
-        total = round(total, 2)
-
-        if quantite_payee > 0 and nbrkm_mois / quantite_payee > 100:
-            nbrkm_mois = f"> {100 * quantite_payee}"
-
-        for mission in record.get("missions", {}):
-            client = mission.get("client", CONST.WRITER.PDF.UNKNOWN)
-            address = mission.get("adresse_client", CONST.WRITER.PDF.UNKNOWN)
-
-            if (client, address) not in memory_mission:
-                data.append(
-                    [
-                        Paragraph(client, stylesheet["Justify"]),
-                        mission.get("periode_production", CONST.WRITER.PDF.UNKNOWN),
-                        Paragraph(address, stylesheet["Justify"]),
-                        nbrkm_mois,
-                        quantite_payee,
-                        prix_unitaire,
-                        total,  # TODO
-                    ]
-                )
-                memory_mission.append((client, address))
+        for indemnite in record.indemnites.values():
+            data[1][4] += f"\n{indemnite.quantite_payee}"
+            data[1][5] += f"\n{indemnite.plafond}"
+            data[1][6] += f"\n{indemnite.total}"
 
         # Create table with data
         table = Table(
@@ -181,8 +164,7 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         )
         style = TableStyle(
             [
-                # First row in blue
-                ("BACKGROUND", (0, 0), (-1, 0), self.color),
+                ("BACKGROUND", (0, 0), (-1, 0), self.color),  # First row in color
                 ("GRID", (0, 0), (-1, -1), 0.25, black),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("ALIGN", (0, 0), (-1, -1), "CENTER"),
@@ -190,26 +172,26 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         )
 
         # Merge
-        total_status = Utils.getattr(CONST.STATUS, total_status)
-        if total_status:
+        status = Utils.getattr(CONST.STATUS, status)
+        if status:
             for i in (1, 3, 4, 5, 6):
                 style.add("SPAN", (i, 1), (i, -1))
+                style.add("ALIGN", (0, 0), (-1, -1), "CENTER"),
 
         table.setStyle(style)
-        return table, total_status
+        return table, status
 
     def create_path(self, data=None):
         filename = self.create_filename(data)
         return super().create_path(filename)
 
     def create_filename(self, data):
-        matricule = data.get("matricule", CONST.WRITER.PDF.UNKNOWN)
-        self.log.debug(f"Create pdf for matricule {matricule} with {len(data.get('missions', []))} missions.")
+        self.log.debug(f"Create pdf for matricule {data.matricule} with {len(data.missions)} missions.")
         if self.date is not None:
             date = self.date.strftime("%Y%m")
         else:
             date = "NODATE"
-        return f"{data.get('agence', CONST.WRITER.PDF.UNKNOWN)}_{matricule}_{date}"
+        return f"{data.agence}_{data.matricule}_{date}"
 
     def _write(self, data, path):
         """Create method, add each element of pdf.
@@ -221,10 +203,10 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         paragraphs = []
         # add some flowables
         paragraphs.append(Paragraph("NOTE DE FRAIS", stylesheet["title"]))
-        paragraphs.append(Paragraph(f"AGENCE: {data.get('agence', CONST.WRITER.PDF.UNKNOWN)}", stylesheet["title"]))
-        paragraphs.append(
-            Paragraph(f"AGENCE D'ORIGINE: {data.get('agence_o', CONST.WRITER.PDF.UNKNOWN)}", stylesheet["title"])
-        )
+        paragraphs.append(Paragraph(f"AGENCE: {data.agence}", stylesheet["title"]))
+        paragraphs.append(Paragraph(f"AGENCE D'ORIGINE: {data.agence_o}", stylesheet["title"]))
+
+        # Create tables
         paragraphs.append(self.create_table_collaborator(data))
         table, status = self.create_table_missions(data)
         paragraphs.append(table)

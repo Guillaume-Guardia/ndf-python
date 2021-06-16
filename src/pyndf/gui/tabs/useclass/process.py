@@ -3,6 +3,7 @@
 import os
 from pyndf.gui.tabs.abstract import AbstractTab
 from pyndf.process.reader.factory import Reader
+from pyndf.process.record import RecordsManager
 from pyndf.qtlib import QtWidgets, QtGui
 from pyndf.constants import CONST
 
@@ -10,6 +11,8 @@ from pyndf.constants import CONST
 class ProcessTab(AbstractTab):
     def __init__(self, window, title, excel="", csv="", output=""):
         super().__init__(window, title)
+
+        self.manager = RecordsManager(log_level=window.log_level)
 
         # Graphics elements
         self.icons = {}
@@ -59,7 +62,9 @@ class ProcessTab(AbstractTab):
             return
 
         self.window.tabs[name].table.init(clear=True)
-        records, status = Reader(filename, analyse=self.window.tabs[name].table.add, log_level=self.window.log_level)
+        _, status = Reader(
+            filename, analyse=self.window.tabs[name].table.add, log_level=self.window.log_level, manager=self.manager
+        )
         if not status:
             QtWidgets.QMessageBox.information(
                 self,

@@ -72,6 +72,9 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             CONST.TYPE.ALL: self.tr("Global Analyse"),
             CONST.TYPE.API: self.tr("Google API Analyse"),
             CONST.TYPE.PDF: self.tr("PDF files Analyse"),
+            CONST.TYPE.DB_CLIENT: self.tr("Database Client"),
+            CONST.TYPE.DB_EMPLOYEE: self.tr("Database Employee"),
+            CONST.TYPE.DB_MEASURE: self.tr("Database Measure"),
         }
 
         for index, (key, title) in enumerate(info_dict.items()):

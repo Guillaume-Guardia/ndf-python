@@ -20,8 +20,8 @@ class AbstractItem(QtCore.QObject):
         if columns is not None:
             self.headers = list(columns)
 
-        for index, arg in enumerate(args):
-            setattr(self, self.headers[index], arg)
+        for header, arg in zip(self.headers, args):
+            setattr(self, header, arg)
 
         self.counter = len(args)
 

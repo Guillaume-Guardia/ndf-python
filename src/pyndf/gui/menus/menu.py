@@ -80,6 +80,12 @@ class MainMenu(QtWidgets.QMenuBar):
         for analyse in CONST.TAB.ANALYSE:
             self.create_action_views(menu, self.window.tabs[analyse])
 
+        menu.addSeparator()
+
+        # DB
+        for analyse in CONST.TAB.DB:
+            self.create_action_views(menu, self.window.tabs[analyse])
+
         return menu
 
     def create_action_options(self, menu, title, name):
