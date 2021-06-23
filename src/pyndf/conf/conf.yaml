@@ -52,13 +52,13 @@ csv:
 
 # PDF libellé
 pdf:
-  nom: "Nom Prénom:"
+  nom_intervenant: "Nom Prénom:"
   matricule: "Matricule:"
   adresse_intervenant: "Adresse:"
   client: "Nom du client"
   periode: "Période"
   addresse_client: "Adresse de réalisation"
-  nbrkm_mois: "Nb de Km par mois"
+  nbr_km_mois: "Nb de Km par mois"
   taux: "Taux"
   plafond: "Plafond APSIDE"
   total: "Montant total"

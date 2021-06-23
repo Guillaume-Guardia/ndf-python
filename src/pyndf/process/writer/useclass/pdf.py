@@ -128,8 +128,6 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         data = [[]]
         status = set()
 
-        record.prepare_for_pdf()
-
         # Add headers
         for name in CONST.WRITER.PDF.COL_MISSION:
             data[0].append(Paragraph(self.mapper[name], stylesheet["Center"]))
@@ -142,16 +140,12 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
                     mission.periode_production,
                     Paragraph(mission.adresse_client, stylesheet["Justify"]),
                     record.nbr_km_mois,
-                    "",
-                    "",
-                    "",
                 ]
             )
 
-        for indemnite in record.indemnites.values():
-            data[1][4] += f"\n{indemnite.quantite_payee}"
-            data[1][5] += f"\n{indemnite.plafond}"
-            data[1][6] += f"\n{indemnite.total}"
+        data[1].append(record.quantite_payee_mois())
+        data[1].append(record.plafond_mois)
+        data[1].append(record.total_mois)
 
         # Create table with data
         table = Table(
@@ -176,7 +170,6 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         if status:
             for i in (1, 3, 4, 5, 6):
                 style.add("SPAN", (i, 1), (i, -1))
-                style.add("ALIGN", (0, 0), (-1, -1), "CENTER"),
 
         table.setStyle(style)
         return table, status

@@ -57,8 +57,7 @@ class DistanceMatrixAPI(Logger):
             with db.session_scope() as session:
                 measure = (
                     session.query(Measure)
-                    .filter(Measure.client_address == client_address)
-                    .filter(Measure.employee_address == employee_address)
+                    .filter_by(client_address=client_address, employee_address=employee_address)
                     .first()
                 )
 
@@ -130,13 +129,7 @@ class DistanceMatrixAPI(Logger):
         with db.session_scope() as session:
             # Check if client or employee exists
             new_client = Client(name=client_name, address=client_address)
-            if (
-                session.query(Client)
-                .filter(Client.name == client_name)
-                .filter(Client.address == client_address)
-                .first()
-                is None
-            ):
+            if session.query(Client).filter_by(name=client_name, address=client_address).first() is None:
                 if log:
                     log.info(f"Add new client {new_client}")
                 session.add(new_client)
@@ -146,7 +139,10 @@ class DistanceMatrixAPI(Logger):
                     analyse(Items(CONST.TYPE.DB_CLIENT, new_client))
 
             new_employee = Employee(matricule=employee_matricule, address=employee_address)
-            if session.query(Employee).filter(Employee.matricule == employee_matricule).first() is None:
+            if (
+                session.query(Employee).filter_by(matricule=employee_matricule, address=employee_address).first()
+                is None
+            ):
                 if log:
                     log.info(f"Add new employee {new_employee}")
                 session.add(new_employee)
@@ -156,8 +152,8 @@ class DistanceMatrixAPI(Logger):
                     analyse(Items(CONST.TYPE.DB_EMPLOYEE, new_employee))
 
             # Add relation between client and employee
-            employee = session.query(Employee).filter(Employee.matricule == employee_matricule).first()
-            client = session.query(Client).filter(Client.name == client_name).first()
+            employee = session.query(Employee).filter_by(matricule=employee_matricule).first()
+            client = session.query(Client).filter_by(name=client_name, address=client_address).first()
 
             if client not in employee.clients:
                 employee.clients.append(client)

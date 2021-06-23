@@ -113,21 +113,25 @@ class Record(Logger, Utils):
     @property
     def nbr_km_mois(self):
         nbr_km_mois = sum([mission.km for mission in self.missions])
-        if self.quantite_payee_mois > 0 and nbr_km_mois / self.quantite_payee_mois > 100:
-            return f"> {100 * self.quantite_payee_mois}"
+        quantite = self.quantite_payee_mois(somme=True)
+        if quantite > 0 and nbr_km_mois / quantite > 100:
+            return f"> {100 * quantite}"
         return round(nbr_km_mois, 2)
 
-    @property
-    def quantite_payee_mois(self):
-        return round(sum([data.quantite_payee for data in self.indemnites.values()]), 2)
+    def quantite_payee_mois(self, somme=False):
+        if somme:
+            return round(sum([data.quantite_payee for data in self.indemnites.values()]), 2)
+        return "\n".join([str(indem.quantite_payee) for indem in self.indemnites.values()])
 
     @property
-    def montant_mois(self):
-        return round(sum([data.montant for data in self.indemnites.values()]), 2)
+    def total_mois(self):
+        # return round(sum([data.total for data in self.indemnites.values()]), 2)
+        return "\n".join([str(indem.total) for indem in self.indemnites.values()])
 
     @property
     def plafond_mois(self):
-        return round(self.montant_mois / self.quantite_payee_mois, 2)
+        # return round(self.total_mois / self.quantite_payee_mois, 2)
+        return "\n".join([str(indem.plafond) for indem in self.indemnites.values()])
 
     def __len__(self):
         return len(self.missions) + len(self.indemnites)
@@ -142,6 +146,10 @@ class CsvRecord(Record):
             setattr(self, key, record.get(self.csv_mapper[key], CONST.WRITER.PDF.UNKNOWN))
             self.log.debug(f"{key:25} = {getattr(self, key)}")
 
+    @property
+    def nom_intervenant(self):
+        return f"{self.nom.capitalize()} {self.prenom.capitalize()}"
+
 
 class ExcelRecord(Record):
     def __init__(self, record, *args, **kwargs):
@@ -151,6 +159,13 @@ class ExcelRecord(Record):
         for key in CONST.READER.EXC.COL_PERSO:
             setattr(self, key, record.get(self.excel_mapper[key], CONST.WRITER.PDF.UNKNOWN))
             self.log.debug(f"{key:25} = {getattr(self, key)}")
+
+    @property
+    def nom_intervenant(self):
+        name = self.nom.split()
+        for index, s in enumerate(name):
+            name[index] = s.capitalize()
+        return " ".join(name)
 
 
 class RecordsManager(Logger):

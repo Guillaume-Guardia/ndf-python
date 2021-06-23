@@ -127,7 +127,7 @@ class CONST:
             ]
 
         class CSV:
-            COL_PERSO = ["nom", "matricule", "agence"]
+            COL_PERSO = ["nom", "prenom", "matricule", "agence"]
             COL_MISSION = [
                 "periode_production",
                 "quantite_payee",
@@ -218,7 +218,7 @@ class CONST:
             FONT = ["Helvetica", 10]
             COLOR = "#99ccff"  # Blue
 
-            COL_PERSO = ["nom", "matricule", "adresse_intervenant"]
-            COL_MISSION = ["client", "periode", "addresse_client", "nbrkm_mois", "taux", "plafond", "total"]
+            COL_PERSO = ["nom_intervenant", "matricule", "adresse_intervenant"]
+            COL_MISSION = ["client", "periode", "addresse_client", "nbr_km_mois", "taux", "plafond", "total"]
 
             UNKNOWN = "Inconnu"

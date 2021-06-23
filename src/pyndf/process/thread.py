@@ -115,6 +115,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
         )
 
         for record in self.records_manager:
+            record.prepare_for_pdf()
             (filename, status), time_spend = writer.write(record, filename=record)
 
             total_status.add(str(status))
@@ -125,6 +126,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
                     CONST.TYPE.PDF,
                     Utils.type(record.matricule),
                     filename,
+                    record.nom_intervenant,
                     len(record.missions),
                     len(record.indemnites),
                     status,

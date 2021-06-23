@@ -107,30 +107,26 @@ class TestDistanceMatrixAPI(unittest.TestCase):
 
         # Check in db
         with db.session_scope() as session:
-            db_client = session.query(Client).filter(Client.name == client.name).one()
+            db_client = session.query(Client).filter_by(name=client.name).one()
             self.assertEqual(db_client.address, client.address)
 
-            db_employee = session.query(Employee).filter(Employee.matricule == employee.matricule).one()
+            db_employee = session.query(Employee).filter_by(matricule=employee.matricule).one()
             self.assertEqual(db_employee.address, employee.address)
 
             # Check relation between employee and client
             self.assertListEqual(db_employee.clients, [db_client])
             self.assertListEqual(db_client.employees, [db_employee])
 
-            db_measure = (
-                session.query(Measure).filter(Measure.client == db_client).filter(Measure.employee == db_employee).one()
-            )
+            db_measure = session.query(Measure).filter_by(client=db_client, employee=db_employee).one()
 
             self.assertEqual(db_measure.distance, 15)
             self.assertEqual(db_measure.duration, 10.5)
 
         # Remove in db
         with db.session_scope() as session:
-            db_client = session.query(Client).filter(Client.name == client.name).one()
-            db_employee = session.query(Employee).filter(Employee.matricule == employee.matricule).one()
-            db_measure = (
-                session.query(Measure).filter(Measure.client == db_client).filter(Measure.employee == db_employee).one()
-            )
+            db_client = session.query(Client).filter_by(name=client.name).one()
+            db_employee = session.query(Employee).filter_by(matricule=employee.matricule).one()
+            db_measure = session.query(Measure).filter_by(client=db_client, employee=db_employee).one()
 
             session.delete(db_client)
             session.delete(db_employee)

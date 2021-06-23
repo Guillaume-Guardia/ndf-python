@@ -33,7 +33,7 @@ class Database(Logger):
             # Create Agence clients
             for value in CONST.FILE.YAML[CONST.TYPE.AGENCE].values():
                 name, address = Utils.pretty_split(value)
-                if session.query(Client).filter(Client.name == name).first() is None:
+                if session.query(Client).filter_by(name=name).first() is None:
                     session.add(Client(name=name, address=Utils.format_address(address)))
 
     @contextmanager
