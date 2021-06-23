@@ -74,6 +74,11 @@ class TestCsvReader(unittest.TestCase):
         result = CsvReader.can_read(self.filename)
         self.assertEqual(result, CONST.TYPE.CSV)
 
+    def test_can_read_2(self):
+        result, status = Reader("")
+        self.assertIsNone(result)
+        self.assertEqual(status, CONST.STATUS.CANT_READ)
+
     def test_read(self):
         manager_records, status = Reader(self.filename)
         for record in manager_records:

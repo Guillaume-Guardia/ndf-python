@@ -17,4 +17,4 @@ class Reader(Factory):
                 instance.__init__(log_level=log_level)
 
                 return instance.read(filename, *args, **kwargs), CONST.STATUS.OK
-        return CONST.STATUS.CANT_READ
+        return None, CONST.STATUS.CANT_READ
