@@ -24,6 +24,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.color = color
         self.use_db = use_db
         self.use_cache = use_cache
+        self.use_api = True
 
         # Window parameters
         self.setWindowTitle(CONST.TITLE_APP)
@@ -109,6 +110,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             log_level=self.log_level,
             use_db=self.use_db,
             use_cache=self.use_cache,
+            use_api=self.use_api,
         )
         process.signals.error.connect(self.error)
         process.signals.finished.connect(self.generated)

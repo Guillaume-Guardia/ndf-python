@@ -33,7 +33,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
     :param data: The data to add to the PDF for generating.
     """
 
-    def __init__(self, excel_file, csv_file, output_directory, color, use_db, use_cache, **kwargs):
+    def __init__(self, excel_file, csv_file, output_directory, color, use_db, use_cache, use_api, **kwargs):
         super().__init__(**kwargs)
         self.excel_file = excel_file
         self.csv_file = csv_file
@@ -41,6 +41,7 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
         self.color = color
         self.use_db = use_db
         self.use_cache = use_cache
+        self.use_api = use_api
         self.signals = WorkerSignals()
         self.progress = Progress(self.signals.progressed.emit)
         self.records_manager = RecordsManager(log_level=self.log_level)
@@ -80,7 +81,12 @@ class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
                 employee = record.matricule, record.adresse_intervenant
 
                 (result, status), time_spend = api.run(
-                    client, employee, use_db=self.use_db, use_cache=self.use_cache, analyse=self.signals.analysed.emit
+                    client,
+                    employee,
+                    use_db=self.use_db,
+                    use_cache=self.use_cache,
+                    use_api=self.use_api,
+                    analyse=self.signals.analysed.emit,
                 )
                 mission.status = status
                 total_status.add(str(status))

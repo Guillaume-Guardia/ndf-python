@@ -59,6 +59,7 @@ class CONST:
         LAN = "language"
         DB = "use_db"
         CACHE = "use_cache"
+        USE_API = "use_api"
         AGENCE = "agence"
 
         # DB
@@ -109,6 +110,9 @@ class CONST:
         READER = ["csv", "excel"]
         ANALYSE = ["all", "api", "pdf"]
         DB = ["client", "employee", "measure"]
+
+    class MENU:
+        API_ACTIONS = ["use_cache", "use_api"]
 
     class READER:
         """All constants links to reader."""
