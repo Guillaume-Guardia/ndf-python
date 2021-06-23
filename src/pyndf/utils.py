@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import re
+import json
 from datetime import datetime
+from pyndf.constants import CONST
 
 
 class Utils:
     @staticmethod
-    def type(value: str, decimal: str = "."):
+    def type(value: str, decimal: str = ".", default=None):
         try:
             value = value.replace(decimal, ".")
             if value.lower() == "true":
@@ -22,6 +24,8 @@ class Utils:
                 return int_value
             return float_value
         except ValueError:
+            if default is not None:
+                return default
             return value
         except AttributeError:
             return value
@@ -53,13 +57,57 @@ class Utils:
 
     @staticmethod
     def get_date_from_file(path: str):
-        regex = re.compile(r"^.*_(?P<date>\d{6}).*$")
+        regex = re.compile(r"^.*(?P<year>\d{4})(?P<month>\d{2}).*$")
 
         match = regex.match(path)
         if match is not None:
-            date = match.groupdict()["date"]
-            return datetime(year=int(date[:4]), month=int(date[4:6]), day=1)
+            year = int(match.groupdict()["year"])
+            month = int(match.groupdict()["month"])
+            return datetime(year=year, month=month, day=1)
         return None
+
+    @staticmethod
+    def dict2obj(d):
+        class obj(object):
+            def __init__(self, dict_):
+                self.__dict__.update(dict_)
+
+        return json.loads(json.dumps(d), object_hook=obj)
+
+    def __getattribute__(self, item):
+        # Gets called when an attribute is accessed
+        # Calling the super class to avoid recursion
+        return super().__getattribute__(item)
+
+    def __getattr__(self, item):
+        # Gets called when the item is not found via __getattribute__
+        return CONST.WRITER.PDF.UNKNOWN
+
+    def __repr__(self):
+        return f"{self.__dict__}"
+
+    @staticmethod
+    def format_address(addr: str) -> str:
+        """Formatter of addresses. Each address is returned like:
+        - ROAD,ZIPCODE,CITY if match
+        else:
+            return the raw address
+
+        Args:
+            addr (string): addresse to format
+
+        Returns:
+            string: formatted addresse or "" if no match with the regex.
+        """
+        addr = Utils.pretty_join(addr)
+        reg = re.compile(r"(?P<road>^.*)(?P<zipcode> \d{5} )(?P<city>.*$)")
+        match = reg.match(addr)
+        if match is not None:
+            road = match.groupdict()["road"]
+            code = match.groupdict()["zipcode"].strip()
+            city = match.groupdict()["city"].upper()
+            return ",".join([road, code, city])
+        return addr
 
 
 class Factory:

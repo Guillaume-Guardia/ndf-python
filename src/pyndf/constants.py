@@ -12,7 +12,7 @@ class CONST:
 
     TITLE_APP = "PYNDF"
     COMPANY = "APSIDE"
-    VERSION = "1.0"
+    VERSION = "1.1"
     OPTI = True
 
     class FILE:
@@ -59,7 +59,13 @@ class CONST:
         LAN = "language"
         DB = "use_db"
         CACHE = "use_cache"
+        USE_API = "use_api"
         AGENCE = "agence"
+
+        # DB
+        DB_CLIENT = "client"
+        DB_EMPLOYEE = "employee"
+        DB_MEASURE = "measure"
 
     MEMORY = TYPE.EXC, TYPE.CSV, TYPE.OUT, TYPE.COL, TYPE.DB, TYPE.CACHE
 
@@ -103,6 +109,10 @@ class CONST:
 
         READER = ["csv", "excel"]
         ANALYSE = ["all", "api", "pdf"]
+        DB = ["client", "employee", "measure"]
+
+    class MENU:
+        API_ACTIONS = ["use_cache", "use_api"]
 
     class READER:
         """All constants links to reader."""
@@ -115,6 +125,15 @@ class CONST:
                 "periode_production",
                 "client",
                 "adresse_client",
+                "quantite_payee",
+                "prix_unitaire",
+                "total",
+            ]
+
+        class CSV:
+            COL_PERSO = ["nom", "prenom", "matricule", "agence"]
+            COL_MISSION = [
+                "periode_production",
                 "quantite_payee",
                 "prix_unitaire",
                 "total",
@@ -203,7 +222,7 @@ class CONST:
             FONT = ["Helvetica", 10]
             COLOR = "#99ccff"  # Blue
 
-            COL_PERSO = ["nom", "matricule", "adresse_intervenant"]
-            COL_MISSION = ["client", "periode", "addresse_client", "nbrkm_mois", "taux", "plafond", "total"]
+            COL_PERSO = ["nom_intervenant", "matricule", "adresse_intervenant"]
+            COL_MISSION = ["client", "periode", "addresse_client", "nbr_km_mois", "taux", "plafond", "total"]
 
             UNKNOWN = "Inconnu"

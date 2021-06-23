@@ -5,9 +5,10 @@ from pyndf.gui.dialogs.preview import PreviewDialog
 
 
 class PdfTable(AnalyseTable):
-    def finished(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
         self.cellClicked.connect(self.on_filename_clicked)
-        super().finished()
 
     def on_filename_clicked(self, row, col):
         if self.custom_item.headers[col] == "filename":

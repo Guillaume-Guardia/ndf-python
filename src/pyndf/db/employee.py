@@ -8,7 +8,7 @@ from pyndf.db.base import Base, association_table
 class Employee(Base):
     """Db class"""
 
-    matricule = Column(Integer, nullable=False, unique=True)
+    matricule = Column(Integer, nullable=False)
 
     # Client relation many to many
     clients = relationship("Client", secondary=association_table, backref="employees")
@@ -17,4 +17,4 @@ class Employee(Base):
     measures = relationship("Measure")
 
     # Real attribute
-    address = Column(String)
+    address = Column(String, nullable=False)

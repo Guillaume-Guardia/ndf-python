@@ -46,23 +46,24 @@ csv:
   matricule: Matricule
   nom: Nom
   prenom: 'Prénom'
+  nombre: "Nombre Ind. Déplac."
   montant: "Montant salarial Ind. Déplac."
   date_depart: 'Date départ'
 
 # PDF libellé
 pdf:
-  nom: "Nom Prénom:"
+  nom_intervenant: "Nom Prénom:"
   matricule: "Matricule:"
   adresse_intervenant: "Adresse:"
   client: "Nom du client"
   periode: "Période"
   addresse_client: "Adresse de réalisation"
-  nbrkm_mois: "Nb de Km par mois"
+  nbr_km_mois: "Nb de Km par mois"
   taux: "Taux"
   plafond: "Plafond APSIDE"
   total: "Montant total"
 
-# Code, addresse
+# Code: Nom | adresse
 agence:
   AI1: APSIDE INFOGERANCE 1|6 RUE PAUL BAUDRY 75008 PARIS
   AI2: APSIDE INFOGERANCE 2|6 RUE PAUL BAUDRY 75008 PARIS

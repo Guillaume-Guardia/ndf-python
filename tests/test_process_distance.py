@@ -7,6 +7,7 @@ from pyndf.db.employee import Employee
 from pyndf.db.measure import Measure
 from pyndf.process.distance import DistanceMatrixAPI
 from pyndf.db.session import db
+from pyndf.utils import Utils
 
 
 class TestDistanceMatrixAPI(unittest.TestCase):
@@ -32,7 +33,7 @@ class TestDistanceMatrixAPI(unittest.TestCase):
         ]
 
         for raw, result in dico:
-            self.assertEqual(DistanceMatrixAPI.format_address(raw), result)
+            self.assertEqual(Utils.format_address(raw), result)
 
     def test_run(self):
         origin = "15000", "7 Rue George Sand, 29200 Brest"
@@ -73,7 +74,7 @@ class TestDistanceMatrixAPI(unittest.TestCase):
 
     def test_run_not_found(self):
         # indicates that the origin and/or destination of this pairing could not be geocoded.
-        origin = "15000", "cgduyuyzyz uichsduicshd 78500 sdciucshui"
+        origin = "15000", "cgduyuyzyz uichsduicshd sss sdciucshui"
         destination = "Apside", "90 Rue Ernest Hemingway, 29200 Brest"
         # Check API
         (result, status), time_spend = self.api.run(origin, destination, use_db=False)
@@ -106,30 +107,26 @@ class TestDistanceMatrixAPI(unittest.TestCase):
 
         # Check in db
         with db.session_scope() as session:
-            db_client = session.query(Client).filter(Client.name == client.name).one()
+            db_client = session.query(Client).filter_by(name=client.name).one()
             self.assertEqual(db_client.address, client.address)
 
-            db_employee = session.query(Employee).filter(Employee.matricule == employee.matricule).one()
+            db_employee = session.query(Employee).filter_by(matricule=employee.matricule).one()
             self.assertEqual(db_employee.address, employee.address)
 
             # Check relation between employee and client
             self.assertListEqual(db_employee.clients, [db_client])
             self.assertListEqual(db_client.employees, [db_employee])
 
-            db_measure = (
-                session.query(Measure).filter(Measure.client == db_client).filter(Measure.employee == db_employee).one()
-            )
+            db_measure = session.query(Measure).filter_by(client=db_client, employee=db_employee).one()
 
             self.assertEqual(db_measure.distance, 15)
             self.assertEqual(db_measure.duration, 10.5)
 
         # Remove in db
         with db.session_scope() as session:
-            db_client = session.query(Client).filter(Client.name == client.name).one()
-            db_employee = session.query(Employee).filter(Employee.matricule == employee.matricule).one()
-            db_measure = (
-                session.query(Measure).filter(Measure.client == db_client).filter(Measure.employee == db_employee).one()
-            )
+            db_client = session.query(Client).filter_by(name=client.name).one()
+            db_employee = session.query(Employee).filter_by(matricule=employee.matricule).one()
+            db_measure = session.query(Measure).filter_by(client=db_client, employee=db_employee).one()
 
             session.delete(db_client)
             session.delete(db_employee)

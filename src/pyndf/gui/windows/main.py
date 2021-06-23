@@ -24,6 +24,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.color = color
         self.use_db = use_db
         self.use_cache = use_cache
+        self.use_api = True
 
         # Window parameters
         self.setWindowTitle(CONST.TITLE_APP)
@@ -72,6 +73,9 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             CONST.TYPE.ALL: self.tr("Global Analyse"),
             CONST.TYPE.API: self.tr("Google API Analyse"),
             CONST.TYPE.PDF: self.tr("PDF files Analyse"),
+            CONST.TYPE.DB_CLIENT: self.tr("Database Client"),
+            CONST.TYPE.DB_EMPLOYEE: self.tr("Database Employee"),
+            CONST.TYPE.DB_MEASURE: self.tr("Database Measure"),
         }
 
         for index, (key, title) in enumerate(info_dict.items()):
@@ -106,6 +110,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             log_level=self.log_level,
             use_db=self.use_db,
             use_cache=self.use_cache,
+            use_api=self.use_api,
         )
         process.signals.error.connect(self.error)
         process.signals.finished.connect(self.generated)

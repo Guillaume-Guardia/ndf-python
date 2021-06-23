@@ -12,6 +12,9 @@ class MainMenu(QtWidgets.QMenuBar):
         super().__init__(parent=window)
         self.window = window
 
+        # store special actions
+        self.__actions = {}
+
         # file
         self.addMenu(self.create_file_menu())
 
@@ -23,6 +26,8 @@ class MainMenu(QtWidgets.QMenuBar):
 
         # Help
         self.addMenu(self.create_help_menu())
+
+        self.enable_dev_mode(False)
 
     def create_file_menu(self):
         menu = QtWidgets.QMenu(self.tr("File"), self)
@@ -59,10 +64,24 @@ class MainMenu(QtWidgets.QMenuBar):
         menu.addSeparator()
 
         # API
-        self.create_action_options(menu, self.tr("Use DB"), CONST.TYPE.DB)
-        self.create_action_options(menu, self.tr("Use CACHE"), CONST.TYPE.CACHE)
+        self.__actions[CONST.TYPE.DB] = self.create_action_options(menu, self.tr("Use DB"), CONST.TYPE.DB)
+        self.__actions[CONST.TYPE.CACHE] = self.create_action_options(menu, self.tr("Use CACHE"), CONST.TYPE.CACHE)
+        self.__actions[CONST.TYPE.USE_API] = self.create_action_options(menu, self.tr("Use API"), CONST.TYPE.USE_API)
+
+        # Dev mode
+        menu.addSeparator()
+        action = QtGui.QAction(self.tr("Dev mode"), menu)
+        action.setCheckable(True)
+        action.setShortcut("Ctrl+D")
+        action.toggled.connect(self.enable_dev_mode)
+        action.setChecked(False)
+        menu.addAction(action)
 
         return menu
+
+    def enable_dev_mode(self, boolean):
+        for analyse in CONST.TAB.ANALYSE + CONST.TAB.DB + CONST.MENU.API_ACTIONS:
+            self.__actions[analyse].setVisible(boolean)
 
     def create_views_menu(self):
         menu = QtWidgets.QMenu(self.tr("Views"), self)
@@ -78,7 +97,13 @@ class MainMenu(QtWidgets.QMenuBar):
 
         # Analyse
         for analyse in CONST.TAB.ANALYSE:
-            self.create_action_views(menu, self.window.tabs[analyse])
+            self.__actions[analyse] = self.create_action_views(menu, self.window.tabs[analyse])
+
+        menu.addSeparator()
+
+        # DB
+        for analyse in CONST.TAB.DB:
+            self.__actions[analyse] = self.create_action_views(menu, self.window.tabs[analyse])
 
         return menu
 
@@ -89,6 +114,7 @@ class MainMenu(QtWidgets.QMenuBar):
         attr = getattr(self.window, name)
         action.setChecked(attr if attr is not None else CONST.FILE.YAML[CONST.TYPE.API][name])
         menu.addAction(action)
+        return action
 
     def create_action_views(self, menu, tab):
         action = QtGui.QAction(tab.title, menu)
@@ -96,6 +122,7 @@ class MainMenu(QtWidgets.QMenuBar):
         action.toggled.connect(lambda boolean, tab_=tab: self.window.toggled_tab(tab_, boolean))
         action.setChecked(self.window.controller_tab.isTabVisible(self.window.controller_tab.indexOf(tab)))
         menu.addAction(action)
+        return action
 
     def create_help_menu(self):
         menu = QtWidgets.QMenu(self.tr("Help"), self)
