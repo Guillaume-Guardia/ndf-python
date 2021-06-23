@@ -139,7 +139,7 @@ class CsvRecord(Record):
         self.log.debug("Create CSV record")
         # Matricule + Nom + agence
         for key in CONST.READER.CSV.COL_PERSO:
-            setattr(self, key, record[self.csv_mapper[key]])
+            setattr(self, key, record.get(self.csv_mapper[key], CONST.WRITER.PDF.UNKNOWN))
             self.log.debug(f"{key:25} = {getattr(self, key)}")
 
 
@@ -149,7 +149,7 @@ class ExcelRecord(Record):
         self.log.debug("Create Excel record")
         # Personal info
         for key in CONST.READER.EXC.COL_PERSO:
-            setattr(self, key, record[self.excel_mapper[key]])
+            setattr(self, key, record.get(self.excel_mapper[key], CONST.WRITER.PDF.UNKNOWN))
             self.log.debug(f"{key:25} = {getattr(self, key)}")
 
 

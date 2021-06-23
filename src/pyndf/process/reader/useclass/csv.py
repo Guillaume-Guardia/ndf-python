@@ -5,6 +5,7 @@ import pandas as pd
 from pyndf.constants import CONST
 from pyndf.gui.items.factory import Items
 from pyndf.process.reader.abstract import AbstractReader
+from pyndf.process.record import RecordsManager
 from pyndf.utils import Utils
 
 
@@ -25,10 +26,10 @@ class CsvReader(AbstractReader):
         if progress:
             progress.set_maximum(len(dataframe.to_dict("records")))
 
-        for record in dataframe.to_dict("records"):
-            if manager is None:
-                continue
+        if manager is None:
+            manager = RecordsManager()
 
+        for record in dataframe.to_dict("records"):
             status = manager.add_csv_record(record, list(dataframe.columns))
 
             if analyse:

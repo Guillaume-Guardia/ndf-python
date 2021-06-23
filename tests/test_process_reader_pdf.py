@@ -5,9 +5,11 @@ import unittest
 import tempfile
 import shutil
 from pyndf.process.reader.factory import Reader
+from pyndf.process.record import Record
 from pyndf.process.writer.factory import Writer
 from pyndf.process.reader.useclass.pdf import PdfReader
 from pyndf.constants import CONST
+from pyndf.utils import Utils
 
 
 class TestPdfReader(unittest.TestCase):
@@ -18,7 +20,7 @@ class TestPdfReader(unittest.TestCase):
         """Before all tests"""
         cls.directory = tempfile.mkdtemp()
         cls.headers = CONST.FILE.YAML[CONST.TYPE.CSV]
-        cls.date = "300012"
+        cls.date = Utils.get_date_from_file("300012")
         cls.writer = Writer(CONST.TYPE.PDF, cls.date, CONST.WRITER.PDF.COLOR, directory=cls.directory)
         cls.reader = PdfReader()
 
@@ -27,9 +29,9 @@ class TestPdfReader(unittest.TestCase):
         self.filename = self.create_pdf()
 
     def create_pdf(self):
-        data = dict()
-        data["matricule"] = "0150"
-        data["agence"] = "BREST"
+        data = Record()
+        data.matricule = "0150"
+        data.agence = "BREST"
 
         (filename, status), time_spend = self.writer.write(data, data)
         return filename

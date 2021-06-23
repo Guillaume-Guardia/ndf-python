@@ -6,6 +6,7 @@ import tempfile
 import shutil
 from collections import defaultdict
 from pyndf.process.reader.factory import Reader
+from pyndf.process.record import Record
 from pyndf.process.writer.factory import Writer
 from pyndf.process.reader.useclass.csv import CsvReader
 from pyndf.constants import CONST
@@ -20,10 +21,12 @@ class TestCsvReader(unittest.TestCase):
     def setUpClass(cls):
         """Before all tests"""
         cls.directory = tempfile.mkdtemp()
-        cls.headers = CONST.FILE.YAML[CONST.TYPE.CSV]
 
-        for i in range(10):
+        # Create headers
+        cls.headers = CONST.FILE.YAML[CONST.TYPE.CSV]
+        for i in range(10000, 10010):
             cls.headers[f"montant{i}"] = CONST.FILE.YAML[CONST.TYPE.CSV]["montant"] + str(i)
+            cls.headers[f"nombre{i}"] = CONST.FILE.YAML[CONST.TYPE.CSV]["nombre"] + str(i)
 
         cls.writer = Writer(CONST.TYPE.CSV, directory=cls.directory)
         cls.reader = CsvReader()
@@ -38,18 +41,20 @@ class TestCsvReader(unittest.TestCase):
         self.filename = self.create_csv(filename)
 
     def create_csv(self, filename):
-
         data = defaultdict(list)
-        for row in range(self.n_rows):
+        for matricule in range(self.n_rows):
             for header in self.headers.values():
-                if self.reader.record_regex.match(header):
-                    value = row * 10
+                if Record.regexes["total"].match(header):
+                    indice = Record.regexes["total"].match(header).groupdict()["indice"].strip()
+                    value = f"{int(indice)}"
+                elif Record.regexes["quantite_payee"].match(header):
+                    indice = Record.regexes["quantite_payee"].match(header).groupdict()["indice"].strip()
+                    value = f"{int(indice) / 1000}"
                 elif header == self.headers["matricule"]:
-                    value = row
+                    value = matricule
                 else:
-                    value = row, header
+                    value = f"{header}_{matricule}"
                 data[header].append(value)
-
         (filename, status), time_spend = self.writer.write(data, filename)
         return filename
 
@@ -70,14 +75,11 @@ class TestCsvReader(unittest.TestCase):
         self.assertEqual(result, CONST.TYPE.CSV)
 
     def test_read(self):
-        records, status = Reader(self.filename)
-
-        for row in range(self.n_rows):
-            value = 0
-            for header in self.headers.values():
-                if self.reader.record_regex.match(header):
-                    value += row * 10
-            self.assertEqual(records[row], value)
+        manager_records, status = Reader(self.filename)
+        for record in manager_records:
+            for indice, indemnite in record.indemnites.items():
+                self.assertEqual(indemnite.total, int(indice))
+                self.assertEqual(indemnite.quantite_payee, int(indice) / 1000)
 
     def tearDown(self):
         os.remove(self.filename)

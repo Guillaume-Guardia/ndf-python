@@ -7,6 +7,7 @@ from pyndf.db.employee import Employee
 from pyndf.db.measure import Measure
 from pyndf.process.distance import DistanceMatrixAPI
 from pyndf.db.session import db
+from pyndf.utils import Utils
 
 
 class TestDistanceMatrixAPI(unittest.TestCase):
@@ -32,7 +33,7 @@ class TestDistanceMatrixAPI(unittest.TestCase):
         ]
 
         for raw, result in dico:
-            self.assertEqual(DistanceMatrixAPI.format_address(raw), result)
+            self.assertEqual(Utils.format_address(raw), result)
 
     def test_run(self):
         origin = "15000", "7 Rue George Sand, 29200 Brest"
@@ -73,7 +74,7 @@ class TestDistanceMatrixAPI(unittest.TestCase):
 
     def test_run_not_found(self):
         # indicates that the origin and/or destination of this pairing could not be geocoded.
-        origin = "15000", "cgduyuyzyz uichsduicshd 78500 sdciucshui"
+        origin = "15000", "cgduyuyzyz uichsduicshd sss sdciucshui"
         destination = "Apside", "90 Rue Ernest Hemingway, 29200 Brest"
         # Check API
         (result, status), time_spend = self.api.run(origin, destination, use_db=False)

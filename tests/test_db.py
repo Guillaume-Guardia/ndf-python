@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import re
 import unittest
 from pyndf.db.client import Client
 from pyndf.db.session import db

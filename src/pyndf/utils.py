@@ -57,12 +57,13 @@ class Utils:
 
     @staticmethod
     def get_date_from_file(path: str):
-        regex = re.compile(r"^.*_(?P<date>\d{6}).*$")
+        regex = re.compile(r"^.*(?P<year>\d{4})(?P<month>\d{2}).*$")
 
         match = regex.match(path)
         if match is not None:
-            date = match.groupdict()["date"]
-            return datetime(year=int(date[:4]), month=int(date[4:6]), day=1)
+            year = int(match.groupdict()["year"])
+            month = int(match.groupdict()["month"])
+            return datetime(year=year, month=month, day=1)
         return None
 
     @staticmethod
