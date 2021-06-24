@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import shutil
+from pyndf.gui.widgets.control import ControlButtons
 from pyndf.qtlib import QtWidgets, QtCore
 from pyndf.logbook import Logger
-from pyndf.process.thread import Thread
+from pyndf.process.thread import NdfProcess
 from pyndf.constants import CONST
 from pyndf.gui.tabs.useclass.analyse import AnalyseTab
 from pyndf.gui.tabs.useclass.process import ProcessTab
@@ -35,9 +36,6 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         self.read_settings()
 
-        # Initialisation attributes
-        self.threadpool = QtCore.QThreadPool()
-
         # Tabs
         self.controller_tab = QtWidgets.QTabWidget()
         self.setCentralWidget(self.controller_tab)
@@ -48,6 +46,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.setMenuWidget(MainMenu(self))
 
         # Progress Bar in status bar
+        self.control_buttons = ControlButtons(self)
         self.progress = QtWidgets.QProgressBar()
         self._create_status_bar()
 
@@ -90,9 +89,10 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.controller_tab.setCurrentIndex(0)
 
     def _create_status_bar(self):
-        self.progress.hide()
         status_bar = QtWidgets.QStatusBar()
-        status_bar.addPermanentWidget(self.progress, 0)
+        status_bar.addPermanentWidget(self.control_buttons)
+        status_bar.addPermanentWidget(self.progress)
+        status_bar.hide()
         self.setStatusBar(status_bar)
 
     def generate(self):
@@ -100,11 +100,13 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         if not all([t.text() for t in self.tabs[CONST.TYPE.PRO].texts.values()]):
             return None  # If one field is empty, ignore.
 
-        self.progress.show()
+        self.statusBar().show()
+
         self.tabs[CONST.TYPE.PRO].buttons[CONST.TYPE.PDF].setDisabled(True)
         for name in CONST.TAB.ANALYSE + CONST.TAB.READER:
             self.tabs[name].table.init()
-        process = Thread(
+
+        process = NdfProcess(
             *[t.text() for t in self.tabs[CONST.TYPE.PRO].texts.values()],
             color=self.color,
             log_level=self.log_level,
@@ -116,7 +118,8 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         process.signals.finished.connect(self.generated)
         process.signals.progressed.connect(self.progressed)
         process.signals.analysed.connect(self.analysed)
-        self.threadpool.start(process)
+        process.start()
+
         return True
 
     @QtCore.pyqtSlot(object)
@@ -134,7 +137,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
     # End methods
     def tear_down(self):
-        self.progress.hide()
+        self.statusBar().hide()
         self.progress.reset()
         for name in CONST.TAB.ANALYSE + CONST.TAB.READER:
             self.tabs[name].table.finished()

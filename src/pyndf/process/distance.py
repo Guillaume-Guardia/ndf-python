@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import re
 import googlemaps
 from pyndf.logbook import Logger, log_time
 from pyndf.constants import CONST
@@ -55,18 +54,21 @@ class DistanceMatrixAPI(Logger):
         # Check DB
         if use_db:
             with db.session_scope() as session:
-                measure = (
-                    session.query(Measure)
-                    .filter_by(client_address=client_address, employee_address=employee_address)
-                    .first()
-                )
+                try:
+                    measure = (
+                        session.query(Measure)
+                        .filter_by(client_address=client_address, employee_address=employee_address)
+                        .first()
+                    )
 
-                if measure:
-                    # Add in cache
-                    self._cache[(client_address, employee_address)] = (measure.distance, measure.duration)
+                    if measure:
+                        # Add in cache
+                        self._cache[(client_address, employee_address)] = (measure.distance, measure.duration)
 
-                    self.log.debug(f"Status: {CONST.STATUS.DB} || Result: {(measure.distance, measure.duration)}")
-                    return (measure.distance, measure.duration), CONST.STATUS.DB
+                        self.log.debug(f"Status: {CONST.STATUS.DB} || Result: {(measure.distance, measure.duration)}")
+                        return (measure.distance, measure.duration), CONST.STATUS.DB
+                except Exception:
+                    self.log.warning("No measure object in DB")
 
         if not use_api:
             return None, CONST.STATUS.NO_USE_API

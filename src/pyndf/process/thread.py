@@ -23,7 +23,7 @@ class WorkerSignals(QtCore.QObject):
     analysed = QtCore.pyqtSignal(object)
 
 
-class Thread(Logger, QtCore.QRunnable, QtCore.QObject):
+class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
     """
     Worker thread
 
