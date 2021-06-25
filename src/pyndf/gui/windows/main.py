@@ -129,6 +129,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
     # End methods
     def tear_down(self):
+        """Hide the status bar, reset the progress bar, show the table tabs, add the total in each table. Reactivation of the start button."""
         self.statusBar().hide()
         self.progress.reset()
         for name in CONST.TAB.ANALYSE + CONST.TAB.READER:
@@ -138,10 +139,16 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot()
     def cancelled(self):
+        """Slot method which is connected to tear_down method."""
         self.tear_down()
 
     @QtCore.pyqtSlot(object)
     def analysed(self, obj):
+        """Slot method which send the obj row to the good table.
+
+        Args:
+            obj (row): row to print in table.
+        """
         self.toggled_tab(self.tabs[obj.type], True)
         if self.moving_tab and self.controller_tab.currentWidget != self.tabs[obj.type]:
             self.controller_tab.setCurrentWidget(self.tabs[obj.type])
@@ -149,12 +156,23 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(float, str)
     def progressed(self, value, text):
+        """Slot method which show the evolution of thread via progress bar and message.
+
+        Args:
+            value (int): 0 -> 100
+            text (str): message printed
+        """
         if value <= 100:
             self.progress.setValue(int(value))
             self.statusBar().showMessage(text, 3000)
 
     @QtCore.pyqtSlot(object)
     def error(self, obj):
+        """Slot method which pop up a message of error
+
+        Args:
+            obj (Exception): Exception to print
+        """
         self.tear_down()
         QtWidgets.QMessageBox.critical(self, self.tr("Error"), self.tr("Error: {}").format(obj))
 
@@ -165,6 +183,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.information(self, self.tr("Finished"), self.tr("The PDF files have been generated!"))
 
     def read_settings(self):
+        """Read the settings store in PC"""
         settings = QtCore.QSettings(CONST.COMPANY, CONST.TITLE_APP)
         geo = settings.value("geometry")
         if geo is not None:
@@ -180,6 +199,11 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
                 setattr(self, name, Utils.type(attr))
 
     def closeEvent(self, event):
+        """Qt method
+
+        Args:
+            event (Qt.event):
+        """
         # Cancel processing
         self.control_buttons.cancel()
 

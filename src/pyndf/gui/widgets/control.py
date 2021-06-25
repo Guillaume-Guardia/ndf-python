@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from pyndf.qtlib import QtWidgets, QtCore
+from pyndf.qtlib import QtWidgets
 
 
 class ControlButtons(QtWidgets.QWidget):
+    """Widget adding in status bar to control the execution of the thread
+
+    Args:
+        QtWidgets (QT):
+    """
+
     def __init__(self, windows, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.windows = windows
@@ -25,5 +31,6 @@ class ControlButtons(QtWidgets.QWidget):
         self.setLayout(layout)
 
     def cancel(self):
+        """Cancel method which stop the thread execution safely with the set of a flag."""
         if self.windows.process is not None:
             self.windows.process.flags.cancel = True
