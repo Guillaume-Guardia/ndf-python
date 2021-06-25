@@ -9,7 +9,7 @@ from pyndf.constants import CONST
 
 
 class ProcessTab(AbstractTab):
-    def __init__(self, window, title, excel="", csv="", output=""):
+    def __init__(self, window, title, excel=None, csv=None, output=None):
         super().__init__(window, title)
 
         self.manager = RecordsManager(log_level=window.log_level)
@@ -54,11 +54,12 @@ class ProcessTab(AbstractTab):
 
     def add_data(self, filename, name):
         if not os.path.exists(filename):
-            setattr(self.window, name, "")
-            self.texts[name].setText("")
+            getattr(self.window, name).remove(filename)
+            self.texts[name].removeItem(self.texts[name].currentIndex())
             return
 
         if name not in CONST.TAB.READER:
+            # Directory doesn't have reader
             return
 
         self.window.tabs[name].table.init(clear=True)
@@ -73,28 +74,38 @@ class ProcessTab(AbstractTab):
             )
         self.window.tabs[name].table.finished(bool(status))
 
-    def add_button(self, name_env, name, _format=None, default=""):
+    def add_button(self, name_env, name, _format=None, default=None):
         """Add label, text + button
 
         Args:
             name_env (str): name of button in app
             name (str): name of the button
             _format (str, optional): format of file. Defaults to None.
-            default (str, optional): default text. Defaults to "".
+            default (list, optional): default list text in memory. Defaults to None.
         """
-        self.icons[name_env] = QtWidgets.QLabel()
+        # Icon
+        self.icons[name_env] = QtWidgets.QLabel(name)
         pix = QtGui.QPixmap(getattr(CONST.UI.ICONS, name_env))
         if pix:
             self.icons[name_env].setPixmap(pix.scaledToHeight(15))
-        self.labels[name_env] = QtWidgets.QLabel(name)
-        self.texts[name_env] = QtWidgets.QLineEdit()
-        self.texts[name_env].textChanged.connect(lambda filename: self.add_data(filename, name_env))
-        self.texts[name_env].setText(default)
-        self.texts[name_env].setFixedHeight(30)
-        self.texts[name_env].setDisabled(True)  # must use the file finder to select a valid file.
+        self.icons[name_env].setFixedWidth(20)
 
+        # Name
+        self.labels[name_env] = QtWidgets.QLabel(name)
+        self.labels[name_env].setFixedWidth(150)
+
+        # Text
+        self.texts[name_env] = QtWidgets.QComboBox()
+        self.texts[name_env].currentTextChanged.connect(lambda filename: self.add_data(filename, name_env))
+        for path in default:
+            self.texts[name_env].addItem(path)
+        self.texts[name_env].setFixedHeight(30)
+        self.texts[name_env].setEditable(False)  # must use the file finder to select a valid file.
+
+        # Button explorer
         self.buttons[name_env] = QtWidgets.QPushButton("...")
         self.buttons[name_env].setFixedHeight(30)
+        self.buttons[name_env].setFixedWidth(45)
         self.buttons[name_env].pressed.connect(lambda: self.choose(name_env, name, _format))
 
     @staticmethod
@@ -135,5 +146,6 @@ class ProcessTab(AbstractTab):
                 filter=f"{name} {_format}" + f";;{self.tr('All files')} *" * CONST.READER.CAN_ADD_ALL_FILES,
             )
         if path:
-            self.texts[name_env].setText(path)
-            setattr(self.window, name_env, path)
+            self.texts[name_env].addItem(path)
+            self.texts[name_env].setCurrentText(path)
+            getattr(self.window, name_env).append(path)

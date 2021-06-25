@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import shutil
+import json
 from pyndf.gui.widgets.control import ControlButtons
 from pyndf.qtlib import QtWidgets, QtCore
 from pyndf.logbook import Logger
@@ -19,13 +20,27 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
     def __init__(self, app, excel=None, csv=None, output=None, color=None, use_db=None, use_cache=None, **kwargs):
         super().__init__(**kwargs)
         self.app = app
-        self.excel = excel
-        self.csv = csv
-        self.output = output
-        self.color = color
+
+        # Selection files + directory
+        self.excel = []
+        if excel:
+            self.excel.append(excel)
+
+        self.csv = []
+        if csv:
+            self.csv.append(csv)
+
+        self.output = []
+        if output:
+            self.output.append(output)
+
+        # Api parameters
         self.use_db = use_db
         self.use_cache = use_cache
         self.use_api = True
+
+        # Pdf parameters
+        self.color = color or CONST.WRITER.PDF.COLOR
 
         # Window parameters
         self.setWindowTitle(CONST.TITLE_APP)
@@ -55,7 +70,13 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self._create_status_bar()
 
     def set_path(self, name, path):
-        self.tabs[CONST.TYPE.PRO].texts[name].setText(path)
+        """Set new path from the temp directory -> modification ask.
+
+        Args:
+            name (str): type of file
+            path (str): path of temp file
+        """
+        self.tabs[CONST.TYPE.PRO].texts[name].setCurrentText(path)
 
     def toggled_tab(self, tab, boolean):
         index = self.controller_tab.indexOf(tab)
@@ -101,7 +122,8 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
     def generate(self):
         """Method triggered with the button to start the generation of pdf. In process tab"""
-        if not all([t.text() for t in self.tabs[CONST.TYPE.PRO].texts.values()]):
+        parameters = [t.currentText() for t in self.tabs[CONST.TYPE.PRO].texts.values()]
+        if not all(parameters):
             return None  # If one field is empty, ignore.
 
         self.statusBar().show()
@@ -111,7 +133,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             self.tabs[name].table.init()
 
         self.process = NdfProcess(
-            *[t.text() for t in self.tabs[CONST.TYPE.PRO].texts.values()],
+            *parameters,
             color=self.color,
             log_level=self.log_level,
             use_db=self.use_db,
@@ -194,9 +216,15 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             self.restoreState(state)
 
         for name in CONST.MEMORY:
-            attr = settings.value(name)
-            if attr is not None and getattr(self, name) is None:
-                setattr(self, name, Utils.type(attr))
+            attr = json.loads(settings.value(name))
+            if attr is None:
+                continue
+
+            if getattr(self, name) is None:
+                setattr(self, name, attr)
+
+            elif isinstance(getattr(self, name), list):
+                getattr(self, name).extend(attr)
 
     def closeEvent(self, event):
         """Qt method
@@ -217,7 +245,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         # Memory
         for name in CONST.MEMORY:
-            settings.setValue(name, getattr(self, name))
+            settings.setValue(name, json.dumps(getattr(self, name)))
 
         self.app.set_language_mem()
         super().closeEvent(event)
