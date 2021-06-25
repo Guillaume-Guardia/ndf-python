@@ -33,6 +33,8 @@ class TestPdfReader(unittest.TestCase):
         data.matricule = "0150"
         data.agence = "BREST"
 
+        data.prepare_for_pdf()
+
         (filename, status), time_spend = self.writer.write(data, data)
         return filename
 
