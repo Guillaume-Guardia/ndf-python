@@ -60,6 +60,7 @@ class CONST:
         DB = "use_db"
         CACHE = "use_cache"
         USE_API = "use_api"
+        USE_MULTITHREAGING = "use_multithreading"
         AGENCE = "agence"
 
         # DB
@@ -112,7 +113,7 @@ class CONST:
         DB = ["client", "employee", "measure"]
 
     class MENU:
-        API_ACTIONS = ["use_cache", "use_api"]
+        API_ACTIONS = ["use_cache", "use_api", "use_multithreading"]
 
     class READER:
         """All constants links to reader."""

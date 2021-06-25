@@ -20,6 +20,43 @@ class Flags:
     cancel = False
 
 
+class PdfGenerator(QtCore.QThread):
+    def __init__(self, parent, record, date, total_status):
+        super().__init__()
+        self.parent = parent
+        self.record = record
+        self.date = date
+        self.total_status = total_status
+
+    def run(self):
+        writer = Writer(
+            CONST.TYPE.PDF,
+            self.date,
+            directory=self.parent.output_directory,
+            color=self.parent.color,
+            log_level=self.parent.log_level,
+        )
+
+        self.record.prepare_for_pdf()
+        (filename, status), time_spend = writer.write(self.record, filename=self.record)
+
+        self.total_status.add(str(status))
+
+        self.parent.progress.send(msg=self.tr("Generate PDF files"))
+        self.parent.signals.analysed.emit(
+            Items(
+                CONST.TYPE.PDF,
+                Utils.type(self.record.matricule),
+                filename,
+                self.record.nom_intervenant,
+                len(self.record.missions),
+                len(self.record.indemnites),
+                status,
+                time_spend,
+            )
+        )
+
+
 class WorkerSignals(QtCore.QObject):
     """
     Defines the signals available from a running worker thread.
@@ -42,15 +79,29 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
     :param data: The data to add to the PDF for generating.
     """
 
-    def __init__(self, excel_file, csv_file, output_directory, color, use_db, use_cache, use_api, **kwargs):
+    def __init__(
+        self,
+        parent,
+        excel_file,
+        csv_file,
+        output_directory,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
+        self.parent = parent
         self.excel_file = excel_file
         self.csv_file = csv_file
         self.output_directory = output_directory
-        self.color = color
-        self.use_db = use_db
-        self.use_cache = use_cache
-        self.use_api = use_api
+        self.color = parent.color
+
+        # Distance parameters
+        self.use_db = parent.use_db
+        self.use_cache = parent.use_cache
+        self.use_api = parent.use_api
+
+        # Pdf parameters
+        self.use_multithreading = parent.use_multithreading
+
         self.signals = WorkerSignals()
         self.progress = Progress(self.signals.progressed.emit)
         self.records_manager = RecordsManager(log_level=self.log_level)
@@ -138,33 +189,47 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
 
         # Get writer
         date = Utils.get_date_from_file(self.excel_file)
-        writer = Writer(
-            CONST.TYPE.PDF, date, directory=self.output_directory, color=self.color, log_level=self.log_level
-        )
 
-        for record in self.records_manager:
-            # Check cancel
-            if self.flags.cancel:
-                raise CancelException
-
-            record.prepare_for_pdf()
-            (filename, status), time_spend = writer.write(record, filename=record)
-
-            total_status.add(str(status))
-
-            self.progress.send(msg=self.tr("Generate PDF files"))
-            self.signals.analysed.emit(
-                Items(
-                    CONST.TYPE.PDF,
-                    Utils.type(record.matricule),
-                    filename,
-                    record.nom_intervenant,
-                    len(record.missions),
-                    len(record.indemnites),
-                    status,
-                    time_spend,
-                )
+        if not self.use_multithreading:
+            writer = Writer(
+                CONST.TYPE.PDF, date, directory=self.output_directory, color=self.color, log_level=self.log_level
             )
+
+            for record in self.records_manager:
+                # Check cancel
+                if self.flags.cancel:
+                    raise CancelException
+
+                record.prepare_for_pdf()
+                (filename, status), time_spend = writer.write(record, filename=record)
+
+                total_status.add(str(status))
+
+                self.progress.send(msg=self.tr("Generate PDF files"))
+                self.signals.analysed.emit(
+                    Items(
+                        CONST.TYPE.PDF,
+                        Utils.type(record.matricule),
+                        filename,
+                        record.nom_intervenant,
+                        len(record.missions),
+                        len(record.indemnites),
+                        status,
+                        time_spend,
+                    )
+                )
+        else:
+            for record in self.records_manager:
+                # Check cancel
+                if self.flags.cancel:
+                    raise CancelException
+
+                # Create a new thread and start it
+                self.parent.processes.append(PdfGenerator(self, record, date, total_status))
+                self.parent.processes[-1].start()
+
+            for process in self.parent.processes:
+                process.wait()
 
         return Utils.getattr(CONST.STATUS, total_status)
 

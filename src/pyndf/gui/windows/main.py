@@ -11,7 +11,6 @@ from pyndf.gui.tabs.useclass.analyse import AnalyseTab
 from pyndf.gui.tabs.useclass.process import ProcessTab
 from pyndf.gui.items.factory import Items
 from pyndf.gui.menus.menu import MainMenu
-from pyndf.utils import Utils
 
 
 class MainWindow(Logger, QtWidgets.QMainWindow):
@@ -40,6 +39,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.use_api = True
 
         # Pdf parameters
+        self.use_multithreading = True
         self.color = color or CONST.WRITER.PDF.COLOR
 
         # Window parameters
@@ -54,6 +54,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         # Process parameters
         self.moving_tab = False
         self.process = None
+        self.processes = []
 
         # Tabs
         self.controller_tab = QtWidgets.QTabWidget()
@@ -132,14 +133,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         for name in CONST.TAB.ANALYSE + CONST.TAB.READER:
             self.tabs[name].table.init()
 
-        self.process = NdfProcess(
-            *parameters,
-            color=self.color,
-            log_level=self.log_level,
-            use_db=self.use_db,
-            use_cache=self.use_cache,
-            use_api=self.use_api,
-        )
+        self.process = NdfProcess(self, *parameters)
         self.process.signals.error.connect(self.error)
         self.process.signals.finished.connect(self.generated)
         self.process.signals.progressed.connect(self.progressed)

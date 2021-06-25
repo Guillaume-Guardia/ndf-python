@@ -167,9 +167,9 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
 
         # Merge
         status = Utils.getattr(CONST.STATUS, status)
-        if status:
-            for i in (1, 3, 4, 5, 6):
-                style.add("SPAN", (i, 1), (i, -1))
+
+        for i in (1, 3, 4, 5, 6):
+            style.add("SPAN", (i, 1), (i, -1))
 
         table.setStyle(style)
         return table, status

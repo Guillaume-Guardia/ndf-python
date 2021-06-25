@@ -59,17 +59,20 @@ class MainMenu(QtWidgets.QMenuBar):
             )
         menu.addSeparator()
 
-        # Color PDF
+        # PDF
         menu.addAction(QtGui.QIcon(CONST.UI.ICONS.COL), self.tr("Select PDF file color"), self.change_color_pdf)
+        self.__actions[CONST.TYPE.USE_MULTITHREAGING] = self.create_action_options(
+            menu, self.tr("Use multithreading"), CONST.TYPE.USE_MULTITHREAGING
+        )
         menu.addSeparator()
 
         # API
         self.__actions[CONST.TYPE.DB] = self.create_action_options(menu, self.tr("Use DB"), CONST.TYPE.DB)
         self.__actions[CONST.TYPE.CACHE] = self.create_action_options(menu, self.tr("Use CACHE"), CONST.TYPE.CACHE)
         self.__actions[CONST.TYPE.USE_API] = self.create_action_options(menu, self.tr("Use API"), CONST.TYPE.USE_API)
+        menu.addSeparator()
 
         # Dev mode
-        menu.addSeparator()
         action = QtGui.QAction(self.tr("Dev mode"), menu)
         action.setCheckable(True)
         action.setShortcut("Ctrl+D")
