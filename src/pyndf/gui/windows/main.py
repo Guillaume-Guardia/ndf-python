@@ -36,6 +36,10 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         self.read_settings()
 
+        # Process parameters
+        self.moving_tab = False
+        self.process = None
+
         # Tabs
         self.controller_tab = QtWidgets.QTabWidget()
         self.setCentralWidget(self.controller_tab)
@@ -106,7 +110,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         for name in CONST.TAB.ANALYSE + CONST.TAB.READER:
             self.tabs[name].table.init()
 
-        process = NdfProcess(
+        self.process = NdfProcess(
             *[t.text() for t in self.tabs[CONST.TYPE.PRO].texts.values()],
             color=self.color,
             log_level=self.log_level,
@@ -114,26 +118,14 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             use_cache=self.use_cache,
             use_api=self.use_api,
         )
-        process.signals.error.connect(self.error)
-        process.signals.finished.connect(self.generated)
-        process.signals.progressed.connect(self.progressed)
-        process.signals.analysed.connect(self.analysed)
-        process.start()
+        self.process.signals.error.connect(self.error)
+        self.process.signals.finished.connect(self.generated)
+        self.process.signals.progressed.connect(self.progressed)
+        self.process.signals.analysed.connect(self.analysed)
+        self.process.signals.cancelled.connect(self.cancelled)
+        self.process.start()
 
         return True
-
-    @QtCore.pyqtSlot(object)
-    def analysed(self, obj):
-        index = self.controller_tab.indexOf(self.tabs[obj.type])
-        if self.controller_tab.currentIndex != index:
-            self.controller_tab.setCurrentIndex(index)
-        self.tabs[obj.type].table.add(obj)
-
-    @QtCore.pyqtSlot(float, str)
-    def progressed(self, value, text):
-        if value <= 100:
-            self.progress.setValue(int(value))
-            self.statusBar().showMessage(text, 3000)
 
     # End methods
     def tear_down(self):
@@ -142,6 +134,24 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         for name in CONST.TAB.ANALYSE + CONST.TAB.READER:
             self.tabs[name].table.finished()
         self.tabs[CONST.TYPE.PRO].buttons[CONST.TYPE.PDF].setDisabled(False)
+        self.process = None
+
+    @QtCore.pyqtSlot()
+    def cancelled(self):
+        self.tear_down()
+
+    @QtCore.pyqtSlot(object)
+    def analysed(self, obj):
+        self.toggled_tab(self.tabs[obj.type], True)
+        if self.moving_tab and self.controller_tab.currentWidget != self.tabs[obj.type]:
+            self.controller_tab.setCurrentWidget(self.tabs[obj.type])
+        self.tabs[obj.type].table.add(obj)
+
+    @QtCore.pyqtSlot(float, str)
+    def progressed(self, value, text):
+        if value <= 100:
+            self.progress.setValue(int(value))
+            self.statusBar().showMessage(text, 3000)
 
     @QtCore.pyqtSlot(object)
     def error(self, obj):
@@ -170,6 +180,10 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
                 setattr(self, name, Utils.type(attr))
 
     def closeEvent(self, event):
+        # Cancel processing
+        self.control_buttons.cancel()
+
+        # Save geometry of window
         settings = QtCore.QSettings(CONST.COMPANY, CONST.TITLE_APP)
         settings.setValue("geometry", self.saveGeometry())
         settings.setValue("windowState", self.saveState())

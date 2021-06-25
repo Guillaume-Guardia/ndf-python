@@ -12,6 +12,14 @@ from pyndf.logbook import Logger, log_time
 from pyndf.utils import Utils
 
 
+class CancelException(Exception):
+    pass
+
+
+class Flags:
+    cancel = False
+
+
 class WorkerSignals(QtCore.QObject):
     """
     Defines the signals available from a running worker thread.
@@ -21,6 +29,7 @@ class WorkerSignals(QtCore.QObject):
     finished = QtCore.pyqtSignal()
     progressed = QtCore.pyqtSignal(float, str)
     analysed = QtCore.pyqtSignal(object)
+    cancelled = QtCore.pyqtSignal()
 
 
 class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
@@ -45,9 +54,14 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
         self.signals = WorkerSignals()
         self.progress = Progress(self.signals.progressed.emit)
         self.records_manager = RecordsManager(log_level=self.log_level)
+        self.flags = Flags()
 
     @log_time
     def read_excel(self):
+        # Check cancel
+        if self.flags.cancel:
+            raise CancelException
+
         self.progress.add_duration(5)
         _, status = Reader(
             self.excel_file,
@@ -59,6 +73,10 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
 
     @log_time
     def read_csv(self):
+        # Check cancel
+        if self.flags.cancel:
+            raise CancelException
+
         self.progress.add_duration(5)
         _, status = Reader(
             self.csv_file,
@@ -77,6 +95,10 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
 
         for record in self.records_manager:
             for mission in record.missions:
+                # Check cancel
+                if self.flags.cancel:
+                    raise CancelException
+
                 client = mission.client, mission.adresse_client
                 employee = record.matricule, record.adresse_intervenant
 
@@ -121,6 +143,10 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
         )
 
         for record in self.records_manager:
+            # Check cancel
+            if self.flags.cancel:
+                raise CancelException
+
             record.prepare_for_pdf()
             (filename, status), time_spend = writer.write(record, filename=record)
 
@@ -145,8 +171,8 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
     @QtCore.pyqtSlot()
     def run(self):
         """Run method"""
-        self.log.info("Start process")
         try:
+            self.log.info("Start process")
             sender = self.signals.analysed.emit
             # Read Excel file
             status, time_spend = self.read_excel()
@@ -164,9 +190,13 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
             status, time_spend = self.create_pdf()
             sender(Items(CONST.TYPE.ALL, self.tr("Generate PDF files"), status, time_spend))
 
+        except CancelException:
+            self.signals.cancelled.emit()
+
         except Exception as error:
             self.log.exception(error)
             self.signals.error.emit(error)
         else:
             self.signals.finished.emit()
-        self.log.info("End process")
+        finally:
+            self.log.info("End process")

@@ -26,5 +26,4 @@ class ControlButtons(QtWidgets.QWidget):
 
     def cancel(self):
         if self.windows.process is not None:
-            self.windows.process.terminate()
-            self.windows.tear_down()
+            self.windows.process.flags.cancel = True
