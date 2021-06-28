@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import traceback
 import shutil
 import yaml
 from pyndf.gui.widgets.control import ControlButtons
@@ -190,7 +191,9 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             obj (Exception): Exception to print
         """
         self.tear_down()
-        QtWidgets.QMessageBox.critical(self, self.tr("Error"), self.tr("Error: {}").format(obj))
+        QtWidgets.QMessageBox.critical(
+            self, self.tr("Error"), f"{obj.__class__.__name__}:\n{''.join(traceback.format_tb(obj.__traceback__))}"
+        )
 
     @QtCore.pyqtSlot()
     def generated(self):
