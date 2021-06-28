@@ -23,11 +23,6 @@ class FileSelectComboBox(QtWidgets.QComboBox):
         self.addItems(sorted(list(default)))
 
     def add_data(self, filename):
-        if not os.path.exists(filename):
-            getattr(self.window, self.name_env).remove(filename)
-            self.removeItem(self.currentIndex())
-            return
-
         self.window.tabs[self.name_env].table.init(clear=True)
         _, status = Reader(filename, analyse=self.window.tabs[self.name_env].table.add, log_level=self.window.log_level)
         if not status:
@@ -36,6 +31,8 @@ class FileSelectComboBox(QtWidgets.QComboBox):
                 self.tr("Cant read file"),
                 self.tr("No reader implemented to open the file {}! Choose another file!").format(filename),
             )
+            getattr(self.window, self.name_env).discard(filename)
+            self.removeItem(self.currentIndex())
         self.window.tabs[self.name_env].table.finished(bool(status))
 
     def add_items(self, paths):

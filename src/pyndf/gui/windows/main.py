@@ -165,7 +165,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         Args:
             obj (row): row to print in table.
         """
-        self.toggled_tab(self.tabs[obj.type], True)
+        self.menuWidget()._actions[obj.type].setChecked(True)
         if self.moving_tab and self.controller_tab.currentWidget != self.tabs[obj.type]:
             self.controller_tab.setCurrentWidget(self.tabs[obj.type])
         self.tabs[obj.type].table.add(obj)

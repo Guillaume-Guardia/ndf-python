@@ -49,7 +49,10 @@ class AbstractTable(QtWidgets.QTableWidget):
         return widget
 
     def finished(self, boolean=True):
-        self.tab.window.toggled_tab(self.tab, boolean)
+        if self.tab.window.menuWidget() is not None:
+            self.tab.window.menuWidget()._actions[self.custom_item.type].setChecked(boolean)
+        else:
+            self.tab.window.toggled_tab(self.tab, boolean)
 
     def on_header_clicked(self, col):
         if col in self._cache:

@@ -13,7 +13,7 @@ class MainMenu(QtWidgets.QMenuBar):
         self.window = window
 
         # store special actions
-        self.__actions = {}
+        self._actions = {}
 
         # file
         self.addMenu(self.create_file_menu())
@@ -61,15 +61,15 @@ class MainMenu(QtWidgets.QMenuBar):
 
         # PDF
         menu.addAction(QtGui.QIcon(CONST.UI.ICONS.COL), self.tr("Select PDF file color"), self.change_color_pdf)
-        self.__actions[CONST.TYPE.USE_MULTITHREAGING] = self.create_action_options(
+        self._actions[CONST.TYPE.USE_MULTITHREAGING] = self.create_action_options(
             menu, self.tr("Use multithreading"), CONST.TYPE.USE_MULTITHREAGING
         )
         menu.addSeparator()
 
         # API
-        self.__actions[CONST.TYPE.DB] = self.create_action_options(menu, self.tr("Use DB"), CONST.TYPE.DB)
-        self.__actions[CONST.TYPE.CACHE] = self.create_action_options(menu, self.tr("Use CACHE"), CONST.TYPE.CACHE)
-        self.__actions[CONST.TYPE.USE_API] = self.create_action_options(menu, self.tr("Use API"), CONST.TYPE.USE_API)
+        self._actions[CONST.TYPE.DB] = self.create_action_options(menu, self.tr("Use DB"), CONST.TYPE.DB)
+        self._actions[CONST.TYPE.CACHE] = self.create_action_options(menu, self.tr("Use CACHE"), CONST.TYPE.CACHE)
+        self._actions[CONST.TYPE.USE_API] = self.create_action_options(menu, self.tr("Use API"), CONST.TYPE.USE_API)
         menu.addSeparator()
 
         # Dev mode
@@ -84,7 +84,7 @@ class MainMenu(QtWidgets.QMenuBar):
 
     def enable_dev_mode(self, boolean):
         for analyse in CONST.TAB.ANALYSE + CONST.TAB.DB + CONST.MENU.API_ACTIONS:
-            self.__actions[analyse].setVisible(boolean)
+            self._actions[analyse].setVisible(boolean)
 
     def create_views_menu(self):
         menu = QtWidgets.QMenu(self.tr("Views"), self)
@@ -95,18 +95,17 @@ class MainMenu(QtWidgets.QMenuBar):
 
         # Reader/Writer TAB_RW
         for reader in CONST.TAB.READER:
-            self.create_action_views(menu, self.window.tabs[reader])
+            self._actions[reader] = self.create_action_views(menu, self.window.tabs[reader])
         menu.addSeparator()
 
         # Analyse
         for analyse in CONST.TAB.ANALYSE:
-            self.__actions[analyse] = self.create_action_views(menu, self.window.tabs[analyse])
-
+            self._actions[analyse] = self.create_action_views(menu, self.window.tabs[analyse])
         menu.addSeparator()
 
         # DB
         for analyse in CONST.TAB.DB:
-            self.__actions[analyse] = self.create_action_views(menu, self.window.tabs[analyse])
+            self._actions[analyse] = self.create_action_views(menu, self.window.tabs[analyse])
 
         return menu
 
