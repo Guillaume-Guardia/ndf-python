@@ -12,12 +12,13 @@ class AbstractWriter(Logger, QtCore.QObject):
 
     ext = None
 
-    def __init__(self, *args, directory=None, **kwargs):
+    def __init__(self, *args, directory=None, overwrite=True, **kwargs):
         """Initialisation"""
         super().__init__(*args, **kwargs)
         self.directory = directory
+        self.overwrite = overwrite
 
-    def create_path(self, filename, directory=None, page: int = None, ext=None, force=True):
+    def create_path(self, filename, directory=None, page: int = None, ext=None):
         """Check path method.
 
         Args:
@@ -53,7 +54,7 @@ class AbstractWriter(Logger, QtCore.QObject):
             path = path.split(".")[0] + ext
 
         # Check if the file exists
-        if os.path.exists(path) and not force:
+        if os.path.exists(path) and not self.overwrite:
             raise FileExistsError
 
         self.log.info(f"Write data in file {os.path.basename(path)}")

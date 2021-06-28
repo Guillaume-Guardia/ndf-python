@@ -35,6 +35,7 @@ class PdfGenerator(QtCore.QThread):
             directory=self.parent.output_directory,
             color=self.parent.color,
             log_level=self.parent.log_level,
+            overwrite=self.parent.overwrite,
         )
 
         self.record.prepare_for_pdf()
@@ -100,6 +101,7 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
         self.use_api = parent.use_api
 
         # Pdf parameters
+        self.overwrite = parent.overwrite
         self.use_multithreading = parent.use_multithreading
 
         self.signals = WorkerSignals()
@@ -192,7 +194,12 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
 
         if not self.use_multithreading:
             writer = Writer(
-                CONST.TYPE.PDF, date, directory=self.output_directory, color=self.color, log_level=self.log_level
+                CONST.TYPE.PDF,
+                date,
+                directory=self.output_directory,
+                color=self.color,
+                log_level=self.log_level,
+                overwrite=self.overwrite,
             )
 
             for record in self.records_manager:

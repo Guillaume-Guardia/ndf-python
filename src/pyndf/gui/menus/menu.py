@@ -64,6 +64,9 @@ class MainMenu(QtWidgets.QMenuBar):
         self._actions[CONST.TYPE.USE_MULTITHREAGING] = self.create_action_options(
             menu, self.tr("Use multithreading"), CONST.TYPE.USE_MULTITHREAGING
         )
+        self._actions[CONST.TYPE.OVERWRITE] = self.create_action_options(
+            menu, self.tr("Overwrite PDF"), CONST.TYPE.OVERWRITE
+        )
         menu.addSeparator()
 
         # API

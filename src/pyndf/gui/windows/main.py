@@ -40,6 +40,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.use_api = True
 
         # Pdf parameters
+        self.overwrite = True
         self.use_multithreading = True
         self.color = color or CONST.WRITER.PDF.COLOR
 
