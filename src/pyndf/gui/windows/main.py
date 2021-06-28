@@ -77,7 +77,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             name (str): type of file
             path (str): path of temp file
         """
-        self.tabs[CONST.TYPE.PRO].texts[name].setCurrentText(path)
+        self.tabs[CONST.TYPE.PRO].combos[name].setCurrentText(path)
 
     def toggled_tab(self, tab, boolean):
         index = self.controller_tab.indexOf(tab)
@@ -123,7 +123,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
     def generate(self):
         """Method triggered with the button to start the generation of pdf. In process tab"""
-        parameters = [t.currentText() for t in self.tabs[CONST.TYPE.PRO].texts.values()]
+        parameters = [t.currentText() for t in self.tabs[CONST.TYPE.PRO].combos.values()]
         if not all(parameters):
             return None  # If one field is empty, ignore.
 

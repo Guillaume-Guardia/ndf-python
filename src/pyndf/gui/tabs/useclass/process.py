@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import os
 from pyndf.gui.tabs.abstract import AbstractTab
-from pyndf.process.reader.factory import Reader
+from pyndf.gui.widgets.combobox import FileSelectComboBox
 from pyndf.qtlib import QtWidgets, QtGui
 from pyndf.constants import CONST
 
@@ -15,7 +14,7 @@ class ProcessTab(AbstractTab):
         self.icons = {}
         self.labels = {}
         self.buttons = {}
-        self.texts = {}
+        self.combos = {}
 
         # Explorer buttons
         self.add_button(CONST.TYPE.EXC, self.tr("EXCEL file"), "(*.xl* *.XLS)", default=window.excel)
@@ -25,7 +24,7 @@ class ProcessTab(AbstractTab):
         # Add grid layout
         grid_layout = QtWidgets.QGridLayout()
         for row, widgets in enumerate(
-            zip(self.icons.values(), self.labels.values(), self.texts.values(), self.buttons.values())
+            zip(self.icons.values(), self.labels.values(), self.combos.values(), self.buttons.values())
         ):
             for col, widget in enumerate(widgets):
                 grid_layout.addWidget(widget, row, col)
@@ -49,26 +48,6 @@ class ProcessTab(AbstractTab):
 
         self.setLayout(layout)
 
-    def add_data(self, filename, name):
-        if not os.path.exists(filename):
-            getattr(self.window, name).remove(filename)
-            self.texts[name].removeItem(self.texts[name].currentIndex())
-            return
-
-        if name not in CONST.TAB.READER:
-            # Directory doesn't have reader
-            return
-
-        self.window.tabs[name].table.init(clear=True)
-        _, status = Reader(filename, analyse=self.window.tabs[name].table.add, log_level=self.window.log_level)
-        if not status:
-            QtWidgets.QMessageBox.information(
-                self,
-                self.tr("Cant read file"),
-                self.tr("No reader implemented to open the file {}! Choose another file!").format(filename),
-            )
-        self.window.tabs[name].table.finished(bool(status))
-
     def add_button(self, name_env, name, _format=None, default=None):
         """Add label, text + button
 
@@ -90,12 +69,7 @@ class ProcessTab(AbstractTab):
         self.labels[name_env].setFixedWidth(150)
 
         # Text
-        self.texts[name_env] = QtWidgets.QComboBox()
-        self.texts[name_env].currentTextChanged.connect(lambda filename: self.add_data(filename, name_env))
-        for path in default:
-            self.texts[name_env].addItem(path)
-        self.texts[name_env].setFixedHeight(30)
-        self.texts[name_env].setEditable(False)  # must use the file finder to select a valid file.
+        self.combos[name_env] = FileSelectComboBox(self.window, name_env, default)
 
         # Button explorer
         self.buttons[name_env] = QtWidgets.QPushButton("...")
@@ -144,9 +118,4 @@ class ProcessTab(AbstractTab):
                 filter=f"{name} {_format}" + f";;{self.tr('All files')} *" * CONST.READER.CAN_ADD_ALL_FILES,
             )
 
-        if len(paths) > 0:
-            for path in paths:
-                if path not in getattr(self.window, name_env):
-                    self.texts[name_env].addItem(path)
-                    self.texts[name_env].setCurrentText(path)
-                getattr(self.window, name_env).add(path)
+        self.combos[name_env].add_items(paths)
