@@ -10,6 +10,10 @@ class PdfTable(AnalyseTable):
 
         self.cellClicked.connect(self.on_filename_clicked)
 
+    def add(self, obj):
+        obj.filename.setToolTip(self.tr("Click to view the pdf"))
+        super().add(obj)
+
     def on_filename_clicked(self, row, col):
         if self.custom_item.headers[col] == "filename":
             dialog = PreviewDialog(self, col, row)
