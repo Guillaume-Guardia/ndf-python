@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import shutil
-import json
+import yaml
 from pyndf.gui.widgets.control import ControlButtons
 from pyndf.qtlib import QtWidgets, QtCore
 from pyndf.logbook import Logger
@@ -21,17 +21,17 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.app = app
 
         # Selection files + directory
-        self.excel = []
+        self.excel = set()
         if excel:
-            self.excel.append(excel)
+            self.excel.add(excel)
 
-        self.csv = []
+        self.csv = set()
         if csv:
-            self.csv.append(csv)
+            self.csv.add(csv)
 
-        self.output = []
+        self.output = set()
         if output:
-            self.output.append(output)
+            self.output.add(output)
 
         # Api parameters
         self.use_db = use_db
@@ -110,7 +110,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         # Process tab
         title = self.tr("Process")
-        self.tabs[CONST.TYPE.PRO] = ProcessTab(self, title, excel=self.excel, csv=self.csv, output=self.output)
+        self.tabs[CONST.TYPE.PRO] = ProcessTab(self, title)
         self.controller_tab.insertTab(0, self.tabs[CONST.TYPE.PRO], title)
         self.controller_tab.setCurrentIndex(0)
 
@@ -210,15 +210,15 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             self.restoreState(state)
 
         for name in CONST.MEMORY:
-            attr = json.loads(settings.value(name))
+            attr = yaml.load(settings.value(name), Loader=yaml.FullLoader)
             if attr is None:
                 continue
 
             if getattr(self, name) is None:
                 setattr(self, name, attr)
 
-            elif isinstance(getattr(self, name), list):
-                getattr(self, name).extend(attr)
+            elif isinstance(getattr(self, name), set):
+                getattr(self, name).update(attr)
 
     def closeEvent(self, event):
         """Qt method
@@ -239,7 +239,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         # Memory
         for name in CONST.MEMORY:
-            settings.setValue(name, json.dumps(getattr(self, name)))
+            settings.setValue(name, yaml.dump(getattr(self, name)))
 
         self.app.set_language_mem()
         super().closeEvent(event)
