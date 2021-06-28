@@ -72,7 +72,7 @@ class ProcessTab(AbstractTab):
         self.combos[name_env] = FileSelectComboBox(self.window, name_env, default)
 
         # Button explorer
-        self.buttons[name_env] = QtWidgets.QPushButton("...")
+        self.buttons[name_env] = QtWidgets.QPushButton(QtGui.QIcon(CONST.UI.ICONS.PLUS), "")
         self.buttons[name_env].setFixedHeight(30)
         self.buttons[name_env].setFixedWidth(45)
         self.buttons[name_env].pressed.connect(lambda: self.choose(name_env, name, _format))

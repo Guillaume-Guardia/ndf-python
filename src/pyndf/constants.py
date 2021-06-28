@@ -87,6 +87,7 @@ class CONST:
             MAN = os.path.join(DIR, r"data\icons\manual.png")
             RIGHT = os.path.join(DIR, r"data\icons\right.png")
             LEFT = os.path.join(DIR, r"data\icons\left.png")
+            PLUS = os.path.join(DIR, r"data\icons\plus.png")
 
         BUTTONSTYLE = """  QPushButton {
                 background-color: #79bbff;
