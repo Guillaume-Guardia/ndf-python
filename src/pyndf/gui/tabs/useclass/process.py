@@ -3,16 +3,13 @@
 import os
 from pyndf.gui.tabs.abstract import AbstractTab
 from pyndf.process.reader.factory import Reader
-from pyndf.process.record import RecordsManager
 from pyndf.qtlib import QtWidgets, QtGui
 from pyndf.constants import CONST
 
 
 class ProcessTab(AbstractTab):
-    def __init__(self, window, title, excel=None, csv=None, output=None):
+    def __init__(self, window, title):
         super().__init__(window, title)
-
-        self.manager = RecordsManager(log_level=window.log_level)
 
         # Graphics elements
         self.icons = {}
@@ -21,9 +18,9 @@ class ProcessTab(AbstractTab):
         self.texts = {}
 
         # Explorer buttons
-        self.add_button(CONST.TYPE.EXC, self.tr("EXCEL file"), "(*.xl* *.XLS)", default=excel)
-        self.add_button(CONST.TYPE.CSV, self.tr("CSV file"), "(*.csv)", default=csv)
-        self.add_button(CONST.TYPE.OUT, self.tr("Save directory"), default=output)
+        self.add_button(CONST.TYPE.EXC, self.tr("EXCEL file"), "(*.xl* *.XLS)", default=window.excel)
+        self.add_button(CONST.TYPE.CSV, self.tr("CSV file"), "(*.csv)", default=window.csv)
+        self.add_button(CONST.TYPE.OUT, self.tr("Save directory"), default=window.output)
 
         # Add grid layout
         grid_layout = QtWidgets.QGridLayout()
@@ -63,9 +60,7 @@ class ProcessTab(AbstractTab):
             return
 
         self.window.tabs[name].table.init(clear=True)
-        _, status = Reader(
-            filename, analyse=self.window.tabs[name].table.add, log_level=self.window.log_level, manager=self.manager
-        )
+        _, status = Reader(filename, analyse=self.window.tabs[name].table.add, log_level=self.window.log_level)
         if not status:
             QtWidgets.QMessageBox.information(
                 self,
@@ -139,13 +134,19 @@ class ProcessTab(AbstractTab):
         """Method which call the native file dialog to choose file."""
         if _format is None:
             path = QtWidgets.QFileDialog.getExistingDirectory(self, self.tr("Open"))
+            if not path:
+                return
+            paths = [path]
         else:
-            path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            paths, _ = QtWidgets.QFileDialog.getOpenFileNames(
                 self,
                 self.tr("Open"),
                 filter=f"{name} {_format}" + f";;{self.tr('All files')} *" * CONST.READER.CAN_ADD_ALL_FILES,
             )
-        if path:
-            self.texts[name_env].addItem(path)
-            self.texts[name_env].setCurrentText(path)
-            getattr(self.window, name_env).append(path)
+
+        if len(paths) > 0:
+            for path in paths:
+                if path not in getattr(self.window, name_env):
+                    self.texts[name_env].addItem(path)
+                    self.texts[name_env].setCurrentText(path)
+                getattr(self.window, name_env).add(path)

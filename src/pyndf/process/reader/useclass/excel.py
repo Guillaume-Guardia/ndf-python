@@ -27,7 +27,7 @@ class ExcelReader(AbstractReader):
             progress.set_maximum(len(dataframe.to_dict("records")))
 
         if manager is None:
-            manager = RecordsManager()
+            manager = RecordsManager(log_level=self.log_level)
 
         for record in dataframe.to_dict("records"):
             keep_me = self.record_regex.match(str(record[CONST.FILE.YAML[CONST.TYPE.EXC]["libelle"]])) is not None

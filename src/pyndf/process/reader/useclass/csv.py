@@ -27,7 +27,7 @@ class CsvReader(AbstractReader):
             progress.set_maximum(len(dataframe.to_dict("records")))
 
         if manager is None:
-            manager = RecordsManager()
+            manager = RecordsManager(log_level=self.log_level)
 
         for record in dataframe.to_dict("records"):
             status = manager.add_csv_record(record, list(dataframe.columns))
