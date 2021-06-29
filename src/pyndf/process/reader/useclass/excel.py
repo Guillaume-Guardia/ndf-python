@@ -30,7 +30,7 @@ class ExcelReader(AbstractReader):
             manager = RecordsManager(log_level=self.log_level)
 
         for record in dataframe.to_dict("records"):
-            keep_me = self.record_regex.match(str(record[CONST.FILE.YAML[CONST.TYPE.EXC]["libelle"]])) is not None
+            keep_me = self.record_regex.match(str(record.get(CONST.FILE.YAML[CONST.TYPE.EXC]["libelle"]))) is not None
 
             if analyse:
                 analyse(

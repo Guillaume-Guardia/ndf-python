@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from pyndf.gui.tabs.abstract import AbstractTab
+from pyndf.gui.widgets.buttons.explorer import ExplorerButton
+from pyndf.gui.widgets.buttons.generate import GenerateButton
 from pyndf.gui.widgets.combobox import FileSelectComboBox
 from pyndf.qtlib import QtWidgets, QtGui
 from pyndf.constants import CONST
@@ -32,11 +34,7 @@ class ProcessTab(AbstractTab):
         grid_widget.setLayout(grid_layout)
 
         # Generate button
-        self.buttons[CONST.TYPE.PDF] = QtWidgets.QPushButton(self.tr("Generate PDF files"))
-        self.buttons[CONST.TYPE.PDF].pressed.connect(self.window.generate)
-        self.buttons[CONST.TYPE.PDF].setMinimumWidth(120)
-        self.buttons[CONST.TYPE.PDF].setMinimumHeight(40)
-        self.buttons[CONST.TYPE.PDF].setStyleSheet(CONST.UI.BUTTONSTYLE)
+        self.buttons[CONST.TYPE.PDF] = GenerateButton(self)
         generate_widget = ProcessTab.add_widget([self.buttons[CONST.TYPE.PDF]])
 
         # Create vertical layout
@@ -72,10 +70,7 @@ class ProcessTab(AbstractTab):
         self.combos[name_env] = FileSelectComboBox(self.window, name_env, default)
 
         # Button explorer
-        self.buttons[name_env] = QtWidgets.QPushButton(QtGui.QIcon(CONST.UI.ICONS.PLUS), "")
-        self.buttons[name_env].setFixedHeight(30)
-        self.buttons[name_env].setFixedWidth(45)
-        self.buttons[name_env].pressed.connect(lambda: self.choose(name_env, name, _format))
+        self.buttons[name_env] = ExplorerButton(self, name_env, name, _format)
 
     @staticmethod
     def add_widget(widgets):
@@ -103,19 +98,3 @@ class ProcessTab(AbstractTab):
         widget = QtWidgets.QWidget()
         widget.setLayout(layout)
         return widget
-
-    def choose(self, name_env, name, _format):
-        """Method which call the native file dialog to choose file."""
-        if _format is None:
-            path = QtWidgets.QFileDialog.getExistingDirectory(self, self.tr("Open"))
-            if not path:
-                return
-            paths = [path]
-        else:
-            paths, _ = QtWidgets.QFileDialog.getOpenFileNames(
-                self,
-                self.tr("Open"),
-                filter=f"{name} {_format}" + f";;{self.tr('All files')} *" * CONST.READER.CAN_ADD_ALL_FILES,
-            )
-
-        self.combos[name_env].add_items(paths)
