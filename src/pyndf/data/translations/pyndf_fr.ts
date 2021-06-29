@@ -101,12 +101,12 @@
 <context>
     <name>FileSelectComboBox</name>
     <message>
-        <location filename="../../gui/widgets/combobox.py" line="31"/>
+        <location filename="../../gui/widgets/combobox.py" line="30"/>
         <source>Cant read file</source>
         <translation>Impossible de lire le fichier</translation>
     </message>
     <message>
-        <location filename="../../gui/widgets/combobox.py" line="32"/>
+        <location filename="../../gui/widgets/combobox.py" line="31"/>
         <source>No reader implemented to open the file {}! Choose another file!</source>
         <translation>Pas de lecteur implémenté pour le fichier {}! Choisissez un autre fichier!</translation>
     </message>
@@ -202,64 +202,69 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../gui/windows/main.py" line="98"/>
+        <location filename="../../gui/windows/main.py" line="99"/>
         <source>EXCEL</source>
         <translation>EXCEL</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="99"/>
+        <location filename="../../gui/windows/main.py" line="100"/>
         <source>CSV</source>
         <translation>CSV</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="100"/>
+        <location filename="../../gui/windows/main.py" line="101"/>
         <source>Global Analyse</source>
         <translation>Analyse Globale</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="101"/>
+        <location filename="../../gui/windows/main.py" line="102"/>
         <source>Google API Analyse</source>
         <translation>Analyse de l&apos;API Google</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="102"/>
+        <location filename="../../gui/windows/main.py" line="103"/>
         <source>PDF files Analyse</source>
         <translation>Analyse des fichiers PDF</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="103"/>
+        <location filename="../../gui/windows/main.py" line="104"/>
         <source>Database Client</source>
         <translation>Clients dans la DB</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="104"/>
+        <location filename="../../gui/windows/main.py" line="105"/>
         <source>Database Employee</source>
         <translation>Salariés dans la DB</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="105"/>
+        <location filename="../../gui/windows/main.py" line="106"/>
         <source>Database Measure</source>
         <translation>Mesures dans la DB</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="114"/>
+        <location filename="../../gui/windows/main.py" line="115"/>
         <source>Process</source>
         <translation>Processus</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="196"/>
+        <location filename="../../gui/windows/main.py" line="197"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="203"/>
-        <source>Finished</source>
-        <translation>Terminé</translation>
+        <location filename="../../gui/windows/main.py" line="205"/>
+        <source>The PDF file with the matricule {} have been generated!</source>
+        <translation>Le fichier avec le matricule {} a été généré !</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="203"/>
+        <location filename="../../gui/windows/main.py" line="207"/>
         <source>The PDF files have been generated!</source>
         <translation>Les fichiers PDF ont été générés!</translation>
+    </message>
+    <message>
+        <location filename="../../gui/windows/main.py" line="208"/>
+        <source>Finished</source>
+        <translation>Terminé</translation>
     </message>
     <message>
         <source>Error: {}</source>
@@ -353,28 +358,28 @@
 <context>
     <name>NdfProcess</name>
     <message>
-        <location filename="../../process/thread.py" line="183"/>
+        <location filename="../../process/thread.py" line="176"/>
         <source>Get distance from Google API/DB/cache</source>
         <translation>Obtention de la distance depuis l&apos;API Google/DB/cache</translation>
     </message>
     <message>
-        <location filename="../../process/thread.py" line="263"/>
-        <location filename="../../process/thread.py" line="215"/>
+        <location filename="../../process/thread.py" line="256"/>
+        <location filename="../../process/thread.py" line="208"/>
         <source>Generate PDF files</source>
         <translation>Générer les fichiers PDF</translation>
     </message>
     <message>
-        <location filename="../../process/thread.py" line="251"/>
+        <location filename="../../process/thread.py" line="244"/>
         <source>Load EXCEL file</source>
         <translation>Chargement du fichier EXCEL</translation>
     </message>
     <message>
-        <location filename="../../process/thread.py" line="255"/>
+        <location filename="../../process/thread.py" line="248"/>
         <source>Load CSV file</source>
         <translation>Chargement du fichier CSV</translation>
     </message>
     <message>
-        <location filename="../../process/thread.py" line="259"/>
+        <location filename="../../process/thread.py" line="252"/>
         <source>Get distance from Google API/DB/Cache</source>
         <translation>Obtention de la distance depuis l&apos;API Google/DB/Cache</translation>
     </message>
@@ -390,39 +395,44 @@
 <context>
     <name>PdfItem</name>
     <message>
-        <location filename="../../gui/items/useclass/analyse/pdf.py" line="18"/>
+        <location filename="../../gui/items/useclass/analyse/pdf.py" line="24"/>
         <source>Matricule</source>
         <translation>Matricule</translation>
     </message>
     <message>
-        <location filename="../../gui/items/useclass/analyse/pdf.py" line="19"/>
+        <location filename="../../gui/items/useclass/analyse/pdf.py" line="25"/>
         <source>Filename</source>
         <translation>Nom du fichier</translation>
     </message>
     <message>
-        <location filename="../../gui/items/useclass/analyse/pdf.py" line="20"/>
+        <location filename="../../gui/items/useclass/analyse/pdf.py" line="26"/>
         <source>Name</source>
         <translation>Nom</translation>
     </message>
     <message>
-        <location filename="../../gui/items/useclass/analyse/pdf.py" line="21"/>
+        <location filename="../../gui/items/useclass/analyse/pdf.py" line="27"/>
         <source>Number of missions</source>
         <translation>Nombre de missions</translation>
     </message>
     <message>
-        <location filename="../../gui/items/useclass/analyse/pdf.py" line="22"/>
+        <location filename="../../gui/items/useclass/analyse/pdf.py" line="28"/>
         <source>Number of indemnity</source>
         <translation>Nombre d&apos;indemnités</translation>
     </message>
     <message>
-        <location filename="../../gui/items/useclass/analyse/pdf.py" line="23"/>
+        <location filename="../../gui/items/useclass/analyse/pdf.py" line="29"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../../gui/items/useclass/analyse/pdf.py" line="24"/>
+        <location filename="../../gui/items/useclass/analyse/pdf.py" line="30"/>
         <source>Time (s)</source>
         <translation>Durée (s)</translation>
+    </message>
+    <message>
+        <location filename="../../gui/items/useclass/analyse/pdf.py" line="31"/>
+        <source>Retry</source>
+        <translation>Regénérer</translation>
     </message>
     <message>
         <source>DB Total</source>
@@ -436,9 +446,14 @@
 <context>
     <name>PdfTable</name>
     <message>
-        <location filename="../../gui/tables/useclass/pdf.py" line="14"/>
+        <location filename="../../gui/tables/useclass/pdf.py" line="16"/>
         <source>Click to view the pdf</source>
         <translation>Cliquer pour visualiser le pdf</translation>
+    </message>
+    <message>
+        <location filename="../../gui/tables/useclass/pdf.py" line="35"/>
+        <source>Retry {}</source>
+        <translation>Regénéner {}</translation>
     </message>
 </context>
 <context>

@@ -169,9 +169,10 @@ class ExcelRecord(Record):
 
 
 class RecordsManager(Logger):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, matricule=None, **kwargs):
         super().__init__(*args, **kwargs)
         self._records = {}
+        self.matricule = Utils.type(matricule)
 
     def add_excel_record(self, record):
         matricule = Utils.type(record[CONST.FILE.YAML[CONST.TYPE.EXC]["matricule"]])
@@ -192,6 +193,10 @@ class RecordsManager(Logger):
         return self._records[matricule].add_indemnites(record, columns)
 
     def __iter__(self):
+        if self.matricule is not None:
+            # Take only the specific matricule
+            return (r for r in [self._records[self.matricule]])
+        # Else take all the records defined in self._records
         return (r for r in self._records.values() if len(r) > 0)
 
     def __len__(self):

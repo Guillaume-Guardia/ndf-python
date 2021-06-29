@@ -11,6 +11,7 @@ class AbstractSmartTable(AbstractTable):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.filename = None
 
         self.writer = Writer(self.type, directory=self.tab.window.app.temp_dir, log_level=self.tab.window.log_level)
 
@@ -26,16 +27,17 @@ class AbstractSmartTable(AbstractTable):
                 value = self.set_type(value, header)
                 data[header].append(value)
 
-        (filename, status), time_spend = self.writer.write(data, getattr(self.tab.window, self.type))
+        (filename, status), time_spend = self.writer.write(data, self.filename)
         self.tab.window.set_path(self.type, filename)
 
     def set_type(self, value, *args):
         return Utils.type(value)
 
-    def init(self, clear=False):
+    def init(self, filename=None, clear=False, **kwargs):
+        if filename is not None:
+            self.filename = filename
         self.blockSignals(True)
-        if clear:
-            super().init()
+        super().init(clear=clear)
 
     def finished(self, *args):
         self.blockSignals(False)

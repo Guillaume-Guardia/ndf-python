@@ -26,7 +26,7 @@ class AbstractItem(QtCore.QObject):
         self.counter = len(args)
 
     def __setattr__(self, name: str, value) -> None:
-        if isinstance(value, list) or name in ("counter", "colored"):
+        if isinstance(value, list) or name in ("counter", "colored", "filename"):
             return super().__setattr__(name, value)
 
         if name == "time":
@@ -54,4 +54,4 @@ class AbstractItem(QtCore.QObject):
 
     def __iter__(self):
         for name in self.headers:
-            yield name, getattr(self, name)
+            yield name, getattr(self, name, QtWidgets.QTableWidgetItem())

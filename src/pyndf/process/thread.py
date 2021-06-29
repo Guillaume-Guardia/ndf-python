@@ -64,7 +64,7 @@ class WorkerSignals(QtCore.QObject):
     """
 
     error = QtCore.pyqtSignal(object)
-    finished = QtCore.pyqtSignal()
+    finished = QtCore.pyqtSignal(object)
     progressed = QtCore.pyqtSignal(float, str)
     analysed = QtCore.pyqtSignal(object)
     cancelled = QtCore.pyqtSignal()
@@ -80,15 +80,8 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
     :param data: The data to add to the PDF for generating.
     """
 
-    def __init__(
-        self,
-        parent,
-        excel_file,
-        csv_file,
-        output_directory,
-        **kwargs,
-    ):
-        super().__init__(**kwargs)
+    def __init__(self, parent, excel_file, csv_file, output_directory, matricule):
+        super().__init__(log_level=parent.log_level)
         self.parent = parent
         self.excel_file = excel_file
         self.csv_file = csv_file
@@ -106,7 +99,7 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
 
         self.signals = WorkerSignals()
         self.progress = Progress(self.signals.progressed.emit)
-        self.records_manager = RecordsManager(log_level=self.log_level)
+        self.records_manager = RecordsManager(log_level=self.log_level, matricule=matricule)
         self.flags = Flags()
 
     @log_time
@@ -269,6 +262,6 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
             self.log.exception(error)
             self.signals.error.emit(error)
         else:
-            self.signals.finished.emit()
+            self.signals.finished.emit(self.records_manager.matricule)
         finally:
             self.log.info("End process")

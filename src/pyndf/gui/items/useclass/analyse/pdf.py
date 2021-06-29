@@ -9,7 +9,13 @@ class PdfItem(AbstractItem):
     """Class for storing data for analyse."""
 
     type = CONST.TYPE.PDF
-    headers = ["matricule", "filename", "name", "nbr_missions", "nbr_indemnites", "status", "time"]
+    headers = ["matricule", "filename", "name", "nbr_missions", "nbr_indemnites", "status", "time", "retry"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Special case for the retry button
+        self.counter += 1
 
     @classmethod
     def headers_pretty(cls):
@@ -22,4 +28,5 @@ class PdfItem(AbstractItem):
             cls.tr("Number of indemnity"),
             cls.tr("Status"),
             cls.tr("Time (s)"),
+            cls.tr("Retry"),
         ]

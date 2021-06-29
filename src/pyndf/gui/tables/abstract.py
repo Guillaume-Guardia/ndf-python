@@ -28,14 +28,39 @@ class AbstractTable(QtWidgets.QTableWidget):
         header.setSectionsMovable(True)
         header.sectionClicked.connect(self.on_header_clicked)
 
-    def init(self):
-        self.clearContents()
-        self.setRowCount(0)
+    def init(self, clear=True, matricule=None):
+        if matricule is not None:
+            # Remove all row which refer to the specific matricule
+            rows_to_delete = []
+
+            for row in range(self.rowCount()):
+                try:
+                    column = self.custom_item.headers.index("matricule")
+                    if self.item(row, column).data(QtCore.Qt.ItemDataRole.EditRole) != matricule:
+                        continue
+                except (ValueError, AttributeError):
+                    pass
+                rows_to_delete.append(row)
+
+            rows_to_delete.reverse()
+            for row in rows_to_delete:
+                self.removeRow(row)
+            return
+
+        if clear:
+            # Remove all rows
+            self.clearContents()
+            self.setRowCount(0)
 
     def add_row(self):
         row = self.rowCount()
         self.insertRow(row)
         return row
+
+    def add_column(self):
+        col = self.columnCount()
+        self.insertColumn(col)
+        return col
 
     def add(self, obj):
         row = self.add_row()
@@ -44,8 +69,11 @@ class AbstractTable(QtWidgets.QTableWidget):
             self.set_horizontal_headers(obj.headers)
             self.custom_item.headers = obj.headers
 
-        for index, (name, widget) in enumerate(obj):
-            self.setItem(row, index, widget)
+        for column, (name, widget) in enumerate(obj):
+            try:
+                self.setItem(row, column, widget)
+            except TypeError:
+                self.setCellWidget(row, column, widget)
         return widget
 
     def finished(self, boolean=True):

@@ -13,8 +13,8 @@ class AnalyseTable(AbstractTable):
         # total time
         self.time = 0
 
-    def init(self):
-        super().init()
+    def init(self, *args, **kwargs):
+        super().init(*args, **kwargs)
         self.time = 0
 
     def add(self, obj):
@@ -33,6 +33,8 @@ class AnalyseTable(AbstractTable):
             status = self.item(r, self.custom_item.headers.index("status")).text()
             if status:
                 total_status.add(status)
+
+        # Create total item
         total_item = Items(CONST.TYPE.TOT, Utils.getattr(CONST.STATUS, total_status), self.time)
 
         # Set total at the end

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 from pyndf.qtlib import QtWidgets, QtGui, QtCore
 from pyndf.constants import CONST
 from pyndf.process.reader.factory import Reader
@@ -23,7 +22,7 @@ class FileSelectComboBox(QtWidgets.QComboBox):
         self.addItems(sorted(list(default)))
 
     def add_data(self, filename):
-        self.window.tabs[self.name_env].table.init(clear=True)
+        self.window.tabs[self.name_env].table.init(filename=filename, clear=True)
         _, status = Reader(filename, analyse=self.window.tabs[self.name_env].table.add, log_level=self.window.log_level)
         if not status:
             QtWidgets.QMessageBox.information(

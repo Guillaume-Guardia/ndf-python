@@ -27,7 +27,7 @@ class Utils:
             if default is not None:
                 return default
             return value
-        except AttributeError:
+        except (AttributeError, TypeError):
             return value
 
     @staticmethod

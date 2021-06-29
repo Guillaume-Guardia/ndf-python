@@ -79,7 +79,8 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             name (str): type of file
             path (str): path of temp file
         """
-        self.tabs[CONST.TYPE.PRO].combos[name].setCurrentText(path)
+        index = self.tabs[CONST.TYPE.PRO].combos[name].currentIndex()
+        self.tabs[CONST.TYPE.PRO].combos[name].setItemText(index, path)
 
     def toggled_tab(self, tab, boolean):
         index = self.controller_tab.indexOf(tab)
@@ -123,7 +124,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         status_bar.hide()
         self.setStatusBar(status_bar)
 
-    def generate(self):
+    def generate(self, matricule=None):
         """Method triggered with the button to start the generation of pdf. In process tab"""
         parameters = [t.currentText() for t in self.tabs[CONST.TYPE.PRO].combos.values()]
         if not all(parameters):
@@ -133,9 +134,9 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         self.tabs[CONST.TYPE.PRO].buttons[CONST.TYPE.PDF].setDisabled(True)
         for name in CONST.TAB.ANALYSE + CONST.TAB.READER:
-            self.tabs[name].table.init()
+            self.tabs[name].table.init(matricule=matricule)
 
-        self.process = NdfProcess(self, *parameters)
+        self.process = NdfProcess(self, *parameters, matricule=matricule)
         self.process.signals.error.connect(self.error)
         self.process.signals.finished.connect(self.generated)
         self.process.signals.progressed.connect(self.progressed)
@@ -196,11 +197,15 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             self, self.tr("Error"), f"{obj.__class__.__name__}:\n{''.join(traceback.format_tb(obj.__traceback__))}"
         )
 
-    @QtCore.pyqtSlot()
-    def generated(self):
+    @QtCore.pyqtSlot(object)
+    def generated(self, matricule):
         """Success methdod"""
         self.tear_down()
-        QtWidgets.QMessageBox.information(self, self.tr("Finished"), self.tr("The PDF files have been generated!"))
+        if matricule is not None:
+            msg = self.tr("The PDF file with the matricule {} have been generated!").format(matricule)
+        else:
+            msg = self.tr("The PDF files have been generated!")
+        QtWidgets.QMessageBox.information(self, self.tr("Finished"), msg)
 
     def read_settings(self):
         """Read the settings store in PC"""
