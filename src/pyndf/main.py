@@ -6,8 +6,8 @@ import logging
 from pyndf.app import App
 
 
-def main(language, **kwargs):
-    app = App(language, [])
+def main(*args, **kwargs):
+    app = App(*args)
     app.load_translator()
     app.load_window(**kwargs)
     return app.exec()

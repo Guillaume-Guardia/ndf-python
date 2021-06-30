@@ -9,8 +9,8 @@ from pyndf.gui.windows.main import MainWindow
 
 
 class App(QtWidgets.QApplication):
-    def __init__(self, language, *args):
-        super().__init__(*args)
+    def __init__(self, language="fr"):
+        super().__init__([])
 
         self.temp_dir = tempfile.mkdtemp()
 
@@ -58,6 +58,7 @@ class App(QtWidgets.QApplication):
     def load_window(self, *args, **kwargs):
         """Load window. shortcut to add app in argument of window."""
         self.window = MainWindow(self, *args, **kwargs)
+        self.window.show()
 
     def set_language_mem(self):
         """Memorize the language in settings object to reuse in another session."""
