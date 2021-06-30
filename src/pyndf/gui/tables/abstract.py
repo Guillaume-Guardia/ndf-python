@@ -4,8 +4,6 @@ from pyndf.qtlib import QtWidgets, QtCore
 
 
 class AbstractTable(QtWidgets.QTableWidget):
-    _cache = {}
-
     sort_order = {True: QtCore.Qt.SortOrder.AscendingOrder, False: QtCore.Qt.SortOrder.DescendingOrder}
 
     def __init__(self, tab, item):
@@ -13,6 +11,14 @@ class AbstractTable(QtWidgets.QTableWidget):
         self.tab = tab
         self.custom_item = item
         self.set_horizontal_headers()
+
+        # Header
+        self.horizontalHeader().setSortIndicatorShown(True)
+        self.horizontalHeader().setSectionsClickable(True)
+        self.horizontalHeader().setSectionsMovable(True)
+        self.horizontalHeader().sectionClicked.connect(self.on_header_clicked)
+
+        self.__cache = {}
 
     def set_horizontal_headers(self, headers=None):
         if headers is None:
@@ -22,11 +28,6 @@ class AbstractTable(QtWidgets.QTableWidget):
         header = self.horizontalHeader()
         for col in range(self.columnCount()):
             header.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-
-        header.setSortIndicatorShown(True)
-        header.setSectionsClickable(True)
-        header.setSectionsMovable(True)
-        header.sectionClicked.connect(self.on_header_clicked)
 
     def init(self, clear=True, matricule=None):
         if matricule is not None:
@@ -83,9 +84,9 @@ class AbstractTable(QtWidgets.QTableWidget):
             self.tab.window.toggled_tab(self.tab, boolean)
 
     def on_header_clicked(self, col):
-        if col in self._cache:
-            self._cache[col] = not self._cache[col]
+        if col in self.__cache:
+            self.__cache[col] = not self.__cache[col]
         else:
-            self._cache[col] = False
-        sort = self.sort_order[self._cache[col]]
+            self.__cache[col] = True
+        sort = self.sort_order[self.__cache[col]]
         self.sortItems(col, sort)
