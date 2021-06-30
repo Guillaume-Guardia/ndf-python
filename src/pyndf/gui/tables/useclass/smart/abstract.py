@@ -13,11 +13,16 @@ class AbstractSmartTable(AbstractTable):
         super().__init__(*args, **kwargs)
         self.filename = None
 
-        self.writer = Writer(self.type, directory=self.tab.window.app.temp_dir, log_level=self.tab.window.log_level)
-
         self.itemChanged.connect(self.on_item_changed)
 
     def on_item_changed(self, *args):
+        if self.tab.window.save_tmp_file:
+            directory = None
+        else:
+            directory = self.tab.window.app.temp_dir
+
+        writer = Writer(self.type, directory=directory, log_level=self.tab.window.log_level)
+
         # table to dataframe
         data = defaultdict(list)
         for row in range(self.rowCount()):
@@ -27,7 +32,7 @@ class AbstractSmartTable(AbstractTable):
                 value = self.set_type(value, header)
                 data[header].append(value)
 
-        (filename, status), time_spend = self.writer.write(data, self.filename)
+        (filename, status), time_spend = writer.write(data, self.filename)
         self.tab.window.set_path(self.type, filename)
 
     def set_type(self, value, *args):

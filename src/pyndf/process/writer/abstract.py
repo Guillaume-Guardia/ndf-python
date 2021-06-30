@@ -11,6 +11,7 @@ class AbstractWriter(Logger, QtCore.QObject):
     """Abstract class for write file."""
 
     ext = None
+    suffixe = "-pyndf"
 
     def __init__(self, *args, directory=None, overwrite=True, **kwargs):
         """Initialisation"""
@@ -48,6 +49,9 @@ class AbstractWriter(Logger, QtCore.QObject):
 
         if page is not None:
             path = Utils.insert(path, path.index("."), f"_page-{page}")
+
+        if self.suffixe is not None and self.suffixe not in path:
+            path = Utils.insert(path, path.index("."), self.suffixe)
 
         if ext is not None and ext.startswith("."):
             # Add extension of filename

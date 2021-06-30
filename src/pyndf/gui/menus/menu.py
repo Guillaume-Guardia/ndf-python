@@ -59,6 +59,12 @@ class MainMenu(QtWidgets.QMenuBar):
             )
         menu.addSeparator()
 
+        # Save tmp file
+        self._actions[CONST.TYPE.SAVE_TMP_FILE] = self.create_action_options(
+            menu, self.tr("Save tmp file"), CONST.TYPE.SAVE_TMP_FILE
+        )
+        menu.addSeparator()
+
         # PDF
         menu.addAction(QtGui.QIcon(CONST.UI.ICONS.COL), self.tr("Select PDF file color"), self.change_color_pdf)
         self._actions[CONST.TYPE.USE_MULTITHREAGING] = self.create_action_options(

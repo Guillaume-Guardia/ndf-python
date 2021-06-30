@@ -36,11 +36,13 @@ class FileSelectComboBox(QtWidgets.QComboBox):
 
     def add_items(self, paths):
         for path in paths:
-            if path not in getattr(self.window, self.name_env):
-                self.addItem(path)
-                self.setCurrentText(path)
-
+            self.add_item(path)
             getattr(self.window, self.name_env).add(path)
+
+    def add_item(self, path):
+        if self.findText(path) == -1:
+            self.addItem(path)
+        self.setCurrentText(path)
 
     def item_pressed(self, model_index):
         """Method to delete item when click on right button of the mouse.

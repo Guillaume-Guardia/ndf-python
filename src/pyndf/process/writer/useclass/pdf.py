@@ -29,6 +29,7 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
 
     ext = CONST.EXT.PDF
     mapper = CONST.FILE.YAML[CONST.TYPE.PDF]
+    suffixe = None
 
     def __init__(self, date, color, **kwargs):
         kwargs["pagesize"] = landscape(A4)

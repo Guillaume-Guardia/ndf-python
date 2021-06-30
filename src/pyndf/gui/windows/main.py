@@ -34,6 +34,9 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         if output:
             self.output.add(output)
 
+        # Reader parameters
+        self.save_tmp_file = True
+
         # Api parameters
         self.use_db = use_db
         self.use_cache = use_cache
@@ -79,8 +82,10 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             name (str): type of file
             path (str): path of temp file
         """
-        index = self.tabs[CONST.TYPE.PRO].combos[name].currentIndex()
-        self.tabs[CONST.TYPE.PRO].combos[name].setItemText(index, path)
+        if self.save_tmp_file:
+            getattr(self, name).add(path)
+
+        self.tabs[CONST.TYPE.PRO].combos[name].add_item(path)
 
     def toggled_tab(self, tab, boolean):
         index = self.controller_tab.indexOf(tab)
