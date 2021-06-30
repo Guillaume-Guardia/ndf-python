@@ -140,7 +140,7 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
 
     @log_time
     def create_pdf(self):
-        self.progress.add_duration(40, len(self.records_manager))
+        self.progress.add_duration(45, len(self.records_manager))
         total_status = set()
 
         # Get writer

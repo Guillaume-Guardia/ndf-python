@@ -43,12 +43,12 @@ class ExcelReader(AbstractReader):
                 )
                 continue
 
+            if progress is not None:
+                progress.send(msg=self.tr("Load EXCEL file"))
+
             if keep_me is False:
                 continue
 
             manager.add_excel_record(record)
-
-            if progress is not None:
-                progress.send(msg=self.tr("Load EXCEL file"))
 
         return manager
