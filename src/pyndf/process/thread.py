@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from pyndf.constants import CONST
-from pyndf.process.progress import Progress
+from pyndf.process.data.progress import Progress
 from pyndf.process.reader.factory import Reader
 from pyndf.gui.items.factory import Items
-from pyndf.process.record import RecordsManager
+from pyndf.process.data.records_manager import RecordsManager
 from pyndf.process.writer.factory import Writer
 from pyndf.qtlib import QtCore
 from pyndf.process.distance import DistanceMatrixAPI

@@ -5,7 +5,7 @@ import pandas as pd
 from pyndf.gui.items.factory import Items
 from pyndf.constants import CONST
 from pyndf.process.reader.abstract import AbstractReader
-from pyndf.process.record import RecordsManager
+from pyndf.process.data.records_manager import RecordsManager
 from pyndf.utils import Utils
 
 

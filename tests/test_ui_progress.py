@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from pyndf.process.progress import Progress
+from pyndf.process.data.progress import Progress
 
 
 class TestProgress(unittest.TestCase):

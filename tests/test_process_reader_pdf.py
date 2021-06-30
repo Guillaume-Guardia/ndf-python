@@ -5,7 +5,7 @@ import unittest
 import tempfile
 import shutil
 from pyndf.process.reader.factory import Reader
-from pyndf.process.record import Record
+from pyndf.process.data.records.abstract import Record
 from pyndf.process.writer.factory import Writer
 from pyndf.process.reader.useclass.pdf import PdfReader
 from pyndf.constants import CONST
