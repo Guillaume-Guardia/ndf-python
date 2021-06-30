@@ -3,11 +3,11 @@
 import traceback
 import shutil
 import yaml
-from pyndf.gui.widgets.control import ControlButtons
 from pyndf.qtlib import QtWidgets, QtCore
 from pyndf.logbook import Logger
-from pyndf.process.threads.ndf import NdfProcess
 from pyndf.constants import CONST
+from pyndf.process.threads.ndf import NdfProcess
+from pyndf.gui.widgets.control import ControlButtons
 from pyndf.gui.tabs.useclass.analyse import AnalyseTab
 from pyndf.gui.tabs.useclass.process import ProcessTab
 from pyndf.gui.items.factory import Items
