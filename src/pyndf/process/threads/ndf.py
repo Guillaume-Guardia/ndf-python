@@ -10,64 +10,11 @@ from pyndf.qtlib import QtCore
 from pyndf.process.distance import DistanceMatrixAPI
 from pyndf.logbook import Logger, log_time
 from pyndf.utils import Utils
+from pyndf.process.threads.pdf import PdfGenerator
 
 
 class CancelException(Exception):
     pass
-
-
-class Flags:
-    cancel = False
-
-
-class PdfGenerator(QtCore.QThread):
-    def __init__(self, parent, record, date, total_status):
-        super().__init__()
-        self.parent = parent
-        self.record = record
-        self.date = date
-        self.total_status = total_status
-
-    def run(self):
-        writer = Writer(
-            CONST.TYPE.PDF,
-            self.date,
-            directory=self.parent.output_directory,
-            color=self.parent.color,
-            log_level=self.parent.log_level,
-            overwrite=self.parent.overwrite,
-        )
-
-        self.record.prepare_for_pdf()
-        (filename, status), time_spend = writer.write(self.record, filename=self.record)
-
-        self.total_status.add(str(status))
-
-        self.parent.progress.send(msg=self.tr("Generate PDF files"))
-        self.parent.signals.analysed.emit(
-            Items(
-                CONST.TYPE.PDF,
-                Utils.type(self.record.matricule),
-                filename,
-                self.record.nom_intervenant,
-                len(self.record.missions),
-                len(self.record.indemnites),
-                status,
-                time_spend,
-            )
-        )
-
-
-class WorkerSignals(QtCore.QObject):
-    """
-    Defines the signals available from a running worker thread.
-    """
-
-    error = QtCore.pyqtSignal(object)
-    finished = QtCore.pyqtSignal(object)
-    progressed = QtCore.pyqtSignal(float, str)
-    analysed = QtCore.pyqtSignal(object)
-    cancelled = QtCore.pyqtSignal()
 
 
 class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
@@ -79,6 +26,20 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
 
     :param data: The data to add to the PDF for generating.
     """
+
+    class WorkerSignals(QtCore.QObject):
+        """
+        Defines the signals available from a running worker thread.
+        """
+
+        error = QtCore.pyqtSignal(object)
+        finished = QtCore.pyqtSignal(object)
+        progressed = QtCore.pyqtSignal(float, str)
+        analysed = QtCore.pyqtSignal(object)
+        cancelled = QtCore.pyqtSignal()
+
+    class Flags:
+        cancel = False
 
     def __init__(self, parent, excel_file, csv_file, output_directory, matricule):
         super().__init__(log_level=parent.log_level)
@@ -97,10 +58,10 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
         self.overwrite = parent.overwrite
         self.use_multithreading = parent.use_multithreading
 
-        self.signals = WorkerSignals()
+        self.signals = self.WorkerSignals()
         self.progress = Progress(self.signals.progressed.emit)
         self.records_manager = RecordsManager(log_level=self.log_level, matricule=matricule)
-        self.flags = Flags()
+        self.flags = self.Flags()
 
     @log_time
     def read_excel(self):
