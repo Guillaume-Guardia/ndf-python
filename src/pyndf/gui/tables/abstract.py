@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from pyndf.constants import CONST
 from pyndf.qtlib import QtWidgets, QtCore
 
 
@@ -66,12 +67,14 @@ class AbstractTable(QtWidgets.QTableWidget):
     def add(self, obj):
         row = self.add_row()
 
-        if self.columnCount() != obj.counter:
-            self.set_horizontal_headers(obj.headers)
-            self.custom_item.headers = obj.headers
+        # get dev mode from menu of main window
+        dev_mode = False
+        if self.tab.window.menuWidget():
+            dev_mode = self.tab.window.menuWidget()._actions[CONST.TYPE.DEV_MODE].isChecked()
 
         for column, (name, widget) in enumerate(obj):
             try:
+                widget.update_mode(dev_mode)
                 self.setItem(row, column, widget)
             except TypeError:
                 self.setCellWidget(row, column, widget)

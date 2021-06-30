@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from pyndf.qtlib import QtWidgets, QtGui, QtCore
-from pyndf.constants import CONST
+from pyndf.qtlib import QtCore
+from pyndf.gui.widgets.table_cells.status import StatusCellItem
+from pyndf.gui.widgets.table_cells.default import DefaultCellItem
+from pyndf.gui.widgets.table_cells.number import NumberCellItem
 
 
 class AbstractItem(QtCore.QObject):
     """Class for storing data for analyse."""
 
-    font = "Helvetica [Cronyx]"
-    font_size = 11
-    font_weight = QtGui.QFont.Weight.Bold
     headers = []
 
     def __init__(self, *args, columns=None, colored=False):
@@ -27,31 +26,18 @@ class AbstractItem(QtCore.QObject):
 
     def __setattr__(self, name: str, value) -> None:
         if isinstance(value, list) or name in ("counter", "colored", "filename"):
-            return super().__setattr__(name, value)
-
-        if name == "time":
-            edit_value = round(value, 4)
-        elif isinstance(value, float):
-            edit_value = round(value, 2)
+            pass
         elif name == "status":
-            edit_value = str(value)
+            value = StatusCellItem(value)
+        elif name == "time":
+            value = NumberCellItem(value, self.colored, 4)
+        elif isinstance(value, (int, float)):
+            value = NumberCellItem(value, self.colored)
         else:
-            edit_value = value
+            value = DefaultCellItem(value, self.colored)
 
-        widget = QtWidgets.QTableWidgetItem()
-        widget.setData(QtCore.Qt.ItemDataRole.EditRole, edit_value)
-
-        if name == "status" or isinstance(value, (int, float)):
-            widget.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-
-        if name == "status":
-            widget.setFont(QtGui.QFont(self.font, self.font_size, self.font_weight))
-            widget.setForeground(QtGui.QColor(value.color))
-
-        if self.colored:
-            widget.setBackground(QtGui.QColor(CONST.WRITER.PDF.COLOR))
-        super().__setattr__(name, widget)
+        super().__setattr__(name, value)
 
     def __iter__(self):
         for name in self.headers:
-            yield name, getattr(self, name, QtWidgets.QTableWidgetItem())
+            yield name, getattr(self, name, DefaultCellItem())

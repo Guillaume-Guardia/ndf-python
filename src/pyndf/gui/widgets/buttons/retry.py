@@ -21,3 +21,6 @@ class RetryButton(QtWidgets.QPushButton):
 
     def retry_process(self, matricule):
         self.parent.tab.window.generate(matricule)
+
+    def update_mode(self, dev_mode):
+        pass

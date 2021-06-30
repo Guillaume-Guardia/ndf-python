@@ -63,6 +63,7 @@ class CONST:
         USE_MULTITHREAGING = "use_multithreading"
         OVERWRITE = "overwrite"
         AGENCE = "agence"
+        DEV_MODE = "dev_mode"
 
         # DB
         DB_CLIENT = "client"
@@ -89,6 +90,8 @@ class CONST:
             RIGHT = os.path.join(DIR, r"data\icons\right.png")
             LEFT = os.path.join(DIR, r"data\icons\left.png")
             PLUS = os.path.join(DIR, r"data\icons\plus.png")
+            RED = os.path.join(DIR, r"data\icons\button-red.png")
+            GREEN = os.path.join(DIR, r"data\icons\button-green.png")
 
         BUTTONSTYLE = """  QPushButton {
                 background-color: #79bbff;
@@ -191,6 +194,12 @@ class CONST:
                 if self:
                     return "#008000"
                 return "#A12312"
+
+            @property
+            def icon(self):
+                if self:
+                    return CONST.UI.ICONS.GREEN
+                return CONST.UI.ICONS.RED
 
         OK = Status("OK", True)
         API = Status("API", True)

@@ -30,7 +30,7 @@ class AnalyseTable(AbstractTable):
         # Check all status
         total_status = set()
         for r in range(self.rowCount() - 1):
-            status = self.item(r, self.custom_item.headers.index("status")).text()
+            status = str(self.item(r, self.custom_item.headers.index("status")).status)
             if status:
                 total_status.add(status)
 
@@ -40,7 +40,16 @@ class AnalyseTable(AbstractTable):
         # Set total at the end
         self.setVerticalHeaderItem(row, total_item.vheaders_pretty)
 
+        dev_mode = self.tab.window.menuWidget()._actions[CONST.TYPE.DEV_MODE].isChecked()
+
         # Add the value from item
         for name, widget in total_item:
+            widget.update_mode(dev_mode)
             self.setItem(row, self.custom_item.headers.index(name), widget)
+
+        # Hide time column if the dev mode is disabled
+        self.setColumnHidden(
+            self.custom_item.headers.index("time"),
+            not dev_mode,
+        )
         super().finished()

@@ -42,3 +42,10 @@ class AbstractSmartTable(AbstractTable):
     def finished(self, *args):
         self.blockSignals(False)
         super().finished(*args)
+
+    def add(self, obj):
+        if self.columnCount() != obj.counter:
+            self.set_horizontal_headers(obj.headers)
+            self.custom_item.headers = obj.headers
+
+        return super().add(obj)

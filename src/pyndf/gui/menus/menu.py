@@ -76,12 +76,12 @@ class MainMenu(QtWidgets.QMenuBar):
         menu.addSeparator()
 
         # Dev mode
-        action = QtGui.QAction(self.tr("Dev mode"), menu)
-        action.setCheckable(True)
-        action.setShortcut("Ctrl+D")
-        action.toggled.connect(self.enable_dev_mode)
-        action.setChecked(False)
-        menu.addAction(action)
+        self._actions[CONST.TYPE.DEV_MODE] = QtGui.QAction(self.tr("Dev mode"), menu)
+        self._actions[CONST.TYPE.DEV_MODE].setCheckable(True)
+        self._actions[CONST.TYPE.DEV_MODE].setShortcut("Ctrl+D")
+        self._actions[CONST.TYPE.DEV_MODE].toggled.connect(self.enable_dev_mode)
+        self._actions[CONST.TYPE.DEV_MODE].setChecked(False)
+        menu.addAction(self._actions[CONST.TYPE.DEV_MODE])
 
         return menu
 
