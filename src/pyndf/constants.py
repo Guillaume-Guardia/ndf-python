@@ -12,7 +12,7 @@ class CONST:
 
     TITLE_APP = "PYNDF"
     COMPANY = "APSIDE"
-    VERSION = "1.1"
+    VERSION = "1.2"
     OPTI = True
 
     class FILE:
