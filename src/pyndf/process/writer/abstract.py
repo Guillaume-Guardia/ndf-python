@@ -19,7 +19,7 @@ class AbstractWriter(Logger, QtCore.QObject):
         self.directory = directory
         self.overwrite = overwrite
 
-    def create_path(self, filename, directory=None, page: int = None, ext=None):
+    def create_path(self, filename, directory=None, page: int = None, ext=None, force=False):
         """Check path method.
 
         Args:
@@ -58,7 +58,8 @@ class AbstractWriter(Logger, QtCore.QObject):
             path = path.split(".")[0] + ext
 
         # Check if the file exists
-        if os.path.exists(path) and not self.overwrite:
+        force = force or self.overwrite
+        if os.path.exists(path) and not force:
             raise FileExistsError
 
         self.log.info(f"Write data in file {os.path.basename(path)}")
@@ -74,6 +75,11 @@ class AbstractWriter(Logger, QtCore.QObject):
         try:
             filename = self.create_path(filename)
             status = self._write(data, filename)
+
+        except FileExistsError:
+            filename = self.create_path(filename, force=True)
+            status = CONST.STATUS.FILE_ALREADY_EXISTS
+
         except Exception as e:
             self.log.exception(e)
             status = CONST.STATUS.ERROR

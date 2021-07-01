@@ -175,9 +175,9 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
         table.setStyle(style)
         return table, status
 
-    def create_path(self, data=None):
+    def create_path(self, data=None, **kwargs):
         filename = self.create_filename(data)
-        return super().create_path(filename)
+        return super().create_path(filename, **kwargs)
 
     def create_filename(self, data):
         self.log.debug(f"Create pdf for matricule {data.matricule} with {len(data.missions)} missions.")
