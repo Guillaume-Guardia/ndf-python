@@ -10,7 +10,7 @@ sys.path.append(__file__)
 
 setup(
     name="pyndf",
-    version="0.1.0",
+    version="1.2",
     author="Guillaume Guardia",
     author_email="guardia.1903@apside-groupe.com",
     packages=["pyndf"],

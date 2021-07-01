@@ -5,7 +5,7 @@ import pandas as pd
 from pyndf.constants import CONST
 from pyndf.gui.items.factory import Items
 from pyndf.process.reader.abstract import AbstractReader
-from pyndf.process.record import RecordsManager
+from pyndf.process.data.records_manager import RecordsManager
 from pyndf.utils import Utils
 
 
@@ -27,7 +27,7 @@ class CsvReader(AbstractReader):
             progress.set_maximum(len(dataframe.to_dict("records")))
 
         if manager is None:
-            manager = RecordsManager()
+            manager = RecordsManager(log_level=self.log_level)
 
         for record in dataframe.to_dict("records"):
             status = manager.add_csv_record(record, list(dataframe.columns))

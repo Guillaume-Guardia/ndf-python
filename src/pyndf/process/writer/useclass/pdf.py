@@ -29,6 +29,7 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
 
     ext = CONST.EXT.PDF
     mapper = CONST.FILE.YAML[CONST.TYPE.PDF]
+    suffixe = None
 
     def __init__(self, date, color, **kwargs):
         kwargs["pagesize"] = landscape(A4)
@@ -167,16 +168,16 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
 
         # Merge
         status = Utils.getattr(CONST.STATUS, status)
-        if status:
-            for i in (1, 3, 4, 5, 6):
-                style.add("SPAN", (i, 1), (i, -1))
+
+        for i in (1, 3, 4, 5, 6):
+            style.add("SPAN", (i, 1), (i, -1))
 
         table.setStyle(style)
         return table, status
 
-    def create_path(self, data=None):
+    def create_path(self, data=None, **kwargs):
         filename = self.create_filename(data)
-        return super().create_path(filename)
+        return super().create_path(filename, **kwargs)
 
     def create_filename(self, data):
         self.log.debug(f"Create pdf for matricule {data.matricule} with {len(data.missions)} missions.")

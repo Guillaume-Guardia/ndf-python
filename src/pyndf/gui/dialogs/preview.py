@@ -6,7 +6,7 @@ from pyndf.constants import CONST
 
 
 class PreviewDialog(QtWidgets.QDialog):
-    def __init__(self, table, col, row):
+    def __init__(self, table, row, col):
         super().__init__(table.tab.window)
         self.table = table
         self.row = row
@@ -33,7 +33,8 @@ class PreviewDialog(QtWidgets.QDialog):
 
             while layout.takeAt(0):
                 child = layout.takeAt(0)
-                child.deleteLater()
+                if child:
+                    child.deleteLater()
                 del child
         else:
             layout = QtWidgets.QVBoxLayout()
@@ -50,7 +51,7 @@ class PreviewDialog(QtWidgets.QDialog):
 
     def get_paths(self, row):
         self.row = row
-        filename = self.table.item(row, self.col).text()
+        filename = self.table.cellWidget(row, self.col).path
         png_paths, status = Reader(
             filename, temp_dir=self.window.app.temp_dir, ratio=self.ratio, log_level=self.window.log_level
         )

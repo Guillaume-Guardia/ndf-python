@@ -11,13 +11,15 @@ class AbstractWriter(Logger, QtCore.QObject):
     """Abstract class for write file."""
 
     ext = None
+    suffixe = "-pyndf"
 
-    def __init__(self, *args, directory=None, **kwargs):
+    def __init__(self, *args, directory=None, overwrite=True, **kwargs):
         """Initialisation"""
         super().__init__(*args, **kwargs)
         self.directory = directory
+        self.overwrite = overwrite
 
-    def create_path(self, filename, directory=None, page: int = None, ext=None, force=True):
+    def create_path(self, filename, directory=None, page: int = None, ext=None, force=False):
         """Check path method.
 
         Args:
@@ -48,11 +50,15 @@ class AbstractWriter(Logger, QtCore.QObject):
         if page is not None:
             path = Utils.insert(path, path.index("."), f"_page-{page}")
 
+        if self.suffixe is not None and self.suffixe not in path:
+            path = Utils.insert(path, path.index("."), self.suffixe)
+
         if ext is not None and ext.startswith("."):
             # Add extension of filename
             path = path.split(".")[0] + ext
 
         # Check if the file exists
+        force = force or self.overwrite
         if os.path.exists(path) and not force:
             raise FileExistsError
 
@@ -69,6 +75,11 @@ class AbstractWriter(Logger, QtCore.QObject):
         try:
             filename = self.create_path(filename)
             status = self._write(data, filename)
+
+        except FileExistsError:
+            filename = self.create_path(filename, force=True)
+            status = CONST.STATUS.FILE_ALREADY_EXISTS
+
         except Exception as e:
             self.log.exception(e)
             status = CONST.STATUS.ERROR

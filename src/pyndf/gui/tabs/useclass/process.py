@@ -1,34 +1,32 @@
 # -*- coding: utf-8 -*-
 
-import os
 from pyndf.gui.tabs.abstract import AbstractTab
-from pyndf.process.reader.factory import Reader
-from pyndf.process.record import RecordsManager
+from pyndf.gui.widgets.buttons.explorer import ExplorerButton
+from pyndf.gui.widgets.buttons.generate import GenerateButton
+from pyndf.gui.widgets.combobox import FileSelectComboBox
 from pyndf.qtlib import QtWidgets, QtGui
 from pyndf.constants import CONST
 
 
 class ProcessTab(AbstractTab):
-    def __init__(self, window, title, excel="", csv="", output=""):
+    def __init__(self, window, title):
         super().__init__(window, title)
-
-        self.manager = RecordsManager(log_level=window.log_level)
 
         # Graphics elements
         self.icons = {}
         self.labels = {}
         self.buttons = {}
-        self.texts = {}
+        self.combos = {}
 
         # Explorer buttons
-        self.add_button(CONST.TYPE.EXC, self.tr("EXCEL file"), "(*.xl* *.XLS)", default=excel)
-        self.add_button(CONST.TYPE.CSV, self.tr("CSV file"), "(*.csv)", default=csv)
-        self.add_button(CONST.TYPE.OUT, self.tr("Save directory"), default=output)
+        self.add_button(CONST.TYPE.EXC, self.tr("EXCEL file"), "(*.xl* *.XLS)", default=window.excel)
+        self.add_button(CONST.TYPE.CSV, self.tr("CSV file"), "(*.csv)", default=window.csv)
+        self.add_button(CONST.TYPE.OUT, self.tr("Save directory"), default=window.output)
 
         # Add grid layout
         grid_layout = QtWidgets.QGridLayout()
         for row, widgets in enumerate(
-            zip(self.icons.values(), self.labels.values(), self.texts.values(), self.buttons.values())
+            zip(self.icons.values(), self.labels.values(), self.combos.values(), self.buttons.values())
         ):
             for col, widget in enumerate(widgets):
                 grid_layout.addWidget(widget, row, col)
@@ -36,11 +34,7 @@ class ProcessTab(AbstractTab):
         grid_widget.setLayout(grid_layout)
 
         # Generate button
-        self.buttons[CONST.TYPE.PDF] = QtWidgets.QPushButton(self.tr("Generate PDF files"))
-        self.buttons[CONST.TYPE.PDF].pressed.connect(self.window.generate)
-        self.buttons[CONST.TYPE.PDF].setMinimumWidth(120)
-        self.buttons[CONST.TYPE.PDF].setMinimumHeight(40)
-        self.buttons[CONST.TYPE.PDF].setStyleSheet(CONST.UI.BUTTONSTYLE)
+        self.buttons[CONST.TYPE.PDF] = GenerateButton(self)
         generate_widget = ProcessTab.add_widget([self.buttons[CONST.TYPE.PDF]])
 
         # Create vertical layout
@@ -52,50 +46,31 @@ class ProcessTab(AbstractTab):
 
         self.setLayout(layout)
 
-    def add_data(self, filename, name):
-        if not os.path.exists(filename):
-            setattr(self.window, name, "")
-            self.texts[name].setText("")
-            return
-
-        if name not in CONST.TAB.READER:
-            return
-
-        self.window.tabs[name].table.init(clear=True)
-        _, status = Reader(
-            filename, analyse=self.window.tabs[name].table.add, log_level=self.window.log_level, manager=self.manager
-        )
-        if not status:
-            QtWidgets.QMessageBox.information(
-                self,
-                self.tr("Cant read file"),
-                self.tr("No reader implemented to open the file {}! Choose another file!").format(filename),
-            )
-        self.window.tabs[name].table.finished(bool(status))
-
-    def add_button(self, name_env, name, _format=None, default=""):
+    def add_button(self, name_env, name, _format=None, default=None):
         """Add label, text + button
 
         Args:
             name_env (str): name of button in app
             name (str): name of the button
             _format (str, optional): format of file. Defaults to None.
-            default (str, optional): default text. Defaults to "".
+            default (list, optional): default list text in memory. Defaults to None.
         """
-        self.icons[name_env] = QtWidgets.QLabel()
+        # Icon
+        self.icons[name_env] = QtWidgets.QLabel(name)
         pix = QtGui.QPixmap(getattr(CONST.UI.ICONS, name_env))
         if pix:
             self.icons[name_env].setPixmap(pix.scaledToHeight(15))
-        self.labels[name_env] = QtWidgets.QLabel(name)
-        self.texts[name_env] = QtWidgets.QLineEdit()
-        self.texts[name_env].textChanged.connect(lambda filename: self.add_data(filename, name_env))
-        self.texts[name_env].setText(default)
-        self.texts[name_env].setFixedHeight(30)
-        self.texts[name_env].setDisabled(True)  # must use the file finder to select a valid file.
+        self.icons[name_env].setFixedWidth(20)
 
-        self.buttons[name_env] = QtWidgets.QPushButton("...")
-        self.buttons[name_env].setFixedHeight(30)
-        self.buttons[name_env].pressed.connect(lambda: self.choose(name_env, name, _format))
+        # Name
+        self.labels[name_env] = QtWidgets.QLabel(name)
+        self.labels[name_env].setFixedWidth(150)
+
+        # Text
+        self.combos[name_env] = FileSelectComboBox(self.window, name_env, default)
+
+        # Button explorer
+        self.buttons[name_env] = ExplorerButton(self, name_env, name, _format)
 
     @staticmethod
     def add_widget(widgets):
@@ -123,17 +98,3 @@ class ProcessTab(AbstractTab):
         widget = QtWidgets.QWidget()
         widget.setLayout(layout)
         return widget
-
-    def choose(self, name_env, name, _format):
-        """Method which call the native file dialog to choose file."""
-        if _format is None:
-            path = QtWidgets.QFileDialog.getExistingDirectory(self, self.tr("Open"))
-        else:
-            path, _ = QtWidgets.QFileDialog.getOpenFileName(
-                self,
-                self.tr("Open"),
-                filter=f"{name} {_format}" + f";;{self.tr('All files')} *" * CONST.READER.CAN_ADD_ALL_FILES,
-            )
-        if path:
-            self.texts[name_env].setText(path)
-            setattr(self.window, name_env, path)

@@ -5,7 +5,7 @@ import pandas as pd
 from pyndf.gui.items.factory import Items
 from pyndf.constants import CONST
 from pyndf.process.reader.abstract import AbstractReader
-from pyndf.process.record import RecordsManager
+from pyndf.process.data.records_manager import RecordsManager
 from pyndf.utils import Utils
 
 
@@ -27,10 +27,10 @@ class ExcelReader(AbstractReader):
             progress.set_maximum(len(dataframe.to_dict("records")))
 
         if manager is None:
-            manager = RecordsManager()
+            manager = RecordsManager(log_level=self.log_level)
 
         for record in dataframe.to_dict("records"):
-            keep_me = self.record_regex.match(str(record[CONST.FILE.YAML[CONST.TYPE.EXC]["libelle"]])) is not None
+            keep_me = self.record_regex.match(str(record.get(CONST.FILE.YAML[CONST.TYPE.EXC]["libelle"]))) is not None
 
             if analyse:
                 analyse(
@@ -43,12 +43,12 @@ class ExcelReader(AbstractReader):
                 )
                 continue
 
+            if progress is not None:
+                progress.send(msg=self.tr("Load EXCEL file"))
+
             if keep_me is False:
                 continue
 
             manager.add_excel_record(record)
-
-            if progress is not None:
-                progress.send(msg=self.tr("Load EXCEL file"))
 
         return manager

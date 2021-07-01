@@ -12,7 +12,7 @@ class CONST:
 
     TITLE_APP = "PYNDF"
     COMPANY = "APSIDE"
-    VERSION = "1.1"
+    VERSION = "1.2"
     OPTI = True
 
     class FILE:
@@ -60,7 +60,11 @@ class CONST:
         DB = "use_db"
         CACHE = "use_cache"
         USE_API = "use_api"
+        USE_MULTITHREAGING = "use_multithreading"
+        SAVE_TMP_FILE = "save_tmp_file"
+        OVERWRITE = "overwrite"
         AGENCE = "agence"
+        DEV_MODE = "dev_mode"
 
         # DB
         DB_CLIENT = "client"
@@ -86,6 +90,9 @@ class CONST:
             MAN = os.path.join(DIR, r"data\icons\manual.png")
             RIGHT = os.path.join(DIR, r"data\icons\right.png")
             LEFT = os.path.join(DIR, r"data\icons\left.png")
+            PLUS = os.path.join(DIR, r"data\icons\plus.png")
+            RED = os.path.join(DIR, r"data\icons\button-red.png")
+            GREEN = os.path.join(DIR, r"data\icons\button-green.png")
 
         BUTTONSTYLE = """  QPushButton {
                 background-color: #79bbff;
@@ -112,7 +119,7 @@ class CONST:
         DB = ["client", "employee", "measure"]
 
     class MENU:
-        API_ACTIONS = ["use_cache", "use_api"]
+        API_ACTIONS = ["use_cache", "use_api", "use_multithreading", "overwrite", "save_tmp_file"]
 
     class READER:
         """All constants links to reader."""
@@ -188,6 +195,12 @@ class CONST:
                 if self:
                     return "#008000"
                 return "#A12312"
+
+            @property
+            def icon(self):
+                if self:
+                    return CONST.UI.ICONS.GREEN
+                return CONST.UI.ICONS.RED
 
         OK = Status("OK", True)
         API = Status("API", True)

@@ -11,12 +11,18 @@ class AbstractSmartTable(AbstractTable):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        self.writer = Writer(self.type, directory=self.tab.window.app.temp_dir, log_level=self.tab.window.log_level)
+        self.filename = None
 
         self.itemChanged.connect(self.on_item_changed)
 
     def on_item_changed(self, *args):
+        if self.tab.window.save_tmp_file:
+            directory = None
+        else:
+            directory = self.tab.window.app.temp_dir
+
+        writer = Writer(self.type, directory=directory, log_level=self.tab.window.log_level)
+
         # table to dataframe
         data = defaultdict(list)
         for row in range(self.rowCount()):
@@ -26,17 +32,25 @@ class AbstractSmartTable(AbstractTable):
                 value = self.set_type(value, header)
                 data[header].append(value)
 
-        (filename, status), time_spend = self.writer.write(data, getattr(self.tab.window, self.type))
+        (filename, status), time_spend = writer.write(data, self.filename)
         self.tab.window.set_path(self.type, filename)
 
     def set_type(self, value, *args):
         return Utils.type(value)
 
-    def init(self, clear=False):
+    def init(self, filename=None, clear=False, **kwargs):
+        if filename is not None:
+            self.filename = filename
         self.blockSignals(True)
-        if clear:
-            super().init()
+        super().init(clear=clear)
 
     def finished(self, *args):
         self.blockSignals(False)
         super().finished(*args)
+
+    def add(self, obj):
+        if self.columnCount() != obj.counter:
+            self.set_horizontal_headers(obj.headers)
+            self.custom_item.headers = obj.headers
+
+        return super().add(obj)

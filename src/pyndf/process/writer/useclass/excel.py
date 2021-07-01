@@ -9,7 +9,8 @@ class ExcelWriter(AbstractWriter):
     """Class for writing excel file."""
 
     ext = CONST.EXT.EXC
-    engine = "xlsxwriter"
+    engines = ["openpyxl", "xlwt", "xlsxwriter", "odf"]
+    engine = engines[2]
 
     def _write(self, data, filename=None):
         df = pd.DataFrame(data)
