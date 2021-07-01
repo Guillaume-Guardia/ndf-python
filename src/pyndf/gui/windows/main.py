@@ -26,9 +26,9 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             setattr(self, name, set())
             if value:
                 try:
-                    getattr(self, name).add(excel)
+                    getattr(self, name).add(value)
                 except TypeError:
-                    getattr(self, name).update(excel)
+                    getattr(self, name).update(value)
 
         # Reader parameters
         self.save_tmp_file = True
