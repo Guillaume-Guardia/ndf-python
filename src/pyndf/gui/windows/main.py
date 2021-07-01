@@ -22,17 +22,13 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.app = app
 
         # Selection files + directory
-        self.excel = set()
-        if excel:
-            self.excel.add(excel)
-
-        self.csv = set()
-        if csv:
-            self.csv.add(csv)
-
-        self.output = set()
-        if output:
-            self.output.add(output)
+        for name, value in (("excel", excel), ("csv", csv), ("output", output)):
+            setattr(self, name, set())
+            if value:
+                try:
+                    getattr(self, name).add(excel)
+                except TypeError:
+                    getattr(self, name).update(excel)
 
         # Reader parameters
         self.save_tmp_file = True
