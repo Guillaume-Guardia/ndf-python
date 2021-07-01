@@ -16,12 +16,13 @@ class TestUI(unittest.TestCase):
         pass
 
     def test_app(self):
-        app = QtWidgets.QApplication([])
+        pass
+        # app = QtWidgets.QApplication([])
 
-        window = QtWidgets.QMainWindow()
-        window.show()
+        # window = QtWidgets.QMainWindow()
+        # window.show()
 
-        sys.exit(app.exec())
+        # sys.exit(app.exec())
 
     def tearDown(self):
         pass
@@ -32,11 +33,4 @@ class TestUI(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # unittest.main()
-
-    app = QtWidgets.QApplication([])
-
-    window = QtWidgets.QMainWindow()
-    window.show()
-
-    sys.exit(app.exec())
+    unittest.main()

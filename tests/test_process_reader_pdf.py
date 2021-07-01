@@ -58,7 +58,9 @@ class TestPdfReader(unittest.TestCase):
         # The reader create a png file
         png_paths, status = Reader(self.filename, temp_dir=self.directory, ratio=3)
 
-        self.assertEqual(self.filename.replace(CONST.EXT.PDF, CONST.EXT.PNG), png_paths[0])
+        path = self.filename.replace(CONST.EXT.PDF, CONST.EXT.PNG)
+        path = Utils.insert(path, path.index("."), "-pyndf")
+        self.assertEqual(path, png_paths[0])
 
     def tearDown(self):
         os.remove(self.filename)
