@@ -2,13 +2,13 @@
 
 ## Contenu de cet article
 
-**[Installation](installation)**  
-**[Lancement de l'application](lancement_app)**  
-**[Lancement de l'algorithme](lancement_algo)**  
-**[Visualisation des résultats](resultats)**  
-**[Bonus](bonus)**  
+**[Installation](#installation)**  
+**[Lancement de l'application](#lancement_app)**  
+**[Lancement de l'algorithme](#lancement_algo)**  
+**[Visualisation des résultats](#resultats)**  
+**[Bonus](#bonus)**
 
-## Installation <a id="installation"></a>
+## Installation <a id="#installation"></a>
 
 1. [Télécharger python version 3.9.1](https://www.python.org/downloads/release/python-391/). Pour vérifier:
     <!-- ![Vérification de l'installation de python](data/images/check_python.png) -->
@@ -38,7 +38,7 @@
 9. Créer un raccourci du fichier ndf.exe
     <!-- ![Création d'un environnement virtuel](data/images/create_shortcut.png) -->
 
-## Lancement de l'application <a id="lancement_app"></a>
+## Lancement de l'application <a id="#lancement_app"></a>
 
 Il existe manière de démarrer l'application:
 * Par la ligne de commande *"py src/pyndf/main.py [-h] [--log {NOTSET, DEBUG, INFO, WARN, ERROR, CRITICAL}] [-e EXCEL] [-c CSV] [-o OUTPUT] [-l LANGUAGE]"* à la racine du dépôt git. Il faut s'assurer d'avoir activer l'environnement virtuel avant d'exécuter la commande. Pour activer l'environnement virtuel, il suffit de lancer la commande *"workon ndfurssaf"*. Pour se rendre à la racine du dépôt git, taper la commande *"cdvirtualenv & cd ndf-python"*.
@@ -57,7 +57,7 @@ L'ensemble des façons va ouvrir la fenêtre de l'application prête à être ut
 
   <!-- ![Création d'un environnement virtuel](data/images/patron.png) -->
 
-## Lancement de l'algorithme <a id="lancement_algo"></a>
+## Lancement de l'algorithme <a id="#lancement_algo"></a>
 
 Pour lancer l'algorithme depuis l'interface utilisateur graphique, il suffit de cliquer sur le bouton destiné à générer les fichiers PDF au centre de l'onglet processus. Il faut, bien entendu avoir préalablement renseigné les différents paramètres qui sont:
 * le fichier EXCEL (fichier avec l'extension correspondant à une des expressions régulières  \*.xl\* et \*. XLS)
@@ -84,7 +84,7 @@ Cette partie va récupérer la distance que parcoure l'intervenant en allant au 
 
 Pour chaque matricule renseigné dans les fichiers CSV et EXCEL, le programme créera une note de frais avec toutes les informations disponibles récupérées précedemment. En l'occurence, pour le fichier EXCEL, toutes les missions effectuées par l'intervenant au cours du mois. L'algorithme calcule automatiquement la distance parcourue par mois. Pour les données recueillis dans le fichier CSV, un simple report de toutes les indemnités non nulles. Les fichiers PDF sont disponibles dans le répertoire de sauvegarde indiqué par l'utilisateur. 
 
-## Visualisation des résultats <a id="resultats"></a>
+## Visualisation des résultats <a id="#resultats"></a>
 
 Pour vérifier les résultats de l'algorithme, on peut se rendre dans l'onglet *Analyse Globale*. Pour chaque étape, un statut est indiqué :
 * une pastille verte si tout s'est passé comme prévu
@@ -101,7 +101,7 @@ On peut vérifier toutes les requêtes de distance dans l'onglet *Analyse de l'A
 En se rendant dans l'onglet *Analyse des fichiers PDF*, un simple coup d'oeil permet de vérifier pour un matricule donné, le fichier PDF (accessible via le bouton prévu à cet effet), le nombre de missions (nombre de lignes sélectionnées dans le fichier EXCEL + la ligne pour l'agence d'origine si pas déjà existante), le nombre d'indemnités (nombre d'indemnités non nulles trouvées dans le fichier CSV) et le status (rouge ou vert).
 Si le statut est illustré par une pastille rouge, un bouton de regénération individuel apparait dans la dernière colonne. Cela va relancer l'algorithme pour ce matricule.
 
-## Bonus
+## Bonus <a id="#bonus"></a>
 
 Il existe un plus grand panel de fonctionalités liés au développement de l'application. Celles-ci sont "cachées" et peuvent être activé avec le l'option *mode developpeur*.
 On peut facilement activer/desactiver les fonctionalités suivantes:

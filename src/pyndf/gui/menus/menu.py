@@ -161,4 +161,4 @@ class MainMenu(QtWidgets.QMenuBar):
     def open_manual(self):
         """Read the ReadMe file in package"""
         dialog = ManualDialog(self.window)
-        dialog.exec()
+        dialog.show()

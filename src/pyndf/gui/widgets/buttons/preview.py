@@ -24,7 +24,7 @@ class PreviewButton(QtWidgets.QPushButton):
 
     def on_filename_press(self, *args):
         dialog = PreviewDialog(self.parent, *args)
-        dialog.exec()
+        dialog.show()
 
     def update_mode(self, dev_mode):
         pass
