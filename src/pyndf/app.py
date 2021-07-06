@@ -9,7 +9,7 @@ from pyndf.gui.windows.main import MainWindow
 
 
 class App(QtWidgets.QApplication):
-    def __init__(self, language="fr"):
+    def __init__(self, language="fr", use_gui=True):
         super().__init__([])
 
         self.temp_dir = tempfile.mkdtemp()
@@ -19,8 +19,10 @@ class App(QtWidgets.QApplication):
 
         self.language = language or App.get_language_mem()
         self.translator = None
-        self.language_available = App.get_available_language()
-        self.resolution = self.primaryScreen().availableSize()
+
+        if use_gui:
+            self.language_available = App.get_available_language()
+            self.resolution = self.primaryScreen().availableSize()
 
     @property
     def window(self):

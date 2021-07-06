@@ -41,13 +41,12 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
     class Flags:
         cancel = False
 
-    def __init__(self, parent, excel_file, csv_file, output_directory, matricule):
-        super().__init__(log_level=parent.log_level)
+    def __init__(self, parent, excel_file, csv_file, output_directory, matricule=None):
+        super().__init__(log_level=getattr(parent, "log_level", None))
         self.parent = parent
         self.excel_file = excel_file
         self.csv_file = csv_file
         self.output_directory = output_directory
-        self.color = parent.color
 
         # Distance parameters
         self.use_db = parent.use_db
@@ -55,6 +54,7 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
         self.use_api = parent.use_api
 
         # Pdf parameters
+        self.color = parent.color
         self.overwrite = parent.overwrite
         self.use_multithreading = parent.use_multithreading
 
@@ -76,6 +76,7 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
             log_level=self.log_level,
             manager=self.records_manager,
         )
+        self.log.info(f"Load EXCEL file: {status}")
         return status
 
     @log_time
@@ -91,6 +92,7 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
             log_level=self.log_level,
             manager=self.records_manager,
         )
+        self.log.info(f"Load CSV file: {status}")
         return status
 
     @log_time
@@ -135,8 +137,9 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
                 )
 
             self.progress.send(msg=self.tr("Get distance from Google API/DB/cache"))
-
-        return Utils.getattr(CONST.STATUS, total_status)
+        status = Utils.getattr(CONST.STATUS, total_status)
+        self.log.info(f"Get distance from Google API/DB/Cache: {status}")
+        return status
 
     @log_time
     def create_pdf(self):
@@ -191,8 +194,9 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
 
             for process in self.parent.processes:
                 process.wait()
-
-        return Utils.getattr(CONST.STATUS, total_status)
+        status = Utils.getattr(CONST.STATUS, total_status)
+        self.log.info(f"Generate PDF files: {status}")
+        return status
 
     @QtCore.pyqtSlot()
     def run(self):

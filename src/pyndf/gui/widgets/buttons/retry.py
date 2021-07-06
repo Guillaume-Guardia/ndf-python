@@ -17,10 +17,7 @@ class RetryButton(QtWidgets.QPushButton):
         self.setStyleSheet(CONST.UI.BUTTONSTYLE)
 
         # Signal
-        self.pressed.connect(lambda: self.retry_process(matricule))
-
-    def retry_process(self, matricule):
-        self.parent.tab.window.generate(matricule)
+        self.pressed.connect(lambda: self.parent.tab.window.generate(matricule=matricule))
 
     def update_mode(self, dev_mode):
         pass

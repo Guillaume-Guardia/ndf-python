@@ -125,7 +125,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         status_bar.hide()
         self.setStatusBar(status_bar)
 
-    def generate(self, matricule=None):
+    def generate(self, **kwargs):
         """Method triggered with the button to start the generation of pdf. In process tab"""
         parameters = [t.currentText() for t in self.tabs[CONST.TYPE.PRO].combos.values()]
         if not all(parameters):
@@ -135,9 +135,9 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
 
         self.tabs[CONST.TYPE.PRO].buttons[CONST.TYPE.PDF].setDisabled(True)
         for name in CONST.TAB.ANALYSE + CONST.TAB.READER:
-            self.tabs[name].table.init(matricule=matricule)
+            self.tabs[name].table.init(**kwargs)
 
-        self.process = NdfProcess(self, *parameters, matricule=matricule)
+        self.process = NdfProcess(self, *parameters, **kwargs)
         self.process.signals.error.connect(self.error)
         self.process.signals.finished.connect(self.generated)
         self.process.signals.progressed.connect(self.progressed)

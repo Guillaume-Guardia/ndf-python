@@ -138,10 +138,20 @@ class MainMenu(QtWidgets.QMenuBar):
     def create_help_menu(self):
         menu = QtWidgets.QMenu(self.tr("Help"), self)
         menu.setIcon(QtGui.QIcon(CONST.UI.ICONS.HEL))
-        action = QtGui.QAction(QtGui.QIcon(CONST.UI.ICONS.MAN), self.tr("Manual"), self)
-        action.setShortcut("F1")
-        action.triggered.connect(self.open_manual)
-        menu.addAction(action)
+
+        # Actions
+        self._actions["manuel"] = QtGui.QAction(QtGui.QIcon(CONST.UI.ICONS.MAN), self.tr("Manual"), self)
+        self._actions["manuel"].setShortcut("F1")
+        self._actions["manuel"].triggered.connect(self.open_manual)
+        menu.addAction(self._actions["manuel"])
+
+        self._actions["about_qt"] = QtGui.QAction(
+            QtGui.QIcon(self.style().standardIcon(self.style().StandardPixmap.SP_TitleBarMenuButton)),
+            self.tr("About Qt"),
+            self,
+        )
+        self._actions["about_qt"].triggered.connect(QtWidgets.QApplication.aboutQt)
+        menu.addAction(self._actions["about_qt"])
 
         return menu
 

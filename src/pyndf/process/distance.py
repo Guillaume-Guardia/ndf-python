@@ -27,8 +27,6 @@ class DistanceMatrixAPI(Logger):
             setattr(self, key, value)
         self.client = googlemaps.Client(self.key)
 
-        self.log.info("Get distance with API or DB or cache from Excel file")
-
     @log_time
     def run(self, client, employee, use_db=True, use_cache=True, use_api=True, analyse=None):
         """Start the process google matrix api.
