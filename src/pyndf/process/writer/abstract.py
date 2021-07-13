@@ -47,15 +47,15 @@ class AbstractWriter(Logger, QtCore.QObject):
             # Modify or Add directory to filename
             path = os.path.join(directory, os.path.basename(path))
 
+        if ext is not None and ext.startswith("."):
+            # Add extension of filename
+            path = path.split(".")[0] + ext
+
         if page is not None:
             path = Utils.insert(path, path.index("."), f"_page-{page}")
 
         if self.suffixe is not None and self.suffixe not in path:
             path = Utils.insert(path, path.index("."), self.suffixe)
-
-        if ext is not None and ext.startswith("."):
-            # Add extension of filename
-            path = path.split(".")[0] + ext
 
         # Check if the file exists
         force = force or self.overwrite
