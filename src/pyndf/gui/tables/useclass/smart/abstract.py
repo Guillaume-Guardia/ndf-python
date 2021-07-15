@@ -28,7 +28,7 @@ class AbstractSmartTable(AbstractTable):
         data = defaultdict(list)
         for row in range(self.rowCount()):
             for col in range(self.columnCount()):
-                header = self.custom_item.headers[col]
+                header = self.horizontalHeaderItem(col).text()
                 value = self.item(row, col).text()
                 value = self.set_type(value, header)
                 data[header].append(value)
@@ -42,6 +42,10 @@ class AbstractSmartTable(AbstractTable):
     def init(self, filename=None, clear=False, **kwargs):
         if filename is not None:
             self.filename = filename
+
+        if self.read_only:
+            # Clear for global excel table
+            clear = True
         self.blockSignals(True)
         super().init(clear=clear)
 

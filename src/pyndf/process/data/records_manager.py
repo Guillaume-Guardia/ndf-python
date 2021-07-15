@@ -47,8 +47,8 @@ class RecordsManager(Logger):
 
         def add_personal_info():
             # Agence
-            data["Agence"] = record.agence
-            data["Agence d'origine"] = record.agence_o
+            data["Agence"].append(record.agence)
+            data["Agence d'origine"].append(record.agence_o)
 
             # Personnal data in record
             for col in CONST.WRITER.PDF.COL_PERSO:

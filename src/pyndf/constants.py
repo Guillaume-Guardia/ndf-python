@@ -116,7 +116,7 @@ class CONST:
         """All tabs name"""
 
         READER = ["csv", "excel"]
-        ANALYSE = ["all", "api", "pdf"]
+        ANALYSE = ["all", "api", "pdf", "global_excel"]
         DB = ["client", "employee", "measure"]
 
     class MENU:

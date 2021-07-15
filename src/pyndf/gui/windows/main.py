@@ -118,6 +118,12 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.controller_tab.insertTab(0, self.tabs[CONST.TYPE.PRO], title)
         self.controller_tab.setCurrentIndex(0)
 
+        # Analyse Global excel
+        title = self.tr("Global analyse EXCEL file")
+        self.tabs[CONST.TYPE.GLO_EXC] = AnalyseTab(self, title, Items(CONST.TYPE.EXC), read_only=True)
+        index = self.controller_tab.addTab(self.tabs[CONST.TYPE.GLO_EXC], title)
+        self.controller_tab.setTabVisible(index, False)
+
     def _create_status_bar(self):
         status_bar = QtWidgets.QStatusBar()
         status_bar.addPermanentWidget(self.control_buttons)
@@ -173,14 +179,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         if self.moving_tab and self.controller_tab.currentWidget != self.tabs[obj.type]:
             self.controller_tab.setCurrentWidget(self.tabs[obj.type])
 
-        if obj.type == CONST.TYPE.EXC and CONST.TYPE.GLO_EXC not in self.tabs:
-            self.tabs[CONST.TYPE.GLO_EXC] = AnalyseTab(self, obj.filename, Items(obj.type), read_only=True)
-            index = self.controller_tab.addTab(self.tabs[CONST.TYPE.GLO_EXC], self.tr("Global analyse EXCEL file"))
-
-        if obj.type == CONST.TYPE.EXC and CONST.TYPE.GLO_EXC in self.tabs:
-            self.tabs[CONST.TYPE.GLO_EXC].table.add(obj)
-        else:
-            self.tabs[obj.type].table.add(obj)
+        self.tabs[obj.type].table.add(obj)
 
     @QtCore.pyqtSlot(float, str)
     def progressed(self, value, text):

@@ -210,7 +210,7 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
         (filename, status), time_spend = writer.write(data, filename)
 
         # Add excel in app for analysed
-        Reader(filename, analyse=self.signals.analysed.emit, log_level=self.log_level)
+        Reader(filename, analyse=self.signals.analysed.emit, log_level=self.log_level, type=CONST.TYPE.GLO_EXC)
 
         self.log.info(f"Generate EXCEL file: {status}")
         return status
