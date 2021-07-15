@@ -13,6 +13,7 @@ class PreviewDialog(QtWidgets.QDialog):
         self.buttons = {}
         self.ratio = 3
         self.col = column
+        self.row = 0
 
         # Window parameter
         self.setWindowFlag(QtCore.Qt.WindowType.WindowMinMaxButtonsHint, True)
@@ -21,8 +22,22 @@ class PreviewDialog(QtWidgets.QDialog):
         self.setMinimumWidth(900)
         self.setMinimumHeight(700)
 
+        # Add layout to view
+        layout = QtWidgets.QVBoxLayout()
+
+        # Container for the png view
+        self.area = QtWidgets.QWidget()
+
+        # Control layout
+        self.control = self.create_control()
+
         # determine the row in table
         row = self.determine_row_in_table(button)
+
+        layout.addWidget(self.area)
+        layout.addLayout(self.control)
+        self.setLayout(layout)
+
         self.render(row)
 
     def determine_row_in_table(self, item):
@@ -32,39 +47,26 @@ class PreviewDialog(QtWidgets.QDialog):
             return items[0].row()
         return 0
 
-    def render(self, row):
-        if not (0 <= row < self.table.rowCount() - 1):
+    def render(self, predicate):
+        self.row += predicate
+        print(self.row)
+        if not (0 <= self.row < self.table.rowCount() - 1):
             return None
 
-        if self.layout():
-            layout = self.layout()
-            # Remove all child item
-
-            while layout.takeAt(0):
-                child = layout.takeAt(0)
-                if child:
-                    child.deleteLater()
-                del child
-        else:
-            layout = QtWidgets.QVBoxLayout()
-
-        # Layout view
-        png_paths = self.get_paths(row)
+        # Png view
+        png_paths = self.get_paths(self.row)
         if png_paths:
             area = self.create_area(png_paths)
-            layout.addWidget(area)
-
-        control = self.create_control()
-        layout.addLayout(control)
-        self.setLayout(layout)
+            self.layout().replaceWidget(self.area, area)
+            self.area.setParent(None)
+            self.area = None
+            self.area = area
 
     def get_paths(self, row):
-        self.row = row
         filename = self.table.cellWidget(row, self.col).path
         png_paths, status = Reader(
             filename, temp_dir=self.window.app.temp_dir, ratio=self.ratio, log_level=self.window.log_level
         )
-
         return png_paths
 
     def create_control(self):
@@ -72,12 +74,12 @@ class PreviewDialog(QtWidgets.QDialog):
 
         layout.addStretch()
         self.buttons["left"] = QtWidgets.QPushButton(QtGui.QIcon(CONST.UI.ICONS.LEFT), "")
-        self.buttons["left"].pressed.connect(lambda: self.render(self.row - 1))
+        self.buttons["left"].pressed.connect(lambda: self.render(-1))
         layout.addWidget(self.buttons["left"])
 
         layout.addStretch()
         self.buttons["right"] = QtWidgets.QPushButton(QtGui.QIcon(CONST.UI.ICONS.RIGHT), "")
-        self.buttons["right"].pressed.connect(lambda: self.render(self.row + 1))
+        self.buttons["right"].pressed.connect(lambda: self.render(1))
         layout.addWidget(self.buttons["right"])
 
         layout.addStretch()
