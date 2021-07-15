@@ -8,10 +8,10 @@ class Indemnite(Logger, Utils):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.total = 0
-        self.quantite_payee = 0
+        self.taux = 0
 
     @property
     def plafond(self):
-        if self.quantite_payee > 0:
-            return round(self.total / self.quantite_payee, 2)
+        if self.taux > 0:
+            return round(self.total / self.taux, 2)
         return 0

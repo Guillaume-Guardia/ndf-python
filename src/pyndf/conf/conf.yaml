@@ -28,7 +28,7 @@ excel:
   r: r
   famille_frais: "Famille\nFrais"
   libelle: Libellé
-  quantite_payee: "Quantité\nPayée"
+  taux: "Quantité\nPayée"
   prix_unitaire: "Prix\nUnitaire"
   total: Total
   tva_recuperer: "TVA\nRécupérer"
@@ -52,12 +52,12 @@ csv:
 
 # PDF libellé
 pdf:
-  nom_intervenant: "Nom Prénom:"
-  matricule: "Matricule:"
-  adresse_intervenant: "Adresse:"
+  nom_intervenant: "Nom Prénom"
+  matricule: "Matricule"
+  adresse_intervenant: "Adresse"
   client: "Nom du client"
-  periode: "Période"
-  addresse_client: "Adresse de réalisation"
+  periode_production: "Période"
+  adresse_client: "Adresse de réalisation"
   nbr_km_mois: "Nb de Km par mois"
   taux: "Taux"
   plafond: "Plafond APSIDE"

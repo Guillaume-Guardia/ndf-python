@@ -47,8 +47,8 @@ class TestCsvReader(unittest.TestCase):
                 if Record.regexes["total"].match(header):
                     indice = Record.regexes["total"].match(header).groupdict()["indice"].strip()
                     value = f"{int(indice)}"
-                elif Record.regexes["quantite_payee"].match(header):
-                    indice = Record.regexes["quantite_payee"].match(header).groupdict()["indice"].strip()
+                elif Record.regexes["taux"].match(header):
+                    indice = Record.regexes["taux"].match(header).groupdict()["indice"].strip()
                     value = f"{int(indice) / 1000}"
                 elif header == self.headers["matricule"]:
                     value = matricule
@@ -84,7 +84,7 @@ class TestCsvReader(unittest.TestCase):
         for record in manager_records:
             for indice, indemnite in record.indemnites.items():
                 self.assertEqual(indemnite.total, int(indice))
-                self.assertEqual(indemnite.quantite_payee, int(indice) / 1000)
+                self.assertEqual(indemnite.taux, int(indice) / 1000)
 
     def tearDown(self):
         os.remove(self.filename)
