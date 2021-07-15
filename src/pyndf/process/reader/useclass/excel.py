@@ -39,6 +39,7 @@ class ExcelReader(AbstractReader):
                         *list([Utils.type(r) for r in record.values()]),
                         columns=dataframe.columns,
                         colored=keep_me,
+                        filename=filename,
                     )
                 )
                 continue

@@ -172,7 +172,15 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.menuWidget()._actions[obj.type].setChecked(True)
         if self.moving_tab and self.controller_tab.currentWidget != self.tabs[obj.type]:
             self.controller_tab.setCurrentWidget(self.tabs[obj.type])
-        self.tabs[obj.type].table.add(obj)
+
+        if obj.type == CONST.TYPE.EXC and CONST.TYPE.GLO_EXC not in self.tabs:
+            self.tabs[CONST.TYPE.GLO_EXC] = AnalyseTab(self, obj.filename, Items(obj.type), read_only=True)
+            index = self.controller_tab.addTab(self.tabs[CONST.TYPE.GLO_EXC], self.tr("Global analyse EXCEL file"))
+
+        if obj.type == CONST.TYPE.EXC and CONST.TYPE.GLO_EXC in self.tabs:
+            self.tabs[CONST.TYPE.GLO_EXC].table.add(obj)
+        else:
+            self.tabs[obj.type].table.add(obj)
 
     @QtCore.pyqtSlot(float, str)
     def progressed(self, value, text):

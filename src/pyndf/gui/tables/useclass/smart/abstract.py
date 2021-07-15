@@ -9,11 +9,12 @@ from pyndf.utils import Utils
 class AbstractSmartTable(AbstractTable):
     type = None
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, read_only=False, **kwargs):
+        super().__init__(*args, read_only=read_only, **kwargs)
         self.filename = None
 
-        self.itemChanged.connect(self.on_item_changed)
+        if not read_only:
+            self.itemChanged.connect(self.on_item_changed)
 
     def on_item_changed(self, *args):
         if self.tab.window.save_tmp_file:

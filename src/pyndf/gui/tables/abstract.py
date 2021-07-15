@@ -7,8 +7,9 @@ from pyndf.qtlib import QtWidgets, QtCore
 class AbstractTable(QtWidgets.QTableWidget):
     sort_order = {True: QtCore.Qt.SortOrder.AscendingOrder, False: QtCore.Qt.SortOrder.DescendingOrder}
 
-    def __init__(self, tab, item):
+    def __init__(self, tab, item, read_only=True):
         super().__init__(tab)
+        self.read_only = read_only
         self.tab = tab
         self.custom_item = item
         self.set_horizontal_headers()
@@ -76,6 +77,8 @@ class AbstractTable(QtWidgets.QTableWidget):
             try:
                 widget.update_mode(dev_mode)
                 self.setItem(row, column, widget)
+                if self.read_only:
+                    widget.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
             except TypeError:
                 self.setCellWidget(row, column, widget)
         return widget

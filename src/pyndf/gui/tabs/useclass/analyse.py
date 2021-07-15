@@ -6,11 +6,11 @@ from pyndf.gui.tables.factory import Table
 
 
 class AnalyseTab(AbstractTab):
-    def __init__(self, window, title, item):
+    def __init__(self, window, title, item, **kwargs):
         super().__init__(window, title)
 
         # Create table
-        self.table = Table(item.type, self, item)
+        self.table = Table(item.type, self, item, **kwargs)
 
         # Add table
         layout = QtWidgets.QHBoxLayout()

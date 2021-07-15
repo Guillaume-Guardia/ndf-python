@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+
+from collections import defaultdict
 from pyndf.constants import CONST
 from pyndf.logbook import Logger
 from pyndf.utils import Utils
@@ -39,3 +41,31 @@ class RecordsManager(Logger):
 
     def __len__(self):
         return sum([int(len(record) > 0) for record in self._records.values()])
+
+    def export(self):
+        data = defaultdict(list)
+
+        def add_personal_info():
+            # Agence
+            data["Agence"] = record.agence
+            data["Agence d'origine"] = record.agence_o
+
+            # Personnal data in record
+            for col in CONST.WRITER.PDF.COL_PERSO:
+                data[CONST.FILE.YAML[CONST.TYPE.PDF][col]].append(getattr(record, col))
+
+        for record in self._records.values():
+            # Missions
+            for mission in record.missions:
+                add_personal_info()
+                # List of dictionnary
+                for name in CONST.WRITER.PDF.COL_MISSION:
+                    data[CONST.FILE.YAML[CONST.TYPE.PDF][name]].append(getattr(mission, name))
+
+            for indemnite in record.indemnites.values():
+                add_personal_info()
+                # Dictionnary of dictionnary
+                for name in CONST.WRITER.PDF.COL_MISSION:
+                    data[CONST.FILE.YAML[CONST.TYPE.PDF][name]].append(getattr(indemnite, name))
+
+        return data

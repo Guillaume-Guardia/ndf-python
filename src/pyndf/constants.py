@@ -48,6 +48,7 @@ class CONST:
         # RW
         CSV = "csv"
         EXC = "excel"
+        GLO_EXC = "global_excel"
         PNG = "png"
 
         # Process
