@@ -80,6 +80,9 @@ class AbstractTable(QtWidgets.QTableWidget):
                 if self.read_only:
                     widget.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
             except TypeError:
+                if name == "filename":
+                    # Add item behind the button for the research in table
+                    self.setItem(row, column, QtWidgets.QTableWidgetItem(widget.path))
                 self.setCellWidget(row, column, widget)
         return widget
 

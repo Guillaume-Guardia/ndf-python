@@ -6,22 +6,31 @@ from pyndf.constants import CONST
 
 
 class PreviewDialog(QtWidgets.QDialog):
-    def __init__(self, table, row, col):
-        super().__init__(table.tab.window)
-        self.table = table
-        self.row = row
-        self.window = table.tab.window
+    def __init__(self, button, column):
+        self.table = button.parent
+        self.window = self.table.tab.window
+        super().__init__(self.window)
         self.buttons = {}
-        self.col = col
         self.ratio = 3
+        self.col = column
 
+        # Window parameter
         self.setWindowFlag(QtCore.Qt.WindowType.WindowMinMaxButtonsHint, True)
         self.setWindowTitle(self.tr("PDF file viewer"))
         self.setSizeGripEnabled(True)
         self.setMinimumWidth(900)
         self.setMinimumHeight(700)
 
+        # determine the row in table
+        row = self.determine_row_in_table(button)
         self.render(row)
+
+    def determine_row_in_table(self, item):
+        items = self.table.findItems(item.path, QtCore.Qt.MatchFlag.MatchExactly)
+
+        if len(items) > 0:
+            return items[0].row()
+        return 0
 
     def render(self, row):
         if not (0 <= row < self.table.rowCount() - 1):
