@@ -40,6 +40,9 @@ class RecordsManager(Logger):
         return (r for r in self._records.values() if len(r) > 0)
 
     def __len__(self):
+        if self.matricule is not None:
+            # Take only the specific matricule
+            return 1
         return sum([int(len(record) > 0) for record in self._records.values()])
 
     def export(self):
