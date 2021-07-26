@@ -5,6 +5,74 @@ from pyndf.qtlib import QtWidgets, QtGui, QtCore
 from pyndf.constants import CONST
 
 
+class MyScrollArea(QtWidgets.QScrollArea):
+    def __init__(self, paths, ratio, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setCursor(QtCore.Qt.CursorShape.OpenHandCursor)
+        self.last_time_move_x = 0
+        self.last_time_move_y = 0
+        self.ratio = ratio
+
+        widget = QtWidgets.QWidget()
+        widget.setLayout(self.create_layout(paths))
+        self.setWidget(widget)
+        self.setWidgetResizable(True)
+
+    def wheelEvent(self, event):
+        if event.modifiers() & QtCore.Qt.KeyboardModifier.ControlModifier:
+            delta = event.angleDelta().y() / 360
+
+            if delta > 0 and self.ratio < 5 or delta < 0 and self.ratio > 0.5:
+                self.ratio += delta
+
+            self.set_widget()
+            return None
+
+        super().wheelEvent(event)
+
+    def create_layout(self, paths):
+        layout = QtWidgets.QHBoxLayout()
+        layout.addStretch()
+        for path in paths:
+            layout.addWidget(self.set_widget(path))
+        layout.addStretch()
+        return layout
+
+    def set_widget(self, path=None):
+        if path is not None:
+            self.widget = QtWidgets.QLabel()
+            self.pix = QtGui.QPixmap(path)
+        self.pix.setDevicePixelRatio(self.ratio)
+        self.widget.setPixmap(self.pix)
+        return self.widget
+
+    def mouseMoveEvent(self, event):
+        self.setCursor(QtCore.Qt.CursorShape.ClosedHandCursor)
+        # For x
+        if self.last_time_move_x == 0:
+            self.last_time_move_x = event.position().x()
+
+        distance = self.last_time_move_x - event.position().x()
+        self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() + distance)
+        self.last_time_move_x = event.position().x()
+
+        # for y
+        if self.last_time_move_y == 0:
+            self.last_time_move_y = event.position().y()
+
+        distance = self.last_time_move_y - event.position().y()
+        self.verticalScrollBar().setValue(self.verticalScrollBar().value() + distance)
+        self.last_time_move_y = event.position().y()
+
+        return super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        self.setCursor(QtCore.Qt.CursorShape.OpenHandCursor)
+        self.last_time_move_x = 0
+        self.last_time_move_y = 0
+        super().mouseReleaseEvent(event)
+
+
 class PreviewDialog(QtWidgets.QDialog):
     def __init__(self, button, column):
         self.table = button.parent
@@ -55,7 +123,7 @@ class PreviewDialog(QtWidgets.QDialog):
         # Png view
         png_paths = self.get_paths(self.row)
         if png_paths:
-            area = self.create_area(png_paths)
+            area = MyScrollArea(png_paths, self.ratio)
             self.layout().replaceWidget(self.area, area)
             self.area.setParent(None)
             self.area = None
@@ -83,33 +151,3 @@ class PreviewDialog(QtWidgets.QDialog):
 
         layout.addStretch()
         return layout
-
-    def create_area(self, paths):
-        scroll_area = QtWidgets.QScrollArea()
-        widget = QtWidgets.QWidget()
-        widget.setLayout(self.create_layout(paths))
-        scroll_area.setWidget(widget)
-        scroll_area.setWidgetResizable(True)
-        return scroll_area
-
-    def create_layout(self, paths):
-        layout = QtWidgets.QHBoxLayout()
-        layout.addStretch()
-        for path in paths:
-            layout.addWidget(self.set_widget(path))
-        layout.addStretch()
-        return layout
-
-    def set_widget(self, path=None):
-        if path is not None:
-            self.widget = QtWidgets.QLabel()
-            self.pix = QtGui.QPixmap(path)
-        self.pix.setDevicePixelRatio(self.ratio)
-        self.widget.setPixmap(self.pix)
-        return self.widget
-
-    def wheelEvent(self, event):
-        self.ratio += event.angleDelta().y() / 360
-
-        if event.modifiers() & QtCore.Qt.KeyboardModifier.ControlModifier:
-            self.set_widget()
