@@ -49,7 +49,6 @@ class PreviewDialog(QtWidgets.QDialog):
 
     def render(self, predicate):
         self.row += predicate
-        print(self.row)
         if not (0 <= self.row < self.table.rowCount() - 1):
             return None
 

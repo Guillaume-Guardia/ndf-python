@@ -57,7 +57,7 @@ class RecordsManager(Logger):
             for col in CONST.WRITER.PDF.COL_PERSO:
                 data[CONST.FILE.YAML[CONST.TYPE.PDF][col]].append(getattr(record, col))
 
-        for record in self._records.values():
+        for record in self:
             # Missions
             for mission in record.missions:
                 add_personal_info()
