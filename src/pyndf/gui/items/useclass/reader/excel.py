@@ -9,6 +9,11 @@ class ExcelItem(AbstractItem):
 
     type = CONST.TYPE.EXC
 
+    def __init__(self, *args, filename=None, **kwargs):
+        """Initialisation"""
+        super().__init__(*args, **kwargs)
+        self.filename = filename
+
     @classmethod
     def headers_pretty(cls):
         # headers

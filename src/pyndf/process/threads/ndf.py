@@ -198,6 +198,23 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
         self.log.info(f"Generate PDF files: {status}")
         return status
 
+    @log_time
+    def create_excel(self):
+        # Create filename
+        filename = "global"
+        data = self.records_manager.export()
+
+        # Create writer
+        writer = Writer(CONST.TYPE.EXC, directory=self.output_directory, log_level=self.log_level)
+
+        (filename, status), time_spend = writer.write(data, filename)
+
+        # Add excel in app for analysed
+        Reader(filename, analyse=self.signals.analysed.emit, log_level=self.log_level, type=CONST.TYPE.GLO_EXC)
+
+        self.log.info(f"Generate EXCEL file: {status}")
+        return status
+
     @QtCore.pyqtSlot()
     def run(self):
         """Run method"""
@@ -219,6 +236,10 @@ class NdfProcess(Logger, QtCore.QThread, QtCore.QObject):
             # Create PDF with data records and distance from the API
             status, time_spend = self.create_pdf()
             sender(Items(CONST.TYPE.ALL, self.tr("Generate PDF files"), status, time_spend))
+
+            # Create EXCEL File with all data records and distance from the API
+            status, time_spend = self.create_excel()
+            sender(Items(CONST.TYPE.ALL, self.tr("Generate EXCEL file"), status, time_spend))
 
         except CancelException:
             self.signals.cancelled.emit()

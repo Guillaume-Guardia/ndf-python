@@ -118,6 +118,12 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.controller_tab.insertTab(0, self.tabs[CONST.TYPE.PRO], title)
         self.controller_tab.setCurrentIndex(0)
 
+        # Analyse Global excel
+        title = self.tr("Global analyse EXCEL file")
+        self.tabs[CONST.TYPE.GLO_EXC] = AnalyseTab(self, title, Items(CONST.TYPE.EXC), read_only=True)
+        index = self.controller_tab.addTab(self.tabs[CONST.TYPE.GLO_EXC], title)
+        self.controller_tab.setTabVisible(index, False)
+
     def _create_status_bar(self):
         status_bar = QtWidgets.QStatusBar()
         status_bar.addPermanentWidget(self.control_buttons)
@@ -172,6 +178,7 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
         self.menuWidget()._actions[obj.type].setChecked(True)
         if self.moving_tab and self.controller_tab.currentWidget != self.tabs[obj.type]:
             self.controller_tab.setCurrentWidget(self.tabs[obj.type])
+
         self.tabs[obj.type].table.add(obj)
 
     @QtCore.pyqtSlot(float, str)

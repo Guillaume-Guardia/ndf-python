@@ -9,7 +9,7 @@ from pyndf.process.data.records.excel.mission import Indemnite, Mission
 class Record(Logger, Utils):
     regexes = {
         "total": re.compile(r".*(?P<montant>Montant.*)(?P<indice>\d{5})"),
-        "quantite_payee": re.compile(r".*(?P<quantite>Nombre.*)(?P<indice>\d{5})"),
+        "taux": re.compile(r".*(?P<quantite>Nombre.*)(?P<indice>\d{5})"),
     }
     csv_mapper = CONST.FILE.YAML[CONST.TYPE.CSV]
     excel_mapper = CONST.FILE.YAML[CONST.TYPE.EXC]
@@ -80,16 +80,19 @@ class Record(Logger, Utils):
 
     @property
     def nbr_km_mois(self):
-        nbr_km_mois = sum([mission.km for mission in self.missions])
-        quantite = self.quantite_payee_mois(somme=True)
+        nbr_km_mois = sum([mission.nbr_km_mois for mission in self.missions])
+        quantite = self.taux_mois_sum
         if quantite > 0 and nbr_km_mois / quantite > 100:
             return f"> {100 * quantite}"
         return round(nbr_km_mois, 2)
 
-    def quantite_payee_mois(self, somme=False):
-        if somme:
-            return round(sum([data.quantite_payee for data in self.indemnites.values()]), 2)
-        return "\n".join([str(indem.quantite_payee) for indem in self.indemnites.values()])
+    @property
+    def taux_mois_sum(self):
+        return round(sum([data.taux for data in self.indemnites.values()]), 2)
+
+    @property
+    def taux_mois(self):
+        return "\n".join([str(indem.taux) for indem in self.indemnites.values()])
 
     @property
     def total_mois(self):

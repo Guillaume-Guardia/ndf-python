@@ -85,7 +85,7 @@
 <context>
     <name>ExcelReader</name>
     <message>
-        <location filename="../../process/reader/useclass/excel.py" line="47"/>
+        <location filename="../../process/reader/useclass/excel.py" line="48"/>
         <source>Load EXCEL file</source>
         <translation>Chargement du fichier EXCEL</translation>
     </message>
@@ -181,7 +181,7 @@
         <translation>Sauvegarder les fichiers temporaires</translation>
     </message>
     <message>
-        <location filename="../../gui/menus/menu.py" line="150"/>
+        <location filename="../../gui/menus/menu.py" line="160"/>
         <location filename="../../gui/menus/menu.py" line="69"/>
         <source>Select PDF file color</source>
         <translation>Sélectionner la couleur du fichier PDF</translation>
@@ -227,9 +227,14 @@
         <translation>Aide</translation>
     </message>
     <message>
-        <location filename="../../gui/menus/menu.py" line="141"/>
+        <location filename="../../gui/menus/menu.py" line="143"/>
         <source>Manual</source>
         <translation>Manuel</translation>
+    </message>
+    <message>
+        <location filename="../../gui/menus/menu.py" line="150"/>
+        <source>About Qt</source>
+        <translation>A propos de Qt</translation>
     </message>
     <message>
         <source>Generate PDFs</source>
@@ -239,67 +244,72 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../gui/windows/main.py" line="104"/>
+        <location filename="../../gui/windows/main.py" line="100"/>
         <source>EXCEL</source>
         <translation>EXCEL</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="105"/>
+        <location filename="../../gui/windows/main.py" line="101"/>
         <source>CSV</source>
         <translation>CSV</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="106"/>
+        <location filename="../../gui/windows/main.py" line="102"/>
         <source>Global Analyse</source>
         <translation>Analyse Globale</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="107"/>
+        <location filename="../../gui/windows/main.py" line="103"/>
         <source>Google API Analyse</source>
         <translation>Analyse de l&apos;API Google</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="108"/>
+        <location filename="../../gui/windows/main.py" line="104"/>
         <source>PDF files Analyse</source>
         <translation>Analyse des fichiers PDF</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="109"/>
+        <location filename="../../gui/windows/main.py" line="105"/>
         <source>Database Client</source>
         <translation>Clients dans la DB</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="110"/>
+        <location filename="../../gui/windows/main.py" line="106"/>
         <source>Database Employee</source>
         <translation>Salariés dans la DB</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="111"/>
+        <location filename="../../gui/windows/main.py" line="107"/>
         <source>Database Measure</source>
         <translation>Mesures dans la DB</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="120"/>
+        <location filename="../../gui/windows/main.py" line="116"/>
         <source>Process</source>
         <translation>Processus</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="202"/>
+        <location filename="../../gui/windows/main.py" line="178"/>
+        <source>Global analyse EXCEL file</source>
+        <translation>Analyse du fichier EXCEL global</translation>
+    </message>
+    <message>
+        <location filename="../../gui/windows/main.py" line="206"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="210"/>
+        <location filename="../../gui/windows/main.py" line="214"/>
         <source>The PDF file with the matricule {} have been generated!</source>
         <translation>Le fichier avec le matricule {} a été généré !</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="212"/>
+        <location filename="../../gui/windows/main.py" line="216"/>
         <source>The PDF files have been generated!</source>
         <translation>Les fichiers PDF ont été générés!</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="213"/>
+        <location filename="../../gui/windows/main.py" line="217"/>
         <source>Finished</source>
         <translation>Terminé</translation>
     </message>
@@ -387,7 +397,7 @@
 <context>
     <name>ManualDialog</name>
     <message>
-        <location filename="../../gui/dialogs/manual.py" line="12"/>
+        <location filename="../../gui/dialogs/manual.py" line="11"/>
         <source>Manual</source>
         <translation>Manuel</translation>
     </message>
@@ -395,30 +405,35 @@
 <context>
     <name>NdfProcess</name>
     <message>
-        <location filename="../../process/threads/ndf.py" line="137"/>
+        <location filename="../../process/threads/ndf.py" line="139"/>
         <source>Get distance from Google API/DB/cache</source>
         <translation>Obtention de la distance depuis l&apos;API Google/DB/cache</translation>
     </message>
     <message>
-        <location filename="../../process/threads/ndf.py" line="217"/>
-        <location filename="../../process/threads/ndf.py" line="169"/>
+        <location filename="../../process/threads/ndf.py" line="238"/>
+        <location filename="../../process/threads/ndf.py" line="172"/>
         <source>Generate PDF files</source>
         <translation>Générer les fichiers PDF</translation>
     </message>
     <message>
-        <location filename="../../process/threads/ndf.py" line="205"/>
+        <location filename="../../process/threads/ndf.py" line="226"/>
         <source>Load EXCEL file</source>
         <translation>Chargement du fichier EXCEL</translation>
     </message>
     <message>
-        <location filename="../../process/threads/ndf.py" line="209"/>
+        <location filename="../../process/threads/ndf.py" line="230"/>
         <source>Load CSV file</source>
         <translation>Chargement du fichier CSV</translation>
     </message>
     <message>
-        <location filename="../../process/threads/ndf.py" line="213"/>
+        <location filename="../../process/threads/ndf.py" line="234"/>
         <source>Get distance from Google API/DB/Cache</source>
         <translation>Obtention de la distance depuis l&apos;API Google/DB/Cache</translation>
+    </message>
+    <message>
+        <location filename="../../process/threads/ndf.py" line="242"/>
+        <source>Generate EXCEL file</source>
+        <translation>Généreration du fichier EXCEL</translation>
     </message>
 </context>
 <context>

@@ -144,7 +144,7 @@ class PdfWriter(AbstractWriter, BaseDocTemplate):
                 ]
             )
 
-        data[1].append(record.quantite_payee_mois())
+        data[1].append(record.taux_mois)
         data[1].append(record.plafond_mois)
         data[1].append(record.total_mois)
 

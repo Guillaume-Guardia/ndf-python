@@ -13,8 +13,8 @@ class PdfTable(AnalyseTable):
 
     def add(self, obj):
         # Create push button for filename
-        row, column = self.rowCount(), self.custom_item.headers.index("filename")
-        obj.filename = PreviewButton(obj.filename, self, row, column)
+        column = self.custom_item.headers.index("filename")
+        obj.filename = PreviewButton(obj.filename, self, column)
         super().add(obj)
 
     def finished(self):

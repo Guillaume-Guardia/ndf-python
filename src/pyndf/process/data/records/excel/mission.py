@@ -10,7 +10,7 @@ class Mission(Indemnite):
         super().__init__(**kwargs)
         self.distance = 0
         self.duration = 0
-        self.km = 0
+        self.nbr_km_mois = 0
 
         for key in CONST.READER.EXC.COL_MISSION:
             setattr(self, key, record.get(parent.excel_mapper[key], 0))
@@ -21,4 +21,4 @@ class Mission(Indemnite):
             return
 
         self.distance, self.duration = result
-        self.km = round(self.quantite_payee * 2 * self.distance, 2)
+        self.nbr_km_mois = round(self.taux * 2 * self.distance, 2)

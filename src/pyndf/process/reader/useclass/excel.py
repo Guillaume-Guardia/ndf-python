@@ -16,7 +16,7 @@ class ExcelReader(AbstractReader):
     regex = re.compile(".*[.][xX][lL]*")
     record_regex = re.compile(".*DEPLACEMENT.*")
 
-    def read(self, filename=None, sheet_name=0, progress=None, analyse=None, manager=None):
+    def read(self, filename=None, sheet_name=0, progress=None, analyse=None, manager=None, type=None):
         if self.check_path(filename) is False:
             return
 
@@ -30,15 +30,20 @@ class ExcelReader(AbstractReader):
             manager = RecordsManager(log_level=self.log_level)
 
         for record in dataframe.to_dict("records"):
-            keep_me = self.record_regex.match(str(record.get(CONST.FILE.YAML[CONST.TYPE.EXC]["libelle"]))) is not None
+            keep_me = (
+                self.record_regex.match(str(record.get(CONST.FILE.YAML[CONST.TYPE.EXC]["libelle"]))) is not None
+                # For the global Excel -> colored the info from the csv.
+                or record.get(CONST.FILE.YAML[CONST.TYPE.PDF]["nbr_km_mois"]) == "Inconnu"
+            )
 
             if analyse:
                 analyse(
                     Items(
-                        self.type,
+                        type or self.type,
                         *list([Utils.type(r) for r in record.values()]),
                         columns=dataframe.columns,
                         colored=keep_me,
+                        filename=filename,
                     )
                 )
                 continue

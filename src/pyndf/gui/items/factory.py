@@ -2,6 +2,7 @@
 
 from pyndf.gui.items.useclass.analyse.all import AllItem
 from pyndf.gui.items.useclass.analyse.api import ApiItem
+from pyndf.gui.items.useclass.analyse.global_excel import GlobalExcelItem
 from pyndf.gui.items.useclass.analyse.pdf import PdfItem
 from pyndf.gui.items.useclass.analyse.total import TotalItem
 from pyndf.gui.items.useclass.reader.excel import ExcelItem
@@ -24,4 +25,5 @@ class Items(Factory):
         CONST.TYPE.DB_CLIENT: ClientItem,
         CONST.TYPE.DB_EMPLOYEE: EmployeeItem,
         CONST.TYPE.DB_MEASURE: MeasureItem,
+        CONST.TYPE.GLO_EXC: GlobalExcelItem,
     }

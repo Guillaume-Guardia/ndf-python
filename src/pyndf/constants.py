@@ -48,6 +48,7 @@ class CONST:
         # RW
         CSV = "csv"
         EXC = "excel"
+        GLO_EXC = "global_excel"
         PNG = "png"
 
         # Process
@@ -115,7 +116,7 @@ class CONST:
         """All tabs name"""
 
         READER = ["csv", "excel"]
-        ANALYSE = ["all", "api", "pdf"]
+        ANALYSE = ["all", "api", "pdf", "global_excel"]
         DB = ["client", "employee", "measure"]
 
     class MENU:
@@ -132,7 +133,7 @@ class CONST:
                 "periode_production",
                 "client",
                 "adresse_client",
-                "quantite_payee",
+                "taux",
                 "prix_unitaire",
                 "total",
             ]
@@ -141,7 +142,7 @@ class CONST:
             COL_PERSO = ["nom", "prenom", "matricule", "agence"]
             COL_MISSION = [
                 "periode_production",
-                "quantite_payee",
+                "taux",
                 "prix_unitaire",
                 "total",
             ]
@@ -236,6 +237,6 @@ class CONST:
             COLOR = "#99ccff"  # Blue
 
             COL_PERSO = ["nom_intervenant", "matricule", "adresse_intervenant"]
-            COL_MISSION = ["client", "periode", "addresse_client", "nbr_km_mois", "taux", "plafond", "total"]
+            COL_MISSION = ["client", "periode_production", "adresse_client", "nbr_km_mois", "taux", "plafond", "total"]
 
             UNKNOWN = "Inconnu"
