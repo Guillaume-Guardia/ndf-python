@@ -14,8 +14,10 @@ class Record(Logger, Utils):
     csv_mapper = CONST.FILE.YAML[CONST.TYPE.CSV]
     excel_mapper = CONST.FILE.YAML[CONST.TYPE.EXC]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Record Manager
+        self.parent = parent
         self.indemnites = {}
 
         # Initialize missions
@@ -106,3 +108,11 @@ class Record(Logger, Utils):
 
     def __len__(self):
         return len(self.missions) + len(self.indemnites)
+
+    @property
+    def default_mission(self):
+        return self.missions[0]
+
+    @property
+    def default_indemnite(self):
+        return Indemnite()

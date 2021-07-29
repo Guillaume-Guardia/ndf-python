@@ -20,7 +20,7 @@ class RecordsManager(Logger):
         # Check if not exist already
         if matricule not in self._records:
             # Create Excel record
-            self._records[matricule] = ExcelRecord(record, log_level=self.log_level)
+            self._records[matricule] = ExcelRecord(record, self, log_level=self.log_level)
         self._records[matricule].add_mission(record)
 
     def add_csv_record(self, record, columns):
@@ -29,7 +29,7 @@ class RecordsManager(Logger):
         # Check if not exist already
         if matricule not in self._records:
             # Create CSV record
-            self._records[matricule] = CsvRecord(record, log_level=self.log_level)
+            self._records[matricule] = CsvRecord(record, self, log_level=self.log_level)
         return self._records[matricule].add_indemnites(record, columns)
 
     def __iter__(self):
@@ -58,17 +58,34 @@ class RecordsManager(Logger):
                 data[CONST.FILE.YAML[CONST.TYPE.PDF][col]].append(getattr(record, col))
 
         for record in self:
+            # Check if number of missions is egual to number of indemnites.
+            while len(record.missions) < len(record.indemnites):
+                # Add default mission or add default indemnite
+                record.missions.append(record.default_mission)
+
+            while len(record.missions) > len(record.indemnites):
+                # Add default mission or add default indemnite
+                record.indemnites[f"default_{len(record.indemnites)}"] = record.default_indemnite
+
             # Missions
-            for mission in record.missions:
+            for mission, indemnite in zip(record.missions, record.indemnites.values()):
                 add_personal_info()
                 # List of dictionnary
-                for name in CONST.WRITER.PDF.COL_MISSION:
-                    data[CONST.FILE.YAML[CONST.TYPE.PDF][name]].append(getattr(mission, name))
+                for name in CONST.WRITER.PDF.COL_MISSION_EXCEL:
+                    attr = getattr(mission, name)
 
-            for indemnite in record.indemnites.values():
-                add_personal_info()
+                    if name == "periode_production":
+                        attr = getattr(self, name)
+                    elif name == "nbr_km_mois" and attr == 0:
+                        attr = ""
+
+                    data[CONST.FILE.YAML[CONST.TYPE.PDF][name]].append(attr)
+
                 # Dictionnary of dictionnary
-                for name in CONST.WRITER.PDF.COL_MISSION:
-                    data[CONST.FILE.YAML[CONST.TYPE.PDF][name]].append(getattr(indemnite, name))
+                for name in CONST.WRITER.PDF.COL_MISSION_CSV:
+                    attr = getattr(indemnite, name)
+                    if attr == 0:
+                        attr = ""
+                    data[CONST.FILE.YAML[CONST.TYPE.PDF][name]].append(attr)
 
         return data

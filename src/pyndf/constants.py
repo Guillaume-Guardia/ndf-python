@@ -238,5 +238,6 @@ class CONST:
 
             COL_PERSO = ["nom_intervenant", "matricule", "adresse_intervenant"]
             COL_MISSION = ["client", "periode_production", "adresse_client", "nbr_km_mois", "taux", "plafond", "total"]
-
+            COL_MISSION_EXCEL = COL_MISSION[:4]
+            COL_MISSION_CSV = COL_MISSION[4:]
             UNKNOWN = "Inconnu"
