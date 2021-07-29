@@ -227,7 +227,10 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
             self.restoreState(state)
 
         for name in CONST.MEMORY:
-            attr = yaml.load(settings.value(name), Loader=yaml.FullLoader)
+            setting = settings.value(name)
+            if setting is None:
+                continue
+            attr = yaml.load(setting, Loader=yaml.FullLoader)
             if attr is None:
                 continue
 
