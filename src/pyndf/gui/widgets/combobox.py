@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 from pyndf.qtlib import QtWidgets, QtGui, QtCore
 from pyndf.constants import CONST
 from pyndf.process.reader.factory import Reader
@@ -17,9 +18,29 @@ class FileSelectComboBox(QtWidgets.QComboBox):
         if name_env in CONST.TAB.READER:
             self.currentTextChanged.connect(self.add_data)
 
+        # Add existed security
+        self.activated.connect(self.check_path)
+
         self.view().pressed.connect(self.item_pressed)
 
         self.addItems(sorted(list(default)))
+
+    def remove_item(self, filename):
+        getattr(self.window, self.name_env).discard(filename)
+        self.removeItem(self.currentIndex())
+
+    def check_path(self, index=0):
+        path = self.currentText()
+        # Check if the path exists
+        if not os.path.exists(path):
+            QtWidgets.QMessageBox.information(
+                self,
+                self.tr("Path doesn't exist"),
+                self.tr("The path {} doesn't exist! Choose another one!").format(path),
+            )
+            self.remove_item(path)
+            return False
+        return True
 
     def add_data(self, filename):
         self.window.tabs[self.name_env].table.init(filename=filename, clear=True)
@@ -30,8 +51,7 @@ class FileSelectComboBox(QtWidgets.QComboBox):
                 self.tr("Cant read file"),
                 self.tr("No reader implemented to open the file {}! Choose another file!").format(filename),
             )
-            getattr(self.window, self.name_env).discard(filename)
-            self.removeItem(self.currentIndex())
+            self.remove_item(filename)
         self.window.tabs[self.name_env].table.finished(bool(status))
 
     def add_items(self, paths):

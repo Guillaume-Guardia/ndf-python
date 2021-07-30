@@ -134,8 +134,9 @@ class MainWindow(Logger, QtWidgets.QMainWindow):
     def generate(self, **kwargs):
         """Method triggered with the button to start the generation of pdf. In process tab"""
         parameters = [t.currentText() for t in self.tabs[CONST.TYPE.PRO].combos.values()]
-        if not all(parameters):
-            return None  # If one field is empty, ignore.
+        exists = [t.check_path() for t in self.tabs[CONST.TYPE.PRO].combos.values()]
+        if not all(parameters) or not all(exists):
+            return None  # If one field is empty, ignore or if one path doesn't exists.
 
         self.statusBar().show()
 

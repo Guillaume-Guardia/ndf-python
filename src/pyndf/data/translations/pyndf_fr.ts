@@ -85,7 +85,7 @@
 <context>
     <name>ExcelReader</name>
     <message>
-        <location filename="../../process/reader/useclass/excel.py" line="48"/>
+        <location filename="../../process/reader/useclass/excel.py" line="64"/>
         <source>Load EXCEL file</source>
         <translation>Chargement du fichier EXCEL</translation>
     </message>
@@ -120,12 +120,22 @@
 <context>
     <name>FileSelectComboBox</name>
     <message>
-        <location filename="../../gui/widgets/combobox.py" line="30"/>
+        <location filename="../../gui/widgets/combobox.py" line="38"/>
+        <source>Path doesn&apos;t exist</source>
+        <translation>Le chemin inscrit n&apos;existe pas</translation>
+    </message>
+    <message>
+        <location filename="../../gui/widgets/combobox.py" line="39"/>
+        <source>The path {} doesn&apos;t exist! Choose another one!</source>
+        <translation>Le chemin {} n&apos;existe pas! Sélectionnez-en un autre!</translation>
+    </message>
+    <message>
+        <location filename="../../gui/widgets/combobox.py" line="51"/>
         <source>Cant read file</source>
         <translation>Impossible de lire le fichier</translation>
     </message>
     <message>
-        <location filename="../../gui/widgets/combobox.py" line="31"/>
+        <location filename="../../gui/widgets/combobox.py" line="52"/>
         <source>No reader implemented to open the file {}! Choose another file!</source>
         <translation>Pas de lecteur implémenté pour le fichier {}! Choisissez un autre fichier!</translation>
     </message>
@@ -289,7 +299,7 @@
         <translation>Processus</translation>
     </message>
     <message>
-        <location filename="../../gui/windows/main.py" line="178"/>
+        <location filename="../../gui/windows/main.py" line="122"/>
         <source>Global analyse EXCEL file</source>
         <translation>Analyse du fichier EXCEL global</translation>
     </message>
@@ -509,7 +519,7 @@
 <context>
     <name>PreviewButton</name>
     <message>
-        <location filename="../../gui/widgets/buttons/preview.py" line="19"/>
+        <location filename="../../gui/widgets/buttons/preview.py" line="20"/>
         <source>Click to view the PDF file {}</source>
         <translation>Cliquer pour voir le fichier PDF {}</translation>
     </message>
@@ -517,7 +527,7 @@
 <context>
     <name>PreviewDialog</name>
     <message>
-        <location filename="../../gui/dialogs/preview.py" line="19"/>
+        <location filename="../../gui/dialogs/preview.py" line="88"/>
         <source>PDF file viewer</source>
         <translation>Visionneuse du fichier PDF</translation>
     </message>
