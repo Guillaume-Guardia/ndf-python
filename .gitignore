@@ -5,3 +5,5 @@
 src/pyndf/db/pydb.db
 
 data
+build
+dist

@@ -4,7 +4,7 @@ import os
 from dataclasses import dataclass
 import yaml
 
-DIR = os.path.dirname(__file__)
+DIR = os.path.join(os.path.dirname(__file__), "..", "..")
 
 
 class CONST:
