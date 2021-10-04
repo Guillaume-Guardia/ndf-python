@@ -51,7 +51,7 @@ def cmdline():
 
     args = parser.parse_args()
 
-    level = logging.DEBUG
+    level = logging.NOTSET
     if args.log:
         level = getattr(logging, args.log.upper())
 
@@ -60,11 +60,4 @@ def cmdline():
 
 
 if __name__ == "__main__":
-    print("coucou")
-    # from PyQt6 import QtWidgets
-    # print("ff")
-    # app = QtWidgets.QApplication([])
-    # window = QtWidgets.QMainWindow()
-    # window.show()
-    # sys.exit(app.exec())
     sys.exit(cmdline())

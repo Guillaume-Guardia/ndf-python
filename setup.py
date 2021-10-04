@@ -47,7 +47,7 @@ setup(
     description="Do NDF for Apside",
     long_description=open("README.md").read(),
     install_requires=required,
-    data_files=find_data_files("src/pyndf", "", ["conf/*", "data/*", "data/icons/*"]),
+    data_files=find_data_files("src/pyndf", "", ["conf/*", "data/*", "data/icons/*", "db/*.db"]),
     console=["src/pyndf/main.py"],
     options={
         "py2exe": {
@@ -62,7 +62,6 @@ setup(
                 "sqlalchemy.dialects.sqlite",
             ],
             "excludes": ["py"],
-            # "bundle_files": 2,
         }
     },
 )
