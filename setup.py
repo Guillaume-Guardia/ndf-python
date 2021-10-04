@@ -47,7 +47,9 @@ setup(
     description="Do NDF for Apside",
     long_description=open("README.md").read(),
     install_requires=required,
-    data_files=find_data_files("src/pyndf", "", ["conf/*", "data/*", "data/icons/*", "db/*.db"]),
+    data_files=find_data_files(
+        "src/pyndf", "", ["conf/*", "data/*", "data/icons/*", "data/translations/*", "db/*.db", "../../README.md"]
+    ),
     console=["src/pyndf/main.py"],
     options={
         "py2exe": {
