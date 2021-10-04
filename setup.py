@@ -50,7 +50,7 @@ setup(
     data_files=find_data_files(
         "src/pyndf", "", ["conf/*", "data/*", "data/icons/*", "data/translations/*", "db/*.db", "../../README.md"]
     ),
-    console=["src/pyndf/main.py"],
+    windows=[{"script": "src/pyndf/main.py", "icon_resources": [(1, "NDF_logo.ico")]}],
     options={
         "py2exe": {
             "includes": [
